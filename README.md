@@ -1,2 +1,12 @@
 # gsncore
-digital store core lib
+
+To install
+```
+npm install
+```
+
+To run
+```
+gulp
+gulp test
+```
