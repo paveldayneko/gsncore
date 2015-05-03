@@ -118,15 +118,7 @@ node_modules
 *.pubxml
 
 # ignoring folders
-circulars/
-clientuploads/
-products/
-recipes/
-bower_components/
-git_components/
-.idea/
-asset/roundy
-asset/common
-asset/silver
-asset/bronze
-asset/*.*
+build
+bower_components
+git_components
+.idea
