@@ -52,9 +52,7 @@
                 },
                 $reset: function (items) {
                   for (var k in $storage) {
-                    if ('$' !== k[0]) {
-                      $storage[k] = null;
-                    } 
+                    '$' === k[0] || delete $storage[k];
                   }
 
                   return $storage.$default(items);
@@ -78,7 +76,7 @@
                 angular.forEach($storage, function (v, k) {
                   angular.isDefined(v) && '$' !== k[0] && webStorage.setItem(storageKey + k, angular.toJson(v));
 
-                  currentStorage[k] = null;
+                  delete currentStorage[k];
                 });
 
                 for (var k in currentStorage) {
@@ -89,25 +87,24 @@
               }
             }, 100));
           });
-          
+
           // #6: Use `$window.addEventListener` instead of `angular.element` to avoid the jQuery-specific `event.originalEvent`
           'localStorage' === storageType && $window.addEventListener && $window.addEventListener('storage', function (event) {
             if (storageKey === event.key.slice(0, storageKey.length)) {
               // hack to support older safari (iPad1 or when browsing in private mode)
               // this assume that gsnStorage should never set anything to null.  Empty object yes, no null.
               if (typeof (event.newValue) === 'undefined') return;
-              
-              event.newValue ? $storage[event.key.slice(storageKey.length)] = angular.fromJson(event.newValue) : $storage[event.key.slice(storageKey.length)] = null;
+
+              event.newValue ? $storage[event.key.slice(storageKey.length)] = angular.fromJson(event.newValue) : delete $storage[event.key.slice(storageKey.length)];
 
               currentStorage = angular.copy($storage);
 
               $rootScope.$apply();
             }
-          }); 
+          });
 
           return $storage;
         }
     ];
   }
 })(angular);
-

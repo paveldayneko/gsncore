@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.14
  * gsncore repository
- * Build date: Mon May 04 2015 12:04:18 GMT-0500 (CDT)
+ * Build date: Mon May 04 2015 13:15:35 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -558,15 +558,16 @@
   angular.module('facebook', []);
 
   var serviceId = 'gsnApi';
-  angular.module('gsn.core', ['ngRoute', 'ngSanitize', 'facebook', 'angulartics'])
-  .config(['$analyticsProvider', function ($analyticsProvider) {
+  var mygsncore = angular.module('gsn.core', ['ngRoute', 'ngSanitize', 'facebook', 'angulartics']);
+  
+  mygsncore.config(['$analyticsProvider', function ($analyticsProvider) {
     $analyticsProvider.init = function () {
       // GA already supports buffered invocations so we don't need
       // to wrap these inside angulartics.waitForVendorApi
       if ($analyticsProvider.settings) {
         $analyticsProvider.settings.trackRelativePath = true;
       }
-      
+
       var firstTracker = (gsn.isNull(gsn.config.GoogleAnalyticAccountId1, '').length > 0);
       var secondTracker = (gsn.isNull(gsn.config.GoogleAnalyticAccountId2, '').length > 0);
 
@@ -586,11 +587,11 @@
         // enable demographic
         ga('require', 'displayfeatures');
       }
-                                         
+
       // GA already supports buffered invocations so we don't need
       // to wrap these inside angulartics.waitForVendorApi
 
-      $analyticsProvider.registerPageTrack(function (path) {   
+      $analyticsProvider.registerPageTrack(function (path) {
         // begin tracking
         if (window.ga) {
           ga('send', 'pageview', path);
@@ -599,12 +600,12 @@
             ga('trackerTwo.send', 'pageview', path);
           }
         }
-        
+
         // piwik tracking
         if (window._tk) {
           _tk.pageview()
         }
-        
+
         // quantcast tracking
         if (window._qevents) {
           _qevents.push({
@@ -646,13 +647,21 @@
             }
           }
         }
-        
+
         if (window._tk) {
           _tk.event(properties.category, action, properties.label, properties.value);
         }
       });
     };
-  }]).service(serviceId, ['$rootScope', '$window', '$timeout', '$q', '$http', '$location', '$localStorage', '$sce', gsnApi]);
+  }]);
+
+  mygsncore.run(['$rootScope', 'gsnGlobal', 'gsnApi', function ($rootScope, gsnGlobal, gsnApi) {
+      var siteMenu = gsnApi.getConfig().SiteMenu || '';
+      $rootScope.siteMenu = siteMenu.length > 10 ? JSON.parse(siteMenu) : [];
+      gsnGlobal.init(true);
+    }]);
+
+  mygsncore.service(serviceId, ['$rootScope', '$window', '$timeout', '$q', '$http', '$location', '$localStorage', '$sce', gsnApi]);
 
   function gsnApi($rootScope, $window, $timeout, $q, $http, $location, $localStorage, $sce) {
     var returnObj = { previousDefer: null };
@@ -10533,9 +10542,9 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 (function (angular, undefined) {
   'use strict';
 var serviceId = 'gsnGlobal';
-angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout', '$route', 'gsnApi', 'gsnProfile', 'gsnStore', '$rootScope', 'Facebook', '$analytics', 'gsnYoutech', gsnGlobal]);
+angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout', '$route', 'gsnApi', 'gsnProfile', 'gsnStore', '$rootScope', 'Facebook', '$analytics', 'gsnYoutech', 'gsnDfp', gsnGlobal]);
 
-  function gsnGlobal($window, $location, $timeout, $route, gsnApi, gsnProfile, gsnStore, $rootScope, Facebook, $analytics, gsnYoutech) {
+  function gsnGlobal($window, $location, $timeout, $route, gsnApi, gsnProfile, gsnStore, $rootScope, Facebook, $analytics, gsnYoutech, gsnDfp) {
     var returnObj = {
       init: init,
       hasInit: false
@@ -12736,9 +12745,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
                 },
                 $reset: function (items) {
                   for (var k in $storage) {
-                    if ('$' !== k[0]) {
-                      $storage[k] = null;
-                    } 
+                    '$' === k[0] || delete $storage[k];
                   }
 
                   return $storage.$default(items);
@@ -12762,7 +12769,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
                 angular.forEach($storage, function (v, k) {
                   angular.isDefined(v) && '$' !== k[0] && webStorage.setItem(storageKey + k, angular.toJson(v));
 
-                  currentStorage[k] = null;
+                  delete currentStorage[k];
                 });
 
                 for (var k in currentStorage) {
@@ -12773,29 +12780,27 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
               }
             }, 100));
           });
-          
+
           // #6: Use `$window.addEventListener` instead of `angular.element` to avoid the jQuery-specific `event.originalEvent`
           'localStorage' === storageType && $window.addEventListener && $window.addEventListener('storage', function (event) {
             if (storageKey === event.key.slice(0, storageKey.length)) {
               // hack to support older safari (iPad1 or when browsing in private mode)
               // this assume that gsnStorage should never set anything to null.  Empty object yes, no null.
               if (typeof (event.newValue) === 'undefined') return;
-              
-              event.newValue ? $storage[event.key.slice(storageKey.length)] = angular.fromJson(event.newValue) : $storage[event.key.slice(storageKey.length)] = null;
+
+              event.newValue ? $storage[event.key.slice(storageKey.length)] = angular.fromJson(event.newValue) : delete $storage[event.key.slice(storageKey.length)];
 
               currentStorage = angular.copy($storage);
 
               $rootScope.$apply();
             }
-          }); 
+          });
 
           return $storage;
         }
     ];
   }
 })(angular);
-
-
 (function (angular, undefined) {
   'use strict';
   var serviceId = 'gsnStore';

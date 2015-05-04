@@ -4,15 +4,16 @@
   angular.module('facebook', []);
 
   var serviceId = 'gsnApi';
-  angular.module('gsn.core', ['ngRoute', 'ngSanitize', 'facebook', 'angulartics'])
-  .config(['$analyticsProvider', function ($analyticsProvider) {
+  var mygsncore = angular.module('gsn.core', ['ngRoute', 'ngSanitize', 'facebook', 'angulartics']);
+  
+  mygsncore.config(['$analyticsProvider', function ($analyticsProvider) {
     $analyticsProvider.init = function () {
       // GA already supports buffered invocations so we don't need
       // to wrap these inside angulartics.waitForVendorApi
       if ($analyticsProvider.settings) {
         $analyticsProvider.settings.trackRelativePath = true;
       }
-      
+
       var firstTracker = (gsn.isNull(gsn.config.GoogleAnalyticAccountId1, '').length > 0);
       var secondTracker = (gsn.isNull(gsn.config.GoogleAnalyticAccountId2, '').length > 0);
 
@@ -32,11 +33,11 @@
         // enable demographic
         ga('require', 'displayfeatures');
       }
-                                         
+
       // GA already supports buffered invocations so we don't need
       // to wrap these inside angulartics.waitForVendorApi
 
-      $analyticsProvider.registerPageTrack(function (path) {   
+      $analyticsProvider.registerPageTrack(function (path) {
         // begin tracking
         if (window.ga) {
           ga('send', 'pageview', path);
@@ -45,12 +46,12 @@
             ga('trackerTwo.send', 'pageview', path);
           }
         }
-        
+
         // piwik tracking
         if (window._tk) {
           _tk.pageview()
         }
-        
+
         // quantcast tracking
         if (window._qevents) {
           _qevents.push({
@@ -92,13 +93,21 @@
             }
           }
         }
-        
+
         if (window._tk) {
           _tk.event(properties.category, action, properties.label, properties.value);
         }
       });
     };
-  }]).service(serviceId, ['$rootScope', '$window', '$timeout', '$q', '$http', '$location', '$localStorage', '$sce', gsnApi]);
+  }]);
+
+  mygsncore.run(['$rootScope', 'gsnGlobal', 'gsnApi', function ($rootScope, gsnGlobal, gsnApi) {
+      var siteMenu = gsnApi.getConfig().SiteMenu || '';
+      $rootScope.siteMenu = siteMenu.length > 10 ? JSON.parse(siteMenu) : [];
+      gsnGlobal.init(true);
+    }]);
+
+  mygsncore.service(serviceId, ['$rootScope', '$window', '$timeout', '$q', '$http', '$location', '$localStorage', '$sce', gsnApi]);
 
   function gsnApi($rootScope, $window, $timeout, $q, $http, $location, $localStorage, $sce) {
     var returnObj = { previousDefer: null };
