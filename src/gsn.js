@@ -1,12 +1,4 @@
-﻿/*!
- *  Project:        Utility
- *  Description:    Utility methods
- *  Author:         Tom Noogen
- *  License:        Grocery Shopping Network
- *  Version:        1.0.4
- *
- */
-; (function () {
+﻿; (function () {
   'use strict';
 
   // Baseline setup
@@ -91,9 +83,8 @@
     UseLocalStorage: false,
 
     // chain specific config
-    ContentBaseUrl: '/app',
-    // SiteTheme: null,
-    MaxResultCount: 50,
+    ContentBaseUrl: '/asset',
+
     ChainId: 0,
     ChainName: 'Grocery Shopping Network',
     DfpNetworkId: '/6394/digitalstore.test',
@@ -101,8 +92,6 @@
     GoogleAnalyticAccountId2: null,
     GoogleSiteVerificationId: null,
     RegistrationFromEmailAddress: 'tech@grocerywebsites.com',
-    EnableCircPlus: null,
-    EnableShopperWelcome: null,
     FacebookAppId: null,
     FacebookPermission: null,
     GoogleSiteSearchCode: null,
@@ -138,7 +127,7 @@
 
     // other browser
     return false;
-  }
+  };
 
   gsn.browser = {
     isIE: detectIe(),
@@ -400,7 +389,11 @@
     $sceProvider.enabled(!gsn.browser.isIE);
 
     $sceDelegateProvider.resourceUrlWhitelist(gsn.config.SceWhiteList || [
-      'self', 'http://localhost:3000/**', 'http://**.gsn.io/**', 'https://**.gsn2.com/**', 'http://*.gsngrocers.com/**', 'https://*.gsngrocers.com/**']);
+      'self', 
+      'http://**.gsn.io/**', 
+      'https://**.gsn2.com/**', 
+      'http://*.gsngrocers.com/**', 
+      'https://*.gsngrocers.com/**']);
 
 
     //gets rid of the /#/ in the url and allows things like 'bootstrap collapse' to function

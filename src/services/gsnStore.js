@@ -203,7 +203,7 @@
     };
 
     returnObj.getTopRecipes = function () {
-      var url = gsnApi.getStoreUrl() + '/TopRecipes/' + gsnApi.getChainId() + '/' + gsnApi.getMaxResultCount();
+      var url = gsnApi.getStoreUrl() + '/TopRecipes/' + gsnApi.getChainId() + '/' + 50;
       return gsnApi.httpGetOrPostWithCache($localCache.topRecipes, url);
     };
 

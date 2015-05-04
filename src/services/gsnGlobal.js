@@ -6,12 +6,20 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
   function gsnGlobal($window, $location, $timeout, $route, gsnApi, gsnProfile, gsnStore, $rootScope, Facebook, $analytics, gsnYoutech) {
     var returnObj = {
-      init: init
+      init: init,
+      hasInit: false
     };
 
     return returnObj;
 
     function init(initProfile, $scope) {
+      // prevent mulitple init
+      if (returnObj.hasInit) {
+        return returnObj;
+      }
+      returnObj.hasInit = true;
+
+
       if (initProfile)
         gsnProfile.initialize();
 

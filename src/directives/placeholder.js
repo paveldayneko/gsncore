@@ -26,7 +26,7 @@
       };
 
       var createFakePassword = function () {
-        return angular.element('<input>', gsnApi.extend(copyAttrs(), {
+        return angular.element('<input>', angular.extend(copyAttrs(), {
           'type': 'text',
           'value': placeholderText
         }))

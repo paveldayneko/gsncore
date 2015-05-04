@@ -212,14 +212,6 @@
       return gsn.config.GoogleSiteVerificationId;
     };
 
-    returnObj.getEnableCircPlus = function () {
-      return returnObj.isNull(gsn.config.EnableCircPlus, 'false') == 'true';
-    };
-
-    returnObj.getEnableShopperWelcome = function () {
-      return returnObj.isNull(gsn.config.EnableShopperWelcome, 'false') == 'true';
-    };
-
     returnObj.isBetween = function (value, min, max) {
       return value > min && value < max;
     };
@@ -243,10 +235,6 @@
 
     returnObj.getDfpNetworkId = function () {
       return gsn.config.DfpNetworkId;
-    };
-
-    returnObj.getMaxResultCount = function () {
-      return gsn.config.MaxResultCount ? gsn.config.MaxResultCount : 50;
     };
 
     returnObj.getServiceUnavailableMessage = function () {
