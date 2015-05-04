@@ -5,107 +5,12 @@
 
   var serviceId = 'gsnApi';
   var mygsncore = angular.module('gsn.core', ['ngRoute', 'ngSanitize', 'facebook', 'angulartics']);
-  
-  mygsncore.config(['$analyticsProvider', function ($analyticsProvider) {
-    $analyticsProvider.init = function () {
-      // GA already supports buffered invocations so we don't need
-      // to wrap these inside angulartics.waitForVendorApi
-      if ($analyticsProvider.settings) {
-        $analyticsProvider.settings.trackRelativePath = true;
-      }
 
-      var firstTracker = (gsn.isNull(gsn.config.GoogleAnalyticAccountId1, '').length > 0);
-      var secondTracker = (gsn.isNull(gsn.config.GoogleAnalyticAccountId2, '').length > 0);
-
-      if (window.ga) {
-        // creating google analytic object
-        if (firstTracker) {
-          ga('create', gsn.config.GoogleAnalyticAccountId1, 'auto');
-
-          if (secondTracker) {
-            ga('create', gsn.config.GoogleAnalyticAccountId2, 'auto', { 'name': 'trackerTwo' });
-          }
-        } else if (secondTracker) {
-          secondTracker = false;
-          ga('create', gsn.config.GoogleAnalyticAccountId2, 'auto');
-        }
-
-        // enable demographic
-        ga('require', 'displayfeatures');
-      }
-
-      // GA already supports buffered invocations so we don't need
-      // to wrap these inside angulartics.waitForVendorApi
-
-      $analyticsProvider.registerPageTrack(function (path) {
-        // begin tracking
-        if (window.ga) {
-          ga('send', 'pageview', path);
-
-          if (secondTracker) {
-            ga('trackerTwo.send', 'pageview', path);
-          }
-        }
-
-        // piwik tracking
-        if (window._tk) {
-          _tk.pageview()
-        }
-
-        // quantcast tracking
-        if (window._qevents) {
-          _qevents.push({
-            qacct: "p-1bL6rByav5EUo"
-          });
-        }
-      });
-
-      /**
-      * Track Event in GA
-      * @name eventTrack
-      *
-      * @param {string} action Required 'action' (string) associated with the event
-      * @param {object} properties Comprised of the mandatory field 'category' (string) and optional  fields 'label' (string), 'value' (integer) and 'noninteraction' (boolean)
-      *
-      * @link https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide#SettingUpEventTracking
-      *
-      * @link https://developers.google.com/analytics/devguides/collection/analyticsjs/events
-      */
-      $analyticsProvider.registerEventTrack(function (action, properties) {
-        // GA requires that eventValue be an integer, see:
-        // https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#eventValue
-        // https://github.com/luisfarzati/angulartics/issues/81
-        if (properties.value) {
-          var parsed = parseInt(properties.value, 10);
-          properties.value = isNaN(parsed) ? 0 : parsed;
-        }
-
-        if (window.ga) {
-          if (properties.noninteraction) {
-            ga('send', 'event', properties.category, action, properties.label, properties.value, { nonInteraction: 1 });
-            if (secondTracker) {
-              ga('trackerTwo.send', 'event', properties.category, action, properties.label, properties.value, { nonInteraction: 1 });
-            }
-          } else {
-            ga('send', 'event', properties.category, action, properties.label, properties.value);
-            if (secondTracker) {
-              ga('trackerTwo.send', 'event', properties.category, action, properties.label, properties.value);
-            }
-          }
-        }
-
-        if (window._tk) {
-          _tk.event(properties.category, action, properties.label, properties.value);
-        }
-      });
-    };
+  mygsncore.config(['$locationProvider', '$sceDelegateProvider', '$sceProvider', '$httpProvider', 'FacebookProvider', '$analyticProvider', gsn.init])
+  .run(['$rootScope', 'gsnGlobal', 'gsnApi', function ($rootScope, gsnGlobal, gsnApi) {
+    $rootScope.siteMenu = gsnApi.getConfig().SiteMenu;
+    gsnGlobal.init(true);
   }]);
-
-  mygsncore.run(['$rootScope', 'gsnGlobal', 'gsnApi', function ($rootScope, gsnGlobal, gsnApi) {
-      var siteMenu = gsnApi.getConfig().SiteMenu || '';
-      $rootScope.siteMenu = siteMenu.length > 10 ? JSON.parse(siteMenu) : [];
-      gsnGlobal.init(true);
-    }]);
 
   mygsncore.service(serviceId, ['$rootScope', '$window', '$timeout', '$q', '$http', '$location', '$localStorage', '$sce', gsnApi]);
 

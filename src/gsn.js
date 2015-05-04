@@ -97,6 +97,7 @@
     GoogleSiteSearchCode: null,
     DisableLimitedTimeCoupons: false,
     hasRoundyProfile: false,
+    hasInit: false,
     Theme: null,
     HomePage: null,
     StoreList: null,
@@ -215,8 +216,16 @@
 
   // extend the current config
   gsn.applyConfig = function (config, dontUseProxy) {
-    gsn.extend(gsn.config, config);
-    gsn.config.HomePage = gsn.parsePartialContentData(gsn.config.HomePage);
+    if (!gsn.config.hasInit) {
+      gsn.config.hasInit = true;
+      gsn.extend(gsn.config, config);
+      gsn.config.HomePage = gsn.parsePartialContentData(gsn.config.HomePage);
+      var siteMenu = gsn.config.SiteMenu || '';
+      if (typeof(siteMenu) == 'string') {
+        gsn.config.SiteMenu = siteMenu.length > 10 ? JSON.parse(siteMenu) : [];
+      }
+    }
+
     // determine if proxy should be replace with direct url to api
     var useProxy = !gsn.isNull(dontUseProxy, gsn.config.dontUseProxy);
 
@@ -375,8 +384,109 @@
     // do nothing, dummy function to be polyfill later
   };
 
+  gsn.initAnalytics = function($analyticsProvider) {
+
+    // GA already supports buffered invocations so we don't need
+    // to wrap these inside angulartics.waitForVendorApi
+    if ($analyticsProvider.settings) {
+      $analyticsProvider.settings.trackRelativePath = true;
+    }
+
+    var firstTracker = (gsn.isNull(gsn.config.GoogleAnalyticAccountId1, '').length > 0);
+    var secondTracker = (gsn.isNull(gsn.config.GoogleAnalyticAccountId2, '').length > 0);
+
+    if (root.ga) {
+      // creating google analytic object
+      if (firstTracker) {
+        ga('create', gsn.config.GoogleAnalyticAccountId1, 'auto');
+
+        if (secondTracker) {
+          ga('create', gsn.config.GoogleAnalyticAccountId2, 'auto', { 'name': 'trackerTwo' });
+        }
+      } else if (secondTracker) {
+        secondTracker = false;
+        ga('create', gsn.config.GoogleAnalyticAccountId2, 'auto');
+      }
+
+      // enable demographic
+      ga('require', 'displayfeatures');
+    }
+
+    // GA already supports buffered invocations so we don't need
+    // to wrap these inside angulartics.waitForVendorApi
+
+    $analyticsProvider.registerPageTrack(function (path) {
+      // begin tracking
+      if (root.ga) {
+        ga('send', 'pageview', path);
+
+        if (secondTracker) {
+          ga('trackerTwo.send', 'pageview', path);
+        }
+      }
+
+      // piwik tracking
+      if (root._tk) {
+        _tk.pageview()
+      }
+
+      // quantcast tracking
+      if (root._qevents) {
+        _qevents.push({
+          qacct: "p-1bL6rByav5EUo"
+        });
+      }
+    });
+
+    /**
+    * Track Event in GA
+    * @name eventTrack
+    *
+    * @param {string} action Required 'action' (string) associated with the event
+    * @param {object} properties Comprised of the mandatory field 'category' (string) and optional  fields 'label' (string), 'value' (integer) and 'noninteraction' (boolean)
+    *
+    * @link https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide#SettingUpEventTracking
+    *
+    * @link https://developers.google.com/analytics/devguides/collection/analyticsjs/events
+    */
+    $analyticsProvider.registerEventTrack(function (action, properties) {
+      // GA requires that eventValue be an integer, see:
+      // https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#eventValue
+      // https://github.com/luisfarzati/angulartics/issues/81
+      if (properties.value) {
+        var parsed = parseInt(properties.value, 10);
+        properties.value = isNaN(parsed) ? 0 : parsed;
+      }
+
+      if (root.ga) {
+        if (properties.noninteraction) {
+          ga('send', 'event', properties.category, action, properties.label, properties.value, { nonInteraction: 1 });
+          if (secondTracker) {
+            ga('trackerTwo.send', 'event', properties.category, action, properties.label, properties.value, { nonInteraction: 1 });
+          }
+        } else {
+          ga('send', 'event', properties.category, action, properties.label, properties.value);
+          if (secondTracker) {
+            ga('trackerTwo.send', 'event', properties.category, action, properties.label, properties.value);
+          }
+        }
+      }
+
+      if (root._tk) {
+        _tk.event(properties.category, action, properties.label, properties.value);
+      }
+    });
+  };
+
+  gsn.init = function($locationProvider, $sceDelegateProvider, $sceProvider, $httpProvider, FacebookProvider, $analyticProvider) {
+    gsn.initAngular($sceProvider, $sceDelegateProvider, $locationProvider, $httpProvider, FacebookProvider);
+    gsn.initAnalytics($analyticProvider);
+  };
+  
   // support angular initialization
-  gsn.initAngular = function ($sceProvider, $sceDelegateProvider, $locationProvider, $httpProvider, FacebookProvider, $analyticsProvider) {
+  gsn.initAngular = function ($sceProvider, $sceDelegateProvider, $locationProvider, $httpProvider, FacebookProvider) {
+    gsn.applyConfig(root.globalConfig.data || {});
+    gsn.config.ContentBaseUrl = root.location.port > 1000 && root.location.port < 5000 ? "/asset/" + gsn.config.ChainId : gsn.config.ContentBaseUrl;
     gsn.config.hasRoundyProfile = [215, 216, 217, 218].indexOf(gsn.config.ChainId) > -1;
     gsn.config.DisableLimitedTimeCoupons = (215 ==  gsn.config.ChainId);
     if (gsn.config.Theme) {
@@ -389,10 +499,10 @@
     $sceProvider.enabled(!gsn.browser.isIE);
 
     $sceDelegateProvider.resourceUrlWhitelist(gsn.config.SceWhiteList || [
-      'self', 
-      'http://**.gsn.io/**', 
-      'https://**.gsn2.com/**', 
-      'http://*.gsngrocers.com/**', 
+      'self',
+      'http://**.gsn.io/**',
+      'https://**.gsn2.com/**',
+      'http://*.gsngrocers.com/**',
       'https://*.gsngrocers.com/**']);
 
 
@@ -417,10 +527,6 @@
 
     if (typeof(FacebookProvider) !== "undefined") {
       FacebookProvider.init(gsn.config.FacebookAppId);
-    }
-
-    if (typeof($analyticsProvider) !== "undefined") {
-      $analyticsProvider.init();
     }
   };
   //#endregion
