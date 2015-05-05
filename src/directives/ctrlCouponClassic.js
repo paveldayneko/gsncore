@@ -4,7 +4,7 @@
   var myDirectiveName = 'ctrlCouponClassic';
 
   angular.module('gsn.core')
-    .controller(myDirectiveName, ['$scope', 'gsnStore', 'gsnApi', '$timeout', '$analytics', '$filter', 'gsnYoutech', 'gsnPrinter', 'gsnProfile', 'gsnProLogicRewardCard', '$location', myController])
+    .controller(myDirectiveName, ['$scope', 'gsnStore', 'gsnApi', '$timeout', '$analytics', '$filter', 'gsnYoutech', 'gsnCouponPrinter', 'gsnProfile', 'gsnProLogicRewardCard', '$location', myController])
     .directive(myDirectiveName, myDirective);
 
   function myDirective() {
@@ -17,7 +17,7 @@
     return directive;
   }     
 
-  function myController($scope, gsnStore, gsnApi, $timeout, $analytics, $filter, gsnYoutech, gsnPrinter, gsnProfile, gsnProLogicRewardCard, $location) {
+  function myController($scope, gsnStore, gsnApi, $timeout, $analytics, $filter, gsnYoutech, gsnCouponPrinter, gsnProfile, gsnProLogicRewardCard, $location) {
     $scope.activate = activate;
     $scope.addCouponToCard = addCouponToCard;
     $scope.printManufacturerCoupon = printManufacturerCoupon;
@@ -143,7 +143,7 @@
 
     //#region Internal Methods             
     function printManufacturerCoupon(evt, item) {
-      gsnPrinter.initPrinter([item], true);
+      gsnCouponPrinter.print([item]);
     }
       
     function addCouponToCard(evt, item) {

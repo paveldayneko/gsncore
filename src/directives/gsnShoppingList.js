@@ -1,8 +1,8 @@
 ﻿(function (angular, undefined) {
 
   angular.module('gsn.core')
-      .directive('gsnShoppingList', ['gsnApi', '$timeout', 'gsnProfile', '$routeParams', '$rootScope', 'gsnStore', '$location', 'gsnPrinter', '$filter',
-          function (gsnApi, $timeout, gsnProfile, $routeParams, $rootScope, gsnStore, $location, gsnPrinter, $filter) {
+      .directive('gsnShoppingList', ['gsnApi', '$timeout', 'gsnProfile', '$routeParams', '$rootScope', 'gsnStore', '$location', 'gsnCouponPrinter', '$filter',
+          function (gsnApi, $timeout, gsnProfile, $routeParams, $rootScope, gsnStore, $location, gsnCouponPrinter, $filter) {
             // Usage:  use to manipulate a shopping list on the UI
             // 
             // Creates: 2014-01-13 TomN
@@ -35,6 +35,7 @@
               $scope.shoppinglistdeleted = 0;
               $scope.shoppinglistcreated = 0;
               $scope.circular = gsnStore.getCircularData();
+              $scope.printer = { blocked: 0, notsupported: 0, notinstalled: 0 };
 
               $scope.reloadShoppingList = function (shoppingListId) {
                 $timeout(function () {
@@ -365,10 +366,21 @@
                   // initialize printer
                   if ($scope.manufacturerCoupons.length > 0) {
                     if ($scope.canPrint) {
-                      gsnPrinter.initPrinter($scope.manufacturerCoupons);
+                      gsnCouponPrinter.print($scope.manufacturerCoupons);
                     }
                   }
                 }
+              });
+
+              // trigger modal
+              $scope.$on('gsnevent:gcprinter-not-supported', function() {
+                $scope.printer.blocked++;
+              });
+              $scope.$on('gsnevent:gcprinter-blocked', function() {
+                $scope.printer.notsupported++;
+              });
+              $scope.$on('gsnevent:gcprinter-not-found', function() {
+                $scope.printer.notinstalled++;
               });
             }
           }]);

@@ -4,7 +4,7 @@
   var myDirectiveName = 'ctrlShoppingList';
 
   angular.module('gsn.core')
-    .controller(myDirectiveName, ['$scope', 'gsnPrinter', 'gsnApi', 'gsnProfile', '$timeout', '$rootScope', 'gsnStore', myController])
+    .controller(myDirectiveName, ['$scope', 'gsnApi', 'gsnProfile', '$timeout', '$rootScope', 'gsnStore', myController])
     .directive(myDirectiveName, myDirective);
 
   function myDirective() {
@@ -17,7 +17,7 @@
     return directive;
   }
 
-  function myController($scope, gsnPrinter, gsnApi, gsnProfile, $timeout, $rootScope, gsnStore) {
+  function myController($scope, gsnApi, gsnProfile, $timeout, $rootScope, gsnStore) {
     $scope.activate = activate;
     $scope.listviewList = [];
     $scope.selectedShoppingListId = 0;

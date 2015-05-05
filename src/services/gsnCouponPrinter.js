@@ -1,31 +1,16 @@
 (function (angular, undefined) {
   'use strict';
   var serviceId = 'gsnCouponPrinter';
-  angular.module('gsn.core').factory(serviceId, ['$rootScope', 'gsnApi', '$log', gsnCouponPrinter]);
+  angular.module('gsn.core').service(serviceId, ['$rootScope', 'gsnApi', '$log', '$timeout', gsnCouponPrinter]);
 
-  function gsnCouponPrinter($rootScope, gsnApi, $log) {
+  function gsnCouponPrinter($rootScope, gsnApi, $log, $timeout) {
     var service = {
       print: print,
       init: gcprinter.init,
-      activated: false,
-      isWindows: navigator.platform.indexOf('Win') > -1,
-      isMac: navigator.platform.indexOf('Mac') > -1,
-      dl: {
-        win: "http://cdn.coupons.com/ftp.coupons.com/partners/CouponPrinter.exe",
-        mac: "http://cdn.coupons.com/ftp.coupons.com/safari/MacCouponPrinterWS.dmg"
-      },
-      getDownload: function() {
-        if (service.isWindows) {
-          return dl.win;
-        }
-        else if (service.isMac){
-          return dl.mac;
-        }
-        else{
-          return "";
-        }
-      }
+      activated: false
     };
+    var couponClasses = [];
+    var couponz = [];
 
     activate();
 
@@ -42,39 +27,72 @@
       if (service.activated) return;
       service.activated = true
 
-      gsnprinter.on('printed', function(e, rsp) {
+      gcprinter.on('printed', function(e, rsp) {
+        // process coupon error message
+        var errors = gsnApi.isNull(rsp.ErrorCoupons, []);
+        if (errors.length > 0) {
+          angular.forEach(errors, function (item) {
+            angular.element('.coupon-message-' + item.CouponId).html(item.ErrorMessage);
+          });
+        }
+
         $rootScope.$broadcast('gsnevent:gcprinter-printed', e, rsp);
       });
 
-      gsnprinter.on('printing', function(e) {
+      gcprinter.on('printing', function(e) {
+        $timeout(function () {
+          angular.element(couponClasses.join(',')).html('Printing...');
+        }, 5);
         $rootScope.$broadcast('gsnevent:gcprinter-printing', e);
       });
 
-      gsnprinter.on('printfail', function(rsp) {
+      gcprinter.on('printfail', function(e, rsp) {
+        $timeout(function () {
+          if (e == 'gsn-server') {
+            angular.element(couponClasses.join(',')).html('Print limit reached...');
+          }
+          else if (e == 'gsn-cancel') {
+            angular.element(couponClasses.join(',')).html('Print canceled...');
+          } else {
+            angular.element(couponClasses.join(',')).html('Print failed...');
+          }
+        }, 5);
         $rootScope.$broadcast('gsnevent:gcprinter-printfail', rsp);
       });
       return;
     }
 
-    function print(coupons) {
+    function print(items) {
       if (!gcprinter.isReady) {
         // keep trying to init until ready
         gcprinter.init();
         $timeout(function() {
-          print(coupons)
+          print(items)
         }, 100);
         return;
       }
 
-      printInternal(coupons);
+      if ((items || []).length <= 0){
+        return;
+      }
+
+      printInternal(items);
       return;
     };
 
-    function printInternal(coupons) {
+    function printInternal(items) {
       var siteId = gsnApi.getChainId();
+      angular.forEach(items, function (v, k) {
+        couponClasses.push('.coupon-message-' + v.ProductCode);
+        coupons.push(v.ProductCode);
+      });
+
+      $timeout(function () {
+        angular.element(couponClasses.join(',')).html('Checking...');
+      }, 5);
 
       // check printer installed, blocked, or not supported
-      gsnprinter.checkInstall(function() {
+      gcprinter.checkInstall(function() {
         if (!gsprinter.isPrinterSupported())
         {
           // printer is not supported
@@ -85,7 +103,7 @@
         gcprinter.print(siteId, coupons);
       }, function() {
         // determine if printer is blocked
-        if (gsnprinter.isPluginBlocked()){
+        if (gcprinter.isPluginBlocked()){
           $rootScope.$broadcast('gsnevent:gcprinter-blocked');
           return;
         }
