@@ -406,10 +406,18 @@
       function loadListFromSession() {
         var list = betterStorage.currentShoppingList;
         if (list && list.list && list.list.Id == shoppingListId) {
-          $mySavedData.hasLoaded = list.hasLoaded;
-          $mySavedData.items = list.items;
-          $mySavedData.itemIdentity = list.itemIdentity;
-          $mySavedData.countCache = list.countCache;
+          var isValid = true;
+          angular.forEach(list.items, function(v, k){
+            if (gsnApi.isNull(v)) {
+              isValid = false;
+            }
+          })
+          if (isValid) {
+            $mySavedData.hasLoaded = list.hasLoaded;
+            $mySavedData.items = list.items;
+            $mySavedData.itemIdentity = list.itemIdentity;
+            $mySavedData.countCache = list.countCache;
+          }
         }
       }
 

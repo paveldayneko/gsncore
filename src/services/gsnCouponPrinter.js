@@ -10,7 +10,7 @@
       activated: false
     };
     var couponClasses = [];
-    var couponz = [];
+    var coupons = [];
 
     activate();
 
@@ -82,6 +82,8 @@
 
     function printInternal(items) {
       var siteId = gsnApi.getChainId();
+      coupons.length = 0;
+      couponClasses.length = 0;
       angular.forEach(items, function (v, k) {
         couponClasses.push('.coupon-message-' + v.ProductCode);
         coupons.push(v.ProductCode);
@@ -91,27 +93,18 @@
         angular.element(couponClasses.join(',')).html('Checking...');
       }, 5);
 
-      // check printer installed, blocked, or not supported
-      gcprinter.checkInstall(function() {
-        if (!gsprinter.isPrinterSupported())
-        {
-          // printer is not supported
-          $rootScope.$broadcast('gsnevent:gcprinter-not-supported');
-          return;
-        }
-
-        gcprinter.print(siteId, coupons);
-      }, function() {
-        // determine if printer is blocked
-        if (gcprinter.isPluginBlocked()){
-          $rootScope.$broadcast('gsnevent:gcprinter-blocked');
-          return;
-        }
-
-        // printer not found
+      if (!gcprinter.hasPlugin()) {
         $rootScope.$broadcast('gsnevent:gcprinter-not-found');
-        return;
-      });
+      }
+      else if (gcprinter.isPluginBlocked()) {
+        $rootScope.$broadcast('gsnevent:gcprinter-blocked');
+      }
+      else if (!gcprinter.isPrinterSupported()) {
+        $rootScope.$broadcast('gsnevent:gcprinter-not-supported');
+      }
+      else {
+        gcprinter.print(siteId, coupons);
+      }
     };
   }
 })(angular);

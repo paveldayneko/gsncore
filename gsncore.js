@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.14
  * gsncore repository
- * Build date: Tue May 05 2015 01:29:04 GMT-0500 (CDT)
+ * Build date: Tue May 05 2015 07:05:51 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -10342,7 +10342,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       activated: false
     };
     var couponClasses = [];
-    var couponz = [];
+    var coupons = [];
 
     activate();
 
@@ -10414,6 +10414,8 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 
     function printInternal(items) {
       var siteId = gsnApi.getChainId();
+      coupons.length = 0;
+      couponClasses.length = 0;
       angular.forEach(items, function (v, k) {
         couponClasses.push('.coupon-message-' + v.ProductCode);
         coupons.push(v.ProductCode);
@@ -10423,27 +10425,18 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
         angular.element(couponClasses.join(',')).html('Checking...');
       }, 5);
 
-      // check printer installed, blocked, or not supported
-      gcprinter.checkInstall(function() {
-        if (!gsprinter.isPrinterSupported())
-        {
-          // printer is not supported
-          $rootScope.$broadcast('gsnevent:gcprinter-not-supported');
-          return;
-        }
-
-        gcprinter.print(siteId, coupons);
-      }, function() {
-        // determine if printer is blocked
-        if (gcprinter.isPluginBlocked()){
-          $rootScope.$broadcast('gsnevent:gcprinter-blocked');
-          return;
-        }
-
-        // printer not found
+      if (!gcprinter.hasPlugin()) {
         $rootScope.$broadcast('gsnevent:gcprinter-not-found');
-        return;
-      });
+      }
+      else if (gcprinter.isPluginBlocked()) {
+        $rootScope.$broadcast('gsnevent:gcprinter-blocked');
+      }
+      else if (!gcprinter.isPrinterSupported()) {
+        $rootScope.$broadcast('gsnevent:gcprinter-not-supported');
+      }
+      else {
+        gcprinter.print(siteId, coupons);
+      }
     };
   }
 })(angular);
@@ -11340,10 +11333,18 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       function loadListFromSession() {
         var list = betterStorage.currentShoppingList;
         if (list && list.list && list.list.Id == shoppingListId) {
-          $mySavedData.hasLoaded = list.hasLoaded;
-          $mySavedData.items = list.items;
-          $mySavedData.itemIdentity = list.itemIdentity;
-          $mySavedData.countCache = list.countCache;
+          var isValid = true;
+          angular.forEach(list.items, function(v, k){
+            if (gsnApi.isNull(v)) {
+              isValid = false;
+            }
+          })
+          if (isValid) {
+            $mySavedData.hasLoaded = list.hasLoaded;
+            $mySavedData.items = list.items;
+            $mySavedData.itemIdentity = list.itemIdentity;
+            $mySavedData.countCache = list.countCache;
+          }
         }
       }
 
