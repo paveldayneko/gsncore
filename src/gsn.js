@@ -478,9 +478,9 @@
     });
   };
 
-  gsn.init = function($locationProvider, $sceDelegateProvider, $sceProvider, $httpProvider, FacebookProvider, $analyticProvider) {
+  gsn.init = function($locationProvider, $sceDelegateProvider, $sceProvider, $httpProvider, FacebookProvider, $analyticsProvider) {
     gsn.initAngular($sceProvider, $sceDelegateProvider, $locationProvider, $httpProvider, FacebookProvider);
-    gsn.initAnalytics($analyticProvider);
+    gsn.initAnalytics($analyticsProvider);
   };
   
   // support angular initialization

@@ -6,7 +6,11 @@
   var serviceId = 'gsnApi';
   var mygsncore = angular.module('gsn.core', ['ngRoute', 'ngSanitize', 'facebook', 'angulartics']);
 
-  mygsncore.config(['$locationProvider', '$sceDelegateProvider', '$sceProvider', '$httpProvider', 'FacebookProvider', '$analyticProvider', gsn.init])
+  mygsncore.config(['$locationProvider', '$sceDelegateProvider', '$sceProvider', '$httpProvider', 'FacebookProvider', '$analyticsProvider',
+    function($locationProvider, $sceDelegateProvider, $sceProvider, $httpProvider, FacebookProvider, $analyticsProvider) {
+      gsn.init($locationProvider, $sceDelegateProvider, $sceProvider, $httpProvider, FacebookProvider, $analyticsProvider)
+    }
+   ])
   .run(['$rootScope', 'gsnGlobal', 'gsnApi', function ($rootScope, gsnGlobal, gsnApi) {
     $rootScope.siteMenu = gsnApi.getConfig().SiteMenu;
     gsnGlobal.init(true);
