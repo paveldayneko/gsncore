@@ -35,7 +35,7 @@
               $scope.shoppinglistdeleted = 0;
               $scope.shoppinglistcreated = 0;
               $scope.circular = gsnStore.getCircularData();
-              $scope.printer = { blocked: 0, notsupported: 0, notinstalled: 0 };
+              $scope.printer = { blocked: 0, notsupported: 0, notinstalled: 0, printed: null, count: 0, total: 0 };
 
               $scope.reloadShoppingList = function (shoppingListId) {
                 $timeout(function () {
@@ -366,6 +366,8 @@
                   // initialize printer
                   if ($scope.manufacturerCoupons.length > 0) {
                     if ($scope.canPrint) {
+                      $scope.printer.print = null;
+                      $scope.printer.total = $scope.manufacturerCoupons.length;
                       gsnCouponPrinter.print($scope.manufacturerCoupons);
                     }
                   }
@@ -381,6 +383,16 @@
               });
               $scope.$on('gsnevent:gcprinter-not-found', function() {
                 $scope.printer.notinstalled++;
+              });
+              $scope.$on('gsnevent:gcprinter-printed', function(e, rsp) {
+                $scope.printer.printed = e;
+                if (rsp) {
+                  $scope.printer.errors = gsnApi.isNull(response.ErrorCoupons, []);
+                  var count = $scope.printer.total - $scope.printer.errors.length;
+                  if (count > 0) {
+                    $scope.printer.count = count;
+                  }
+                }
               });
             }
           }]);

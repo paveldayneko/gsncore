@@ -17,7 +17,7 @@
 
       copyAttrs = function () {
         var a = {};
-        gsnApi.forEach(attrs.$attr, function (i, attrName) {
+        angular.forEach(attrs.$attr, function (i, attrName) {
           if (!gsn.contains(settings.excludedAttrs, attrName)) {
             a[attrName] = attrs[attrName];
           }

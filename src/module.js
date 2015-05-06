@@ -41,7 +41,7 @@
     returnObj.mapObject = gsn.mapObject;
 
     // iterator method - forEach(list, function(v,k,list));
-    returnObj.forEach = gsn.forEach;
+    returnObj.forEach = angular.forEach;
 
     // shallow extend method - extend(dest, src)
     returnObj.extend = gsn.extend;

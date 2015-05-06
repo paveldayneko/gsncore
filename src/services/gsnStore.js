@@ -348,7 +348,7 @@
       if (config.AllContent) {
         config.AllContent.Circularz = config.AllContent.Circulars;
         config.AllContent.Circulars = [];
-        gsn.forEach(config.AllContent.Circularz, function(circ) {
+        angular.forEach(config.AllContent.Circularz, function(circ) {
           circ.Pagez = circ.Pages;
           circ.Pages = [];
         });
@@ -403,7 +403,7 @@
       if (isRaw) {
         var stores = storeList;
         if (typeof (stores) != "string") {
-          gsnApi.forEach(stores, function (store) {
+          angular.forEach(stores, function (store) {
             store.Settings = gsnApi.mapObject(store.StoreSettings, 'StoreSettingId');
           });
 
@@ -426,7 +426,7 @@
       // process manufacturer coupon
       var circular = returnObj.getCircularData();
       $localCache.manufacturerCoupons.items = circular.ManufacturerCoupons;
-      gsnApi.forEach($localCache.manufacturerCoupons.items, function (item) {
+      angular.forEach($localCache.manufacturerCoupons.items, function (item) {
         item.CategoryName = gsnApi.isNull($circularProcessed.categoryById[item.CategoryId], { CategoryName: '' }).CategoryName;
         $circularProcessed.manuCouponById[item.ItemId] = item;
       });
@@ -436,7 +436,7 @@
       var circular = returnObj.getCircularData();
       // process in-store coupon
       var items = [];
-      gsnApi.forEach(circular.InstoreCoupons, function (item) {
+      angular.forEach(circular.InstoreCoupons, function (item) {
         if (item.StoreIds.length <= 0 || item.StoreIds.indexOf($localCache.storeId) >= 0) {
           item.CategoryName = gsnApi.isNull($circularProcessed.categoryById[item.CategoryId], { CategoryName: '' }).CategoryName;
           $circularProcessed.storeCouponById[item.ItemId] = item;
@@ -454,7 +454,7 @@
 
       // process youtech coupon
       $localCache.youtechCoupons.items = circular.YoutechCoupons;
-      gsnApi.forEach($localCache.youtechCoupons.items, function (item) {
+      angular.forEach($localCache.youtechCoupons.items, function (item) {
         item.CategoryName = gsnApi.isNull($circularProcessed.categoryById[item.CategoryId], {CategoryName: ''}).CategoryName;
         $circularProcessed.youtechCouponById[item.ItemId] = item;
       });
@@ -499,7 +499,7 @@
       circularData.Circulars = [];
 
       // foreach Circular
-      gsnApi.forEach(circulars, function (circ) {
+      angular.forEach(circulars, function (circ) {
         circ.StoreIds = circ.StoreIds || [];
         if (circ.StoreIds.length <= 0 || circ.StoreIds.indexOf($localCache.storeId) >= 0) {
           circularData.Circulars.push(circ);
@@ -510,7 +510,7 @@
           var pages = circ.Pagez;
           circ.Pages = [];
 
-          gsnApi.forEach(pages, function (page) {
+          angular.forEach(pages, function (page) {
             if (page.StoreIds.length <= 0 || page.StoreIds.indexOf($localCache.storeId) >= 0) {
               circ.Pages.push(page);
             }
@@ -581,7 +581,7 @@
       };
 
       // foreach Page in Circular
-      gsnApi.forEach(pages, function (page) {
+      angular.forEach(pages, function (page) {
         itemCount += page.Items.length;
 
         processingQueue.push(function () {
@@ -601,7 +601,7 @@
 
     function processCircularPage(items, circularMaster, page) {
       // foreach Item on Page
-      gsnApi.forEach(page.Items, function (item) {
+      angular.forEach(page.Items, function (item) {
         circularMaster.items.push(item);
         items.push(item);
       });
