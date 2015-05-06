@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.14
  * gsncore repository
- * Build date: Wed May 06 2015 13:04:21 GMT-0500 (CDT)
+ * Build date: Wed May 06 2015 15:02:38 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -8623,7 +8623,8 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
             var data = gsnApi.parseStoreSpecificContent(partialData.ContentList[i]);
             
             if (data.Headline || data.SortBy) {
-              if ((data.Description || '').indexOf('</script>') > 0) {
+              // match any script with src
+              if (/<script.+src=/gi.test(data.Description || '')) {
                 scope.pcvm.hasScript = true
               }
 
@@ -10368,9 +10369,9 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 (function (angular, undefined) {
   'use strict';
   var serviceId = 'gsnCouponPrinter';
-  angular.module('gsn.core').service(serviceId, ['$rootScope', 'gsnApi', '$log', '$timeout', gsnCouponPrinter]);
+  angular.module('gsn.core').service(serviceId, ['$rootScope', 'gsnApi', '$log', '$timeout', 'gsnStore', gsnCouponPrinter]);
 
-  function gsnCouponPrinter($rootScope, gsnApi, $log, $timeout) {
+  function gsnCouponPrinter($rootScope, gsnApi, $log, $timeout, gsnStore) {
     var service = {
       print: print,
       init: gcprinter.init,
@@ -10395,21 +10396,23 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       service.activated = true
 
       gcprinter.on('printed', function(e, rsp) {
-        // process coupon error message
-        var errors = gsnApi.isNull(rsp.ErrorCoupons, []);
-        if (errors.length > 0) {
-          angular.forEach(errors, function (item) {
-            angular.element('.coupon-message-' + item.CouponId).html(item.ErrorMessage);
-          });
-        }
-        $rootScope.$broadcast('gsnevent:gcprinter-printed', e, rsp);
+        $timeout(function () {
+          // process coupon error message
+          var errors = gsnApi.isNull(rsp.ErrorCoupons, []);
+          if (errors.length > 0) {
+            angular.forEach(errors, function (item) {
+              angular.element('.coupon-message-' + item.CouponId).html(item.ErrorMessage);
+            });
+          }
+          $rootScope.$broadcast('gsnevent:gcprinter-printed', e, rsp);
+        }, 5);
       });
 
       gcprinter.on('printing', function(e) {
         $timeout(function () {
           angular.element(couponClasses.join(',')).html('Printing...');
+          $rootScope.$broadcast('gsnevent:gcprinter-printing', e);
         }, 5);
-        $rootScope.$broadcast('gsnevent:gcprinter-printing', e);
       });
 
       gcprinter.on('printfail', function(e, rsp) {
@@ -10422,8 +10425,8 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
           } else {
             angular.element(couponClasses.join(',')).html('Print failed...');
           }
+          $rootScope.$broadcast('gsnevent:gcprinter-printfail', rsp);
         }, 5);
-        $rootScope.$broadcast('gsnevent:gcprinter-printfail', rsp);
       });
       return;
     }
@@ -10436,6 +10439,12 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       coupons.length = 0;
       couponClasses.length = 0;
       angular.forEach(items, function (v, k) {
+        var item = v;
+        if (gsnApi.isNull(v.ProductCode, null) == null)
+        {
+          item = gsnStore.getCoupon(v.ItemId, v.ItemTypeId);
+        }
+        
         couponClasses.push('.coupon-message-' + v.ProductCode);
         coupons.push(v.ProductCode);
       });
@@ -10447,17 +10456,17 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       if (!gcprinter.isReady) {
         // keep trying to init until ready
         gcprinter.on('initcomplete', function() {
-          printInternal(items);
-        })
+          $timeout(printInternal, 5);
+        });
         gcprinter.init();
         return;
       }
       else {
-        printInternal(items);
+        $timeout(printInternal, 5);
       }
     };
 
-    function printInternal(items) {
+    function printInternal() {
       var siteId = gsnApi.getChainId();
       if (!gcprinter.hasPlugin()) {
         $rootScope.$broadcast('gsnevent:gcprinter-not-found');
@@ -10482,7 +10491,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 
   function gsnDfp($rootScope, gsnApi, gsnStore, gsnProfile, $sessionStorage, $window, $timeout, $location) {
     var service = {
-      forceRefresh: false,
+      forceRefresh: true,
       hasShoppingList: false,
       actionParam: null
     };
@@ -10511,6 +10520,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
         }
       });
 
+      service.forceRefresh = true;
       service.actionParam = {evtname: event.name, evtcategory: gsnProfile.getShoppingListId() };
     });
 
@@ -10529,7 +10539,8 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
           });
         });
         service.forceRefresh = true;
-      }, 50);
+        doRefresh();
+      }, 500);
     });
 
     $rootScope.$on('gsnevent:loadads', function (event, next) {

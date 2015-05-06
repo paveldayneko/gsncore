@@ -57,7 +57,8 @@
             var data = gsnApi.parseStoreSpecificContent(partialData.ContentList[i]);
             
             if (data.Headline || data.SortBy) {
-              if ((data.Description || '').indexOf('</script>') > 0) {
+              // match any script with src
+              if (/<script.+src=/gi.test(data.Description || '')) {
                 scope.pcvm.hasScript = true
               }
 

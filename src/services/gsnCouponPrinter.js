@@ -1,9 +1,9 @@
 (function (angular, undefined) {
   'use strict';
   var serviceId = 'gsnCouponPrinter';
-  angular.module('gsn.core').service(serviceId, ['$rootScope', 'gsnApi', '$log', '$timeout', gsnCouponPrinter]);
+  angular.module('gsn.core').service(serviceId, ['$rootScope', 'gsnApi', '$log', '$timeout', 'gsnStore', gsnCouponPrinter]);
 
-  function gsnCouponPrinter($rootScope, gsnApi, $log, $timeout) {
+  function gsnCouponPrinter($rootScope, gsnApi, $log, $timeout, gsnStore) {
     var service = {
       print: print,
       init: gcprinter.init,
@@ -28,21 +28,23 @@
       service.activated = true
 
       gcprinter.on('printed', function(e, rsp) {
-        // process coupon error message
-        var errors = gsnApi.isNull(rsp.ErrorCoupons, []);
-        if (errors.length > 0) {
-          angular.forEach(errors, function (item) {
-            angular.element('.coupon-message-' + item.CouponId).html(item.ErrorMessage);
-          });
-        }
-        $rootScope.$broadcast('gsnevent:gcprinter-printed', e, rsp);
+        $timeout(function () {
+          // process coupon error message
+          var errors = gsnApi.isNull(rsp.ErrorCoupons, []);
+          if (errors.length > 0) {
+            angular.forEach(errors, function (item) {
+              angular.element('.coupon-message-' + item.CouponId).html(item.ErrorMessage);
+            });
+          }
+          $rootScope.$broadcast('gsnevent:gcprinter-printed', e, rsp);
+        }, 5);
       });
 
       gcprinter.on('printing', function(e) {
         $timeout(function () {
           angular.element(couponClasses.join(',')).html('Printing...');
+          $rootScope.$broadcast('gsnevent:gcprinter-printing', e);
         }, 5);
-        $rootScope.$broadcast('gsnevent:gcprinter-printing', e);
       });
 
       gcprinter.on('printfail', function(e, rsp) {
@@ -55,8 +57,8 @@
           } else {
             angular.element(couponClasses.join(',')).html('Print failed...');
           }
+          $rootScope.$broadcast('gsnevent:gcprinter-printfail', rsp);
         }, 5);
-        $rootScope.$broadcast('gsnevent:gcprinter-printfail', rsp);
       });
       return;
     }
@@ -69,6 +71,12 @@
       coupons.length = 0;
       couponClasses.length = 0;
       angular.forEach(items, function (v, k) {
+        var item = v;
+        if (gsnApi.isNull(v.ProductCode, null) == null)
+        {
+          item = gsnStore.getCoupon(v.ItemId, v.ItemTypeId);
+        }
+        
         couponClasses.push('.coupon-message-' + v.ProductCode);
         coupons.push(v.ProductCode);
       });
@@ -80,17 +88,17 @@
       if (!gcprinter.isReady) {
         // keep trying to init until ready
         gcprinter.on('initcomplete', function() {
-          printInternal(items);
-        })
+          $timeout(printInternal, 5);
+        });
         gcprinter.init();
         return;
       }
       else {
-        printInternal(items);
+        $timeout(printInternal, 5);
       }
     };
 
-    function printInternal(items) {
+    function printInternal() {
       var siteId = gsnApi.getChainId();
       if (!gcprinter.hasPlugin()) {
         $rootScope.$broadcast('gsnevent:gcprinter-not-found');

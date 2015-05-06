@@ -5,7 +5,7 @@
 
   function gsnDfp($rootScope, gsnApi, gsnStore, gsnProfile, $sessionStorage, $window, $timeout, $location) {
     var service = {
-      forceRefresh: false,
+      forceRefresh: true,
       hasShoppingList: false,
       actionParam: null
     };
@@ -34,6 +34,7 @@
         }
       });
 
+      service.forceRefresh = true;
       service.actionParam = {evtname: event.name, evtcategory: gsnProfile.getShoppingListId() };
     });
 
@@ -52,7 +53,8 @@
           });
         });
         service.forceRefresh = true;
-      }, 50);
+        doRefresh();
+      }, 500);
     });
 
     $rootScope.$on('gsnevent:loadads', function (event, next) {
