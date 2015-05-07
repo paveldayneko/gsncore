@@ -66,6 +66,7 @@
     }
 
     $scope.registerProfile = function () {
+	  $scope.$broadcast("autofill:update");
       var payload = angular.copy($scope.profile);
       if ($scope.myForm.$valid) {
 

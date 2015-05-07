@@ -15,13 +15,9 @@
     return directive;
 
     function link(scope, elm, attrs, ngModel) {
-      var origVal = elm.val();
-      $timeout(function () {
-        var newVal = elm.val();
-        if (ngModel.$pristine && origVal !== newVal) {
-          ngModel.$setViewValue(newVal);
-        }
-      }, 500);
+      scope.$on("autofill:update", function() {
+          ngModel.$setViewValue(elm.val());
+      });
     }
   }]);
 })(angular);
