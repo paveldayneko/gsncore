@@ -115,6 +115,7 @@
     }
 
     function saveProfile() {
+	  $scope.$broadcast("autofill:update");
       $scope.validateErrorMessage = null;
       $scope.isLoading = true;
       var payload = angular.copy($scope.profile);
