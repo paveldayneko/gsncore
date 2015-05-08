@@ -122,3 +122,4 @@ build
 bower_components
 git_components
 .idea
+.DS_Store

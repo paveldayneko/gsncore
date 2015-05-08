@@ -2,43 +2,57 @@
   'use strict';
   var myModule = angular.module('gsn.core');
 
-  myModule.directive('gsnModal', ['$compile', 'gsnApi', '$timeout', '$location', '$window', '$rootScope', function ($compile, gsnApi, $timeout, $location, $window, $rootScope) {
-    // Usage: to show a modal
-    // 
-    // Creates: 2013-12-20 TomN
-    // 
+  myModule.directive('gsnModal', ['$compile', '$timeout', '$location', '$http', '$templateCache', '$rootScope', 'gsnApi', function($compile, $timeout, $location, $http, $templateCache, $rootScope, gsnApi) {
+
+    /***
+     * simple directive
+     * @type {Object}
+     */
     var directive = {
       link: link,
       scope: true,
       restrict: 'AE'
     };
-
-    $rootScope.$on('gsnevent:closemodal', function () {
-      angular.element('.myModalForm').modal('hide');
-    });
-
     return directive;
 
     function link(scope, element, attrs) {
-      var modalUrl = scope.$eval(attrs.gsnModal);
-      var template = '<div class="myModalForm modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalForm" aria-hidden="true"><div class="modal-dialog" data-ng-include="\'' + modalUrl + '\'"></div></div>';
-      var $modalElement = null;
-
-      function closeModal() {
-        if ($modalElement) {
-          $modalElement.find('iframe').each(function () {
-            var src = angular.element(this).attr('src');
-            angular.element(this).attr('src', null).attr('src', src);
-          });
+      var myHtml, templateLoader, tplURL;
+      tplURL = scope.$eval(attrs.gsnModal);
+      scope.$location = $location;
+      myHtml = '';
+      templateLoader = $http.get(tplURL, {
+        cache: $templateCache
+      }).success(function(html) {
+        return myHtml = '<div class="myModalForm modal" style="display: block"><div class="modal-dialog">' + html + '</div></div>"';
+      });
+      scope.closeModal = function() {
+        return gmodal.hide();
+      };
+      scope.openModal = function(e) {
+        if (e != null) {
+          if (e.preventDefault != null) {
+            e.preventDefault();
+          }
         }
-        var modal = angular.element('.myModalForm').modal('hide');
-
-        if (!attrs.showIf) {
-          modal.addClass('myModalFormHidden');
+        if (!gmodal.isVisible) {
+          if (attrs.item) {
+            scope.item = scope.$eval(attrs.item);
+          } 
+          templateLoader.then(function() {
+            var $modalElement = angular.element($compile(myHtml)(scope));
+            return gmodal.show({
+              content: $modalElement[0],
+              hideOn: attrs.hideOn,
+              cls: attrs.cls,
+              timeout: attrs.timeout,
+              closeCls: attrs.closeCls
+            }, scope.$eval(attrs.hideCb));
+          }); 
         }
-      }
-
-      scope.closeModal = closeModal;
+        return scope;
+      };
+      scope.hideModal = scope.closeModal;
+      scope.showModal = scope.openModal;
 
       scope.goUrl = function (url, target) {
         if (gsnApi.isNull(target, '') == '_blank') {
@@ -50,27 +64,10 @@
         scope.closeModal();
       };
 
-      scope.showModal = showModal;
-
-      function showModal(e) {
-        if (e) {
-          e.preventDefault();
-        }
-
-        angular.element('.myModalFormHidden').remove();
-        if (attrs.item) {
-          scope.item = scope.$eval(attrs.item);
-        }
-
-        $modalElement = angular.element($compile(template)(scope));
-        $modalElement.modal('show');
-
-      }
-
       if (attrs.showIf) {
-        scope.$watch(attrs.showIf, function (newValue) {
+        scope.$watch(attrs.showIf, function(newValue) {
           if (newValue > 0) {
-            $timeout(showModal, 50);
+            $timeout(scope.openModal, 550);
           }
         });
       }
@@ -78,12 +75,18 @@
       if (attrs.show) {
         scope.$watch(attrs.show, function (newValue) {
           if (newValue) {
-            $timeout(showModal, 550);
+            $timeout(scope.openModal, 550);
           } else {
-            $timeout(closeModal, 550);
+            $timeout(scope.closeModal, 550);
           }
         });
       }
-    }
+
+      if (attrs.hideEvent) {
+        return scope.$on(attrs.hideEvent, function() {
+          return $timeout(scope.closeModal, 550);
+        });
+      }
+    };
   }]);
 })(angular);

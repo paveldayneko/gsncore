@@ -155,7 +155,7 @@
     $scope.$on('gsnevent:gcprinter-printed', function(e, rsp) {
       $scope.printer.printed = e;
       if (rsp) {
-        $scope.printer.errors = gsnApi.isNull(response.ErrorCoupons, []);
+        $scope.printer.errors = gsnApi.isNull(rsp.ErrorCoupons, []);
         var count = $scope.printer.total - $scope.printer.errors.length;
         if (count > 0) {
           $scope.printer.count = count;
