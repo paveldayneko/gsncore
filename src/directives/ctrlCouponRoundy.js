@@ -266,7 +266,7 @@
         return $scope.clippedCoupons[key];
       });
       $scope.printer.total = clippedCouponsInArr.length;
-      clippedCouponsInArr.print(clippedCouponsInArr);
+      gsnCouponPrinter.print(clippedCouponsInArr);
     }
 
     function addCouponToCard(evt, item) {
