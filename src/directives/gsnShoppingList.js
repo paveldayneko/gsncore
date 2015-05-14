@@ -242,21 +242,6 @@
                 $scope.doMassageList(list);
               };
 
-              $scope.doRemoveSelected = function () {
-                var list = $scope.mylist;
-                var toRemove = [];
-                angular.forEach(list.items, function (v, k) {
-                  if (v.selected) {
-                    toRemove.push(v);
-                  }
-                });
-
-                list.removeItems(toRemove).then(function () {
-                  // refresh list
-                  $scope.doMassageList(list);
-                });
-              };
-
               $scope.doSaveList = function (newTitle) {
                 // save list just means to change the title
                 if (!gsnApi.isLoggedIn()) {

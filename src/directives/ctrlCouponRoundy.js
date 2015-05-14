@@ -328,10 +328,12 @@
     }
 
     function addClippedToList() {
-      angular.forEach($scope.clippedCoupons, function (coupon) {
-        if (!gsnProfile.isOnList(coupon))
+      for (var key in $scope.clippedCoupons) {
+        if (!isNaN(parseInt(key))) {
+          var coupon = $scope.clippedCoupons[key];
           $scope.doToggleCartItem(null, coupon);
-      });
+        }
+      }
     }
 
     function getClippedSavedAmount() {
