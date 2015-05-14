@@ -6,7 +6,7 @@
   function gsnCouponPrinter($rootScope, gsnApi, $log, $timeout, gsnStore, gsnProfile) {
     var service = {
       print: print,
-      init: gcprinter.init,
+      init: init,
       activated: false
     };
     var couponClasses = [];
@@ -63,6 +63,18 @@
       return;
     }
 
+    function init() {
+       if (!gcprinter.isReady) {
+        // keep trying to init until ready
+        gcprinter.on('initcomplete', function() {
+          $timeout(printInternal, 5);
+        });
+        gcprinter.init();
+        return;
+      }
+      $timeout(printInternal, 5);
+    }
+
     function print(items) {
       if ((items || []).length <= 0){
         return;
@@ -93,13 +105,11 @@
         gcprinter.init();
         return;
       }
-      else {
-        $timeout(printInternal, 5);
-      }
+
+      $timeout(printInternal, 5);
     };
 
     function printInternal() {
-      var siteId = gsnApi.getChainId();
       if (!gcprinter.hasPlugin()) {
         $rootScope.$broadcast('gsnevent:gcprinter-not-found');
       }
@@ -109,7 +119,8 @@
       else if (!gcprinter.isPrinterSupported()) {
         $rootScope.$broadcast('gsnevent:gcprinter-not-supported');
       }
-      else {
+      else if (coupons.length > 0){
+        var siteId = gsnApi.getChainId();
         angular.forEach(coupons, function (v) {
           gsnProfile.addPrinted(v);
         });

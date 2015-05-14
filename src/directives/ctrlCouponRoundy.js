@@ -131,8 +131,9 @@
               }
             }
           });
-        }Ï
+        }
       } else if ($scope.couponType == 'printable') {
+        gsnCouponPrinter.init();
         gsnStore.getManufacturerCouponTotalSavings().then(function (rst) {
           $scope.selectedCoupons.totalSavings = parseFloat(rst.response).toFixed(2);
         });

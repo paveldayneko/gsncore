@@ -9,14 +9,6 @@
 * For lazy loading of google recaptcha library
 **/
 /*global angular, Recaptcha */
-(function (ng) {
-  'use strict';
-
-  ng.module('vcRecaptcha', []);
-
-}(angular));
-
-/*global angular, Recaptcha */
 (function (angular, undefined) {
   'use strict';
 

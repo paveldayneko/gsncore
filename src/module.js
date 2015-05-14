@@ -224,6 +224,7 @@
       returnObj.goUrl($location.url(), '_reload');
     };
 
+    // allow external code to change the url of angular app
     gsn.goUrl = returnObj.goUrl;
     //#endregion
 
@@ -374,26 +375,6 @@
       $rootScope.$broadcast('gsnevent:shoppinglist-setid', shoppingListId);
     };
     //#endregion
-
-    // wait until some function eval to true, also provide a timeout default to 2 seconds
-    returnObj.waitUntil = function(evalFunc, timeout) {
-      var deferred = $q.defer();
-      var timeUp = false;
-      $timeout(function() {
-        timeUp = true;
-      }, timeout || 2000);
-
-      function doWait() {
-        if (timeUp || evalFunc()) {
-          deferred.resolve({ success: !timeUp });
-        }
-
-        $timeout(doWait, 200);
-      }
-
-      doWait();
-      return deferred.promise;
-    };
 
     returnObj.getApiHeaders = function () {
       // assume access token data is available at this point
@@ -562,7 +543,6 @@
 
     returnObj.initApp = function () {
       $rootScope.appState = 'initializing';
-      initStorage();
 
       // injecting getContentUrl and getThemeUrl for css
       $rootScope.getContentUrl = returnObj.getContentUrl;
@@ -676,10 +656,6 @@
       var tk = returnObj.isNull(token, {});
 
       $localStorage.anonymousToken = tk;
-    }
-
-    function initStorage() {
-      // do nothing for now
     }
 
 //#endregion
