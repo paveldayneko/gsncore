@@ -12,8 +12,6 @@
       var returnObj = { ShoppingListId: shoppingListId };
       var $mySavedData = { list: shoppingList, items: {}, hasLoaded: false, countCache: 0, itemIdentity: 1 };
       
-      loadListFromSession();
-      
       returnObj.getItemKey = function (item) {
         var itemKey = item.ItemTypeId;
         if (item.ItemTypeId == 7 || item.AdCode) {
@@ -474,6 +472,8 @@
         return deferred.promise;
       };
 
+      loadListFromSession();
+      
       return returnObj;
     }
 
