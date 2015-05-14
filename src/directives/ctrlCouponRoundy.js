@@ -5,7 +5,7 @@
   var myDirectiveName = 'ctrlCouponRoundy';
 
   angular.module('gsn.core')
-    .controller(myDirectiveName,  ['$scope', 'gsnStore', 'gsnApi', '$timeout', '$analytics', '$filter', '$modal', 'gsnYoutech', 'gsnPrinter', 'gsnProfile', '$location', 'gsnCouponPrinter', myController])
+    .controller(myDirectiveName,  ['$scope', 'gsnStore', 'gsnApi', '$timeout', '$analytics', '$filter',  'gsnYoutech', 'gsnProfile', '$location', 'gsnCouponPrinter', myController])
     .directive(myDirectiveName, myDirective);
 
   function myDirective() {
@@ -18,9 +18,7 @@
     return directive;
   }    
 
-  function myController($scope, gsnStore, gsnApi, $timeout, $analytics, $filter, $modal, gsnYoutech, gsnPrinter, gsnProfile, $location, gsnCouponPrinter) {
-    $scope.checkPrinter = false;
-    $scope.utInited = false;
+  function myController($scope, gsnStore, gsnApi, $timeout, $analytics, $filter, gsnYoutech, gsnProfile, $location, gsnCouponPrinter) {
     $scope.activate = activate;
     $scope.addCouponToCard = addCouponToCard;
     $scope.printManufacturerCoupon = printManufacturerCoupon;
@@ -32,14 +30,10 @@
     $scope.getClippedSavedAmount = getClippedSavedAmount;
     $scope.countClippedCoupons = countClippedCoupons;
     $scope.getPercentOfClipped = getPercentOfClipped;
-    $scope.checkPrintStatus = checkPrintStatus;
     $scope.changeFilter = changeFilter;
     $scope.unclipCoupon = unclipCoupon;
     $scope.preClipCoupon = preClipCoupon;
-    $scope.isSocketActive = false;
-    $scope.installPrint = null;
     $scope.departments = [];
-    $scope.couponsWithError = [];
     $scope.couponsPrinted = [];
     $scope.selectedCoupons = {
       items: [],
@@ -49,9 +43,9 @@
       printedCouponOnly: false,
       clippedCouponOnly: false,
       totalSavings: 0,
-      isFailedLoading: false,
+      isFailedLoading: false
     };
-
+    $scope.gcprinter = gcprinter;
     $scope.printer = { blocked: 0, notsupported: 0, notinstalled: 0, printed: null, count: 0, total: 0 };
     $scope.preSelectedCoupons = {
       items: [],
@@ -208,8 +202,6 @@
       if (data.success) {
         $timeout(function () {
           activate();
-          if ($scope.checkPrinter)
-            checkPrintStatus();
         }, 500);
         $scope.selectedCoupons.noCircular = false;
       } else {
@@ -235,9 +227,9 @@
     }
 
     function synchWirhErrors() {
-      if ($scope.errorsonPrint) {
+      if ($scope.printer.errors) {
         angular.forEach($scope.preSelectedCoupons.items, function (coupon) {
-          var found = $filter('filter')($scope.errorsonPrint, { CouponId: coupon.ProductCode });
+          var found = $filter('filter')($scope.printer.errors, { CouponId: coupon.ProductCode });
           if (found.length > 0) {
             unclipCoupon(coupon);
             coupon.ErrorMessage = found[0].ErrorMessage;

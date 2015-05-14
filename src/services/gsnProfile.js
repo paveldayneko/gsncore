@@ -6,6 +6,7 @@
   function gsnProfile($rootScope, $http, gsnApi, $q, gsnList, gsnStore, $location, $timeout, $sessionStorage, $localStorage, gsnRoundyProfile) {
     var returnObj = {},
         previousProfileId = gsnApi.getProfileId(),
+        couponStorage = $sessionStorage,
         $profileDefer = null,
         $creatingDefer = null;
     var $savedData = { allShoppingLists: {}, profile: null, profileData: { scoredProducts: {}, circularItems: {}, availableCoupons: {}, myPantry: {} } };
@@ -80,9 +81,9 @@
     // it should reset shopping list
     returnObj.logOut = function () {
       gsnApi.logOut();
-      $localStorage.clipped = [];
-      $localStorage.printed = [];
-      $localStorage.preClipped = {};
+      couponStorage.clipped = [];
+      couponStorage.printed = [];
+      couponStorage.preClipped = {};
     };
 
     // proxy method to add item to current shopping list
@@ -448,38 +449,38 @@
     };
 
     returnObj.clipCoupon = function(productCode) {
-      if (!$localStorage.clipped)
-        $localStorage.clipped = [];
-      if ($localStorage.clipped.indexOf(productCode) < 0)
-        $localStorage.clipped.push(productCode);
+      if (!couponStorage.clipped)
+        couponStorage.clipped = [];
+      if (couponStorage.clipped.indexOf(productCode) < 0)
+        couponStorage.clipped.push(productCode);
     };
 
     returnObj.unclipCoupon = function(productCode) {
-      var index = $localStorage.clipped.indexOf(productCode);
-      $localStorage.clipped.splice(index, 1);
+      var index = couponStorage.clipped.indexOf(productCode);
+      couponStorage.clipped.splice(index, 1);
     };
 
     returnObj.getClippedCoupons = function() {
-      return $localStorage.clipped;
+      return couponStorage.clipped;
     };
 
     returnObj.savePreclippedCoupon = function (item) {
-      $localStorage.preClipped = item;
+      couponStorage.preClipped = item;
     };
 
     returnObj.getPreclippedCoupon = function() {
-      return $localStorage.preClipped;
+      return couponStorage.preClipped;
     };
     
     returnObj.addPrinted = function (productCode) {
-      if (!$localStorage.printed)
-        $localStorage.printed = [];
-      if ($localStorage.printed.indexOf(productCode) < 0)
-        $localStorage.printed.push(productCode);
+      if (!couponStorage.printed)
+        couponStorage.printed = [];
+      if (couponStorage.printed.indexOf(productCode) < 0)
+        couponStorage.printed.push(productCode);
     };
 
     returnObj.getPrintedCoupons = function () {
-      return $localStorage.printed;
+      return couponStorage.printed;
     };
 
     //#region Events Handling

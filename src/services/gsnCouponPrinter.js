@@ -1,9 +1,9 @@
 (function (angular, undefined) {
   'use strict';
   var serviceId = 'gsnCouponPrinter';
-  angular.module('gsn.core').service(serviceId, ['$rootScope', 'gsnApi', '$log', '$timeout', 'gsnStore', gsnCouponPrinter]);
+  angular.module('gsn.core').service(serviceId, ['$rootScope', 'gsnApi', '$log', '$timeout', 'gsnStore', 'gsnProfile', gsnCouponPrinter]);
 
-  function gsnCouponPrinter($rootScope, gsnApi, $log, $timeout, gsnStore) {
+  function gsnCouponPrinter($rootScope, gsnApi, $log, $timeout, gsnStore, gsnProfile) {
     var service = {
       print: print,
       init: gcprinter.init,
@@ -110,6 +110,9 @@
         $rootScope.$broadcast('gsnevent:gcprinter-not-supported');
       }
       else {
+        angular.forEach(coupons, function (v) {
+          gsnProfile.addPrinted(v);
+        });
         gcprinter.print(siteId, coupons);
       }
     };
