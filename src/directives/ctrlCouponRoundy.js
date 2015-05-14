@@ -260,9 +260,11 @@
     });
 
     function printClippedCoupons() {
+      $scope.printer.printed = null; 
       var clippedCouponsInArr = Object.keys($scope.clippedCoupons).map(function (key) {
         return $scope.clippedCoupons[key];
       });
+      $scope.printer.total = clippedCouponsInArr.length;
       clippedCouponsInArr.print(clippedCouponsInArr);
     }
 
