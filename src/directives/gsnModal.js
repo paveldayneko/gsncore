@@ -42,10 +42,10 @@
             var $modalElement = angular.element($compile(myHtml)(scope));
             return gmodal.show({
               content: $modalElement[0],
-              hideOn: attrs.hideOn,
+              hideOn: attrs.hideOn || 'click,esc,tap',
               cls: attrs.cls,
               timeout: attrs.timeout,
-              closeCls: attrs.closeCls
+              closeCls: attrs.closeCls || 'close'
             }, scope.$eval(attrs.hideCb));
           }); 
         }
