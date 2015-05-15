@@ -7,7 +7,8 @@
     var service = {
       forceRefresh: true,
       hasShoppingList: false,
-      actionParam: null
+      actionParam: null,
+      lastRefreshTime: (new Date().getTime())
     };
 
     $rootScope.$on('gsnevent:shoppinglistitem-updating', function (event, shoppingList, item) {
@@ -34,7 +35,6 @@
         }
       });
 
-      service.forceRefresh = true;
       service.actionParam = {evtname: event.name, evtcategory: gsnProfile.getShoppingListId() };
     });
 
@@ -54,7 +54,7 @@
         });
         service.forceRefresh = true;
         doRefresh();
-      }, 500);
+      }, 50);
     });
 
     $rootScope.$on('gsnevent:loadads', function (event, next) {
@@ -64,11 +64,13 @@
 
     $rootScope.$on('gsnevent:digitalcircular-pagechanging', function (event, data) {
       service.actionParam = {evtname: event.name, evtcategory: data.circularIndex, pdesc: data.pageIndex};
-      $timeout(doRefresh, 50);
+      service.forceRefresh = true;
 
       if (angular.element($window).scrollTop() > 140) {
         $window.scrollTo(0, 120);
       }
+
+      $timeout(doRefresh, 50);
     });
 
     init();
@@ -100,6 +102,9 @@
     // refresh method
     function doRefresh() {
       updateNetworkId();
+      var currentTime = (new Date().getTime());
+      if (currentTime - service.lastRefreshTime < 1000) return;
+      service.lastRefreshTime = currentTime;
 
       // targetted campaign
       if (parseFloat(gsnApi.isNull($sessionStorage.GsnCampaign, 0)) <= 0) {

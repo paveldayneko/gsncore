@@ -58,18 +58,24 @@
       
       // go to next slide
       scope.next = function() {
-        return scope.$slideIndex = doIncrement(scope.play(), 1);
+        $timeout(function() {
+          return scope.$slideIndex = doIncrement(scope.play(), 1);
+        }, 5);
       };
       
       // go to previous slide
       scope.prev = function() {
-        return scope.$slideIndex = doIncrement(scope.play(), -1);
+        $timeout(function() {
+          return scope.$slideIndex = doIncrement(scope.play(), -1);
+        }, 5);
       };
 
       // go to specfic slide index
       scope.selectIndex = function(slideIndex) {
-        scope.$slideIndex = slideIndex;
-        return scope.play();
+        $timeout(function() {
+          scope.$slideIndex = slideIndex;
+          return scope.play();
+        }, 5);
       };
 
       // get the current slide
@@ -120,7 +126,9 @@
         
         // on index change, make sure check value is correct
         if (checkValue != newValue) {
-          scope.$slideIndex = checkValue;
+          $timeout(function() {
+            return scope.$slideIndex = checkValue;
+          }, 5);
         }
       });
       
