@@ -230,6 +230,7 @@
               };
 
               $scope.doAddOwnItem = function () {
+                var list = $scope.mylist;
                 var addString = gsnApi.isNull($scope.addString, '');
                 if (addString.length < 1) {
                   return;

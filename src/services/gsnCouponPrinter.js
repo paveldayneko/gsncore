@@ -1,12 +1,13 @@
 (function (angular, undefined) {
   'use strict';
   var serviceId = 'gsnCouponPrinter';
-  angular.module('gsn.core').service(serviceId, ['$rootScope', 'gsnApi', '$log', '$timeout', 'gsnStore', 'gsnProfile', gsnCouponPrinter]);
+  angular.module('gsn.core').service(serviceId, ['$rootScope', 'gsnApi', '$log', '$timeout', 'gsnStore', 'gsnProfile', '$window', gsnCouponPrinter]);
 
-  function gsnCouponPrinter($rootScope, gsnApi, $log, $timeout, gsnStore, gsnProfile) {
+  function gsnCouponPrinter($rootScope, gsnApi, $log, $timeout, gsnStore, gsnProfile, $window) {
     var service = {
       print: print,
       init: init,
+      loadingScript: false,
       activated: false
     };
     var couponClasses = [];
@@ -17,10 +18,23 @@
     return service;
 
     function activate() {
-      // wait until gcprinter is available
       if (typeof(gcprinter) == 'undefined') {
         $log.log('waiting for gcprinter...');
-        $timeout(activate, 100);
+        $timeout(activate, 500);
+
+        if (service.loadingScript) return;
+
+        service.loadingScript = true;
+
+        // dynamically load google
+        var src = '//cdn.gsngrocers.com/script/gcprinter/gcprinter.min.js';
+
+        // Prefix protocol
+        if ($window.location.protocol === 'file') {
+          src = 'https:' + src;
+        }
+
+        gsnApi.loadScripts(src, activate);
         return;
       }
 

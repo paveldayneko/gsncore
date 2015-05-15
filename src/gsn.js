@@ -566,6 +566,10 @@
       }
     }
     else {
+      if (typeof(uris) == 'string'){
+        uris = [uris];
+      }
+      
       var toProcess = [].concat(uris);
       processNext();
     }

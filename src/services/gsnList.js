@@ -25,16 +25,18 @@
       function processServerItem(serverItem, localItem) {
         if (serverItem) {
           var itemKey = returnObj.getItemKey(localItem);
-          $mySavedData.items[itemKey] = undefined;
           
           // set new server item order
           serverItem.Order = localItem.Order;
 
+          // remove existing item locally if new id has been detected
+          if (serverItem.ItemId != localItem.ItemId){
+            returnObj.removeItem(localItem, true);
+          }
+
           // Add the new server item.
           $mySavedData.items[returnObj.getItemKey(serverItem)] = serverItem;
-
-          // Since we are chainging the saved data, the count is suspect.
-          $mySavedData.countCache = 0;
+          saveListToSession();
         }
       }
 
@@ -84,6 +86,7 @@
               if (existingItem.OldQuantity) {
                 existingItem.NewQuantity = existingItem.OldQuantity;
                 existingItem.Quantity = existingItem.OldQuantity;
+                saveListToSession();
               }
             });
           });
@@ -91,8 +94,8 @@
           returnObj.removeItem(existingItem);
         }
 
-        $rootScope.$broadcast('gsnevent:shoppinglist-changed', returnObj);
         saveListToSession();
+        $rootScope.$broadcast('gsnevent:shoppinglist-changed', returnObj);
       };
 
       // add item to list
@@ -111,10 +114,10 @@
           item.Id = undefined;
           item.ShoppingListItemId = undefined;
           item.ShoppingListId = returnObj.ShoppingListId;
+          item.CategoryId = item.CategoryId || -1;
 
           existingItem = item;
           $mySavedData.items[returnObj.getItemKey(existingItem)] = existingItem;
-
         }
         else { // update existing item
 
@@ -140,6 +143,9 @@
 
         if (!gsnApi.isNull(deferSync, false)) {
           returnObj.syncItem(existingItem);
+        } else
+        {
+          saveListToSession();
         }
 
         return existingItem;
@@ -154,8 +160,8 @@
         });
 
         $rootScope.$broadcast('gsnevent:shoppinglistitems-updating', returnObj);
+        saveListToSession();
 
-        $mySavedData.countCache = 0;
         gsnApi.getAccessToken().then(function () {
 
           var url = gsnApi.getShoppingListApiUrl() + '/SaveItems/' + returnObj.ShoppingListId;
@@ -195,9 +201,9 @@
             $mySavedData.items = items;
           }
 
-          if (deferRemove) return returnObj;
+          saveListToSession();
 
-          $mySavedData.countCache = 0;
+          if (deferRemove) return returnObj;
           gsnApi.getAccessToken().then(function () {
             $rootScope.$broadcast('gsnevent:shoppinglist-item-removing', returnObj, item);
 
@@ -286,8 +292,6 @@
       returnObj.clearItems = function () {
         // clear the items
         $mySavedData.items = {};
-
-        $mySavedData.countCache = 0;
         returnObj.saveChanges();
       };
 
@@ -335,6 +339,8 @@
         angular.forEach(items, function (item) {
           syncitems.push(item.ItemId);
         });
+
+        saveListToSession();
 
         gsnApi.getAccessToken().then(function () {
 
@@ -393,6 +399,9 @@
 
       function saveListToSession() {
         betterStorage.currentShoppingList = $mySavedData;
+
+        // Since we are chainging the saved data, the count is suspect.
+        $mySavedData.countCache = 0;
       }
 
       function loadListFromSession() {
