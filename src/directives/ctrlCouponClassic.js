@@ -42,7 +42,18 @@
     $scope.sortBy = 'EndDate';
     $scope.sortByName = 'About to Expire';
     $scope.filterBy = '';
-    $scope.couponType = $scope.couponType || 'digital';  // 'digital', 'printable', 'instore'
+    $scope.coupons = {
+      printable: { items: []},
+      digital: { items: []},
+      store: { items: []}
+    };
+    $scope.couponType = 'store';
+    if ($scope.currentPath.indexOf('/coupons/printable') == 0){
+      $scope.couponType = 'printable';
+    } else if ($scope.currentPath.indexOf('/coupons/digital') == 0) {
+      $scope.couponType = 'digital';
+    }
+    
     $scope.itemsPerPage = ($location.search()).itemsperpage || ($location.search()).itemsPerPage || $scope.itemsPerPage || 20;
 
     function loadMore() {
@@ -70,6 +81,10 @@
         };
       }
 
+      $scope.coupons.printable.items = manuCoupons.items || [];
+      $scope.coupons.store.items = instoreCoupons.items || [];
+      $scope.coupons.digital.items = youtechCouponsOriginal.items || [];
+      
       $scope.preSelectedCoupons.items.length = 0;
       $scope.preSelectedCoupons.targeted.length = 0;
       var list = $scope.preSelectedCoupons;
@@ -97,7 +112,7 @@
         });
 
         list.items = manuCoupons.items;
-      } else if ($scope.couponType == 'instore') {
+      } else {
         list.items = instoreCoupons.items;
       }
     }

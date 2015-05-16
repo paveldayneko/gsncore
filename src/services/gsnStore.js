@@ -430,6 +430,7 @@
         item.CategoryName = gsnApi.isNull($circularProcessed.categoryById[item.CategoryId], { CategoryName: '' }).CategoryName;
         $circularProcessed.manuCouponById[item.ItemId] = item;
       });
+      gsnApi.getConfig().hasPrintableCoupon = $localCache.manufacturerCoupons.items.length > 0;
     }
 
     function processInstoreCoupon() {
@@ -443,6 +444,8 @@
           items.push(item);
         }
       });
+
+      gsnApi.getConfig().hasStoreCoupon = items.length > 0;
 
       $localCache.instoreCoupons.items = items;
     }
@@ -458,6 +461,8 @@
         item.CategoryName = gsnApi.isNull($circularProcessed.categoryById[item.CategoryId], {CategoryName: ''}).CategoryName;
         $circularProcessed.youtechCouponById[item.ItemId] = item;
       });
+
+      gsnApi.getConfig().hasDigitalCoupon = $localCache.youtechCoupons.items.length > 0;
     }
 
     function processCoupon() {

@@ -96,12 +96,15 @@
     FacebookPermission: null,
     GoogleSiteSearchCode: null,
     DisableLimitedTimeCoupons: false,
-    hasRoundyProfile: false,
-    hasInit: false,
     Theme: null,
     HomePage: null,
     StoreList: null,
-    AllContent: null
+    AllContent: null,
+    hasDigitalCoupon: false,
+    hasStoreCoupon: false,
+    hasPrintableCoupon: false,
+    hasRoundyProfile: false,
+    hasInit: false
   };
 
   gsn.identity = function (value) {

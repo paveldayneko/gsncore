@@ -13,6 +13,8 @@
     returnObj.getLoyaltyCard = function (profile, callback) {
       if (returnObj.rewardCard !== null) {
         $timeout(function () { callback(returnObj.rewardCard, returnObj.isValid); }, 500);
+      } else if ((profile.ExternalId || '').length < 2) {
+        callback(null, false);
       } else {
         var url = gsnApi.getStoreUrl().replace(/store/gi, 'ProLogic') + '/GetCardMember/' + gsnApi.getChainId() + '/' + profile.ExternalId;
         $http.get(url).success(function(response) {

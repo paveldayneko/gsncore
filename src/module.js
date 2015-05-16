@@ -11,8 +11,9 @@
       gsn.init($locationProvider, $sceDelegateProvider, $sceProvider, $httpProvider, FacebookProvider, $analyticsProvider)
     }
    ])
-  .run(['$rootScope', 'gsnGlobal', 'gsnApi', function ($rootScope, gsnGlobal, gsnApi) {
+  .run(['$rootScope', 'gsnGlobal', 'gsnApi', '$window', function ($rootScope, gsnGlobal, gsnApi, $window) {
     $rootScope.siteMenu = gsnApi.getConfig().SiteMenu;
+    $rootScope.win = $window;
     gsnGlobal.init(true);
   }]);
 

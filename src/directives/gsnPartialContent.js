@@ -19,7 +19,9 @@
       attrs.gsnPartialContent = attrs.gsnPartialContent || currentPath;
       scope.activate = activate;
       scope.pcvm = {
-        hasScript: false
+        hasScript: false,
+        notFound: false,
+        isLoading: true
       }
       scope.partialContents = [];
       scope.contentDetail = {
@@ -44,7 +46,9 @@
         // attempt to retrieve static content remotely
         gsnStore.getPartial(scope.contentDetail.name).then(function (rst) {
           scope.pcvm.hasScript = false
+          scope.pcvm.isLoading = false
           if (rst.success) {
+            scope.pcvm.notFound = rst.response == "null";
             processData(rst.response);
           }
         });
