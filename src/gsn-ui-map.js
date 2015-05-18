@@ -37,27 +37,12 @@
             var gmap = (window.google || {}).maps || {};
             if (typeof( gmap.Map ) === 'undefined')
             {
-
-              $timeout(activate, 500);
-
-              if (scope.loadingScript) return;
-
-              scope.loadingScript = true;
-              var myCallback = 'dynamic' + new Date().getTime();
-              window[myCallback] = activate;
-
-              // dynamically load google
-              var src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=geometry&&callback=' + myCallback;
-
-              // Prefix protocol
-              if (window.location.protocol === 'file') {
-                src = 'https:' + src;
-              }
-
-              gsnApi.loadScripts(src, activate);
+              // wait until it is defined
+              $timeout(activate, 100);
               return;
             }
             
+            // wait for uiOptions
             if (!attrs.uiOptions) {
               $timeout(activate, 100);
               return;
@@ -92,7 +77,7 @@
             if (typeof( gmap.InfoWindow ) === 'undefined')
             {
               // wait until it is defined
-              $timeout(activate, 200);
+              $timeout(activate, 100);
               return;
             }
 
