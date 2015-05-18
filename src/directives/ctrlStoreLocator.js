@@ -20,7 +20,6 @@
   function myController($scope, gsnApi, $notification, $timeout, $rootScope, $location, gsnStore) {
     $scope.activate = activate;
 
-    var geocoder = new google.maps.Geocoder();
     var defaultZoom = $scope.defaultZoom || 10;
 
     $scope.fromUrl = $location.search().fromUrl;
@@ -38,23 +37,9 @@
     $scope.searchFailed = false;
     $scope.searchFailedResultCount = 1;
     $scope.pharmacyOnly = false;
+    $scope.myMarkerGrouping = [];
+    $scope.activated = false;
 
-    $scope.mapOptions = {
-      center: new google.maps.LatLng(0, 0),
-      zoom: defaultZoom,
-      circle: null,
-      panControl: false,
-      zoomControl: true,
-      zoomControlOptions: {
-        style: google.maps.ZoomControlStyle.LARGE,
-        position: google.maps.ControlPosition.LEFT_CENTER
-      },
-      scaleControl: true,
-      navigationControl: false,
-      streetViewControl: false,
-      //styles: myStyles,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
 
     $scope.openMarkerInfo = function (marker, zoom) {
       $scope.currentMarker = marker;
@@ -132,6 +117,7 @@
       }
 
       $scope.myMarkers = tempMarkers;
+      $scope.myMarkerGrouping = gsnApi.groupBy($scope.myMarkers, 'SortBy');
     };
 
     // find the best zoom to fit all markers
@@ -239,6 +225,36 @@
     };
 
     function activate() {
+      var gmap = (window.google || {}).maps || {};
+      if ((typeof( gmap.Geocoder ) === 'undefined') 
+        || (typeof( gmap.InfoWindow ) === 'undefined')
+        || (typeof( gmap.Map ) === 'undefined'))
+      {
+        $timeout(activate, 200);
+        return;
+      }
+
+      if (!$scope.activated){
+        $scope.activated = true;
+        var geocoder = new google.maps.Geocoder();
+        $scope.mapOptions = {
+          center: new google.maps.LatLng(0, 0),
+          zoom: defaultZoom,
+          circle: null,
+          panControl: false,
+          zoomControl: true,
+          zoomControlOptions: {
+            style: google.maps.ZoomControlStyle.LARGE,
+            position: google.maps.ControlPosition.LEFT_CENTER
+          },
+          scaleControl: true,
+          navigationControl: false,
+          streetViewControl: false,
+          //styles: myStyles,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+      }
+
       gsnStore.getStore().then(function (store) {
         var show = gsnApi.isNull($location.search().show, '');
         if (show == 'event') {
@@ -300,6 +316,8 @@
     });
 
     $scope.$watch('pharmacyOnly', function (event, result) {
+      if (!$scope.activated) return;
+
       var newValue = $scope.search.storeLocator;
       if (gsnApi.isNull(newValue, '').length > 1) {
         $scope.doSearch(true);
@@ -329,6 +347,7 @@
       });
 
       location.zDistance = parseFloat(gsnApi.isNull(location.Distance, 0)).toFixed(2);
+      marker.SortBy = location.SortBy;
 
       return marker;
     };

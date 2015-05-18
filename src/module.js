@@ -2,9 +2,10 @@
   'use strict';
   /* fake definition of angular-facebook if there is none */
   angular.module('facebook', []);
+  angular.module('ui.map', []);
 
   var serviceId = 'gsnApi';
-  var mygsncore = angular.module('gsn.core', ['ngRoute', 'ngSanitize', 'facebook', 'angulartics']);
+  var mygsncore = angular.module('gsn.core', ['ngRoute', 'ngSanitize', 'facebook', 'angulartics', 'ui.event']);
 
   mygsncore.config(['$locationProvider', '$sceDelegateProvider', '$sceProvider', '$httpProvider', 'FacebookProvider', '$analyticsProvider',
     function($locationProvider, $sceDelegateProvider, $sceProvider, $httpProvider, FacebookProvider, $analyticsProvider) {
