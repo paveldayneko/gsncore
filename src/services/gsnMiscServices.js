@@ -126,6 +126,21 @@
     };
   }]);
 
+  myModule.directive('scrollTo', ['$location', function ($location) {
+    return function(scope, element, attrs) {
+
+      element.bind('click', function(event) {
+          event.stopPropagation();
+          var off = scope.$on('$locationChangeStart', function(ev) {
+              off();
+              ev.preventDefault();
+          });
+          var location = attrs.scrollTo;
+          $location.hash(location);
+      });
+    };
+  }]);
+
   myModule.directive('ngScrollTop', ['$window', '$timeout', function ($window, $timeout) {
     var directive = {
       link: link,

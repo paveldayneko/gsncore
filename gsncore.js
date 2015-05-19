@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.4.14
+ * version 1.4.15
  * gsncore repository
- * Build date: Mon May 18 2015 07:21:29 GMT-0500 (CDT)
+ * Build date: Mon May 18 2015 21:30:06 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -11653,6 +11653,23 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       }
     };
   }]);
+
+  myModule.directive('scrollTo', function ($location, $anchorScroll) {
+    return function(scope, element, attrs) {
+
+      element.bind('click', function(event) {
+          event.stopPropagation();
+          var off = scope.$on('$locationChangeStart', function(ev) {
+              off();
+              ev.preventDefault();
+          });
+          var location = attrs.scrollTo;
+          $location.hash(location);
+          $anchorScroll();
+      });
+
+    };
+  });
 
   myModule.directive('ngScrollTop', ['$window', '$timeout', function ($window, $timeout) {
     var directive = {
