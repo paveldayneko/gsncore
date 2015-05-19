@@ -38,7 +38,32 @@ gulp.task('build', function() {
     .pipe(gulp.dest('.'));
 });
 
-gulp.task('default', ['build'], function() {
+
+gulp.task('build-basic', function() {
+  return gulp.src(['src/gsn.js', 'src/module.js', 'src/gsn-ui-map.js', 'src/angular-recaptcha.js', 'src/filters/*.js', 'src/services/!(gsnProLogicRewardCard).js'
+    , 'src/directives/ctrlAccount.js'
+    , 'src/directives/ctrlChangePassword.js'
+    , 'src/directives/ctrlLogin.js'
+    , 'src/directives/ctrlShoppingList.js'
+    , 'src/directives/facebook.js'
+    , 'src/directives/gsn*.js'
+    , 'src/directives/ngGiveHead.js'
+    , 'src/directives/placeholder.js'
+    , 'vendor/angulartics.min.js'
+    ])
+    .pipe(concat('gsncore-basic.js'))
+    .pipe(header(banner, {pkg: pkg}))
+    .pipe(gulp.dest('.'));
+});
+
+
+gulp.task('default', ['build', 'build-basic'], function() {
+  gulp.src('./gsncore-basic.js')
+    .pipe(uglify())
+    .pipe(header(banner, {pkg: pkg}))
+    .pipe(rename({suffix: '.min'}))
+    .pipe(gulp.dest('.'));
+
   return gulp.src('./gsncore.js')
     .pipe(uglify())
     .pipe(header(banner, {pkg: pkg}))

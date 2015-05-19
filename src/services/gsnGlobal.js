@@ -20,8 +20,9 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       returnObj.hasInit = true;
 
 
-      if (initProfile)
+      if (initProfile) {
         gsnProfile.initialize();
+      }
 
       $scope = $scope || $rootScope;
       $scope.defaultLayout = $scope.defaultLayout || gsnApi.getThemeUrl('/views/layout.html');
@@ -245,21 +246,24 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         $scope.gvm.noCircular = !data.success;
       });
 
-      $scope.$watch(function () {
-        return Facebook.isReady(); // This is for convenience, to notify if Facebook is loaded and ready to go.
-      }, function (newVal) {
-        $scope.facebookReady = true; // You might want to use this to disable/show/hide buttons and else
+      // trigger facebook init if there is appId
+      if (gsnApi.getConfig().FacebookAppId) {
+        $scope.$watch(function () {
+          return Facebook.isReady(); // This is for convenience, to notify if Facebook is loaded and ready to go.
+        }, function (newVal) {
+          $scope.facebookReady = true; // You might want to use this to disable/show/hide buttons and else
 
-        if (gsnApi.isLoggedIn()) return;
+          if (gsnApi.isLoggedIn()) return;
 
-        // attempt to auto login facebook user
-        Facebook.getLoginStatus(function (response) {
-          // only auto login for connected status
-          if (response.status == 'connected') {
-            $scope.validateRegistration(response);
-          }
+          // attempt to auto login facebook user
+          Facebook.getLoginStatus(function (response) {
+            // only auto login for connected status
+            if (response.status == 'connected') {
+              $scope.validateRegistration(response);
+            }
+          });
         });
-      });
+      }
 
       //#region analytics
       $scope.$on('gsnevent:shoppinglistitem-updating', function (event, shoppingList, item) {

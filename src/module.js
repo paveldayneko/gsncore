@@ -1,8 +1,14 @@
 (function (gsn, angular, undefined) {
   'use strict';
-  /* fake definition of angular-facebook if there is none */
-  angular.module('facebook', []);
+  /* fake definition of angular-facebook if there is none */ 
+  angular.module('facebook', []).provider('Facebook', function test(){
+    return { init: function() {}, $get: function() { return new test(); } };
+  });
   angular.module('ui.map', []);
+  angular.module('ui.event', []);
+  angular.module('ui.utils', []);
+  angular.module('ui.keypress', []);
+  angular.module('chieffancypants.loadingBar', []);
 
   var serviceId = 'gsnApi';
   var mygsncore = angular.module('gsn.core', ['ngRoute', 'ngSanitize', 'facebook', 'angulartics', 'ui.event']);
