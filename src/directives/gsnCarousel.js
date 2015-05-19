@@ -140,12 +140,13 @@
       //#region private functions
       // initialize
       function activate() {
-        if (gsnApi.isNull(scope[attrs.slides], []).length <= 0) {
+        var slides = scope.$eval(attrs.slides);
+        if (gsnApi.isNull(slides, []).length <= 0) {
           $timeout(activate, 200);
           return;
         }
         
-        scope.slides = scope[attrs.slides];
+        scope.slides = slides;
         scope.selectIndex(0);
         var win = angular.element($window);
         win.blur(function() {

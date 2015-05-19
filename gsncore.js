@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.15
  * gsncore repository
- * Build date: Tue May 19 2015 12:28:53 GMT-0500 (CDT)
+ * Build date: Tue May 19 2015 12:52:27 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -7844,12 +7844,13 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       //#region private functions
       // initialize
       function activate() {
-        if (gsnApi.isNull(scope[attrs.slides], []).length <= 0) {
+        var slides = scope.$eval(attrs.slides);
+        if (gsnApi.isNull(slides, []).length <= 0) {
           $timeout(activate, 200);
           return;
         }
         
-        scope.slides = scope[attrs.slides];
+        scope.slides = slides;
         scope.selectIndex(0);
         var win = angular.element($window);
         win.blur(function() {
