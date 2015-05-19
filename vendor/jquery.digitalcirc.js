@@ -9,7 +9,7 @@
 
 // the semi-colon before function invocation is a safety net against concatenated
 // scripts and/or other plugins which may not be closed properly.
-; (function ($, templateEngine, window, document, undefined) {
+; (function ($, window, document, undefined) {
 
   // undefined is used here as the undefined global variable in ECMAScript 3 is
   // mutable (ie. it can be changed by someone else). undefined isn't really being
@@ -65,7 +65,7 @@
 
     this.element = element;
 
-    templateEngine.registerHelper('ifeq', function (v1, v2, options) {
+    HandleBars.registerHelper('ifeq', function (v1, v2, options) {
       if (v1 === v2) {
         return options.fn(this);
       }
@@ -79,10 +79,10 @@
     this.settings = $.extend({}, defaults, options);
 
     // compile templates
-    this._templateCircList = templateEngine.compile(this.settings.templateCircularList);
-    this._templateCircPopup = templateEngine.compile(this.settings.templateCircularPopup);
-    this._templateCircPopupTitle = templateEngine.compile(this.settings.templateCircularPopupTitle);
-    this._templateCircSingle = templateEngine.compile(this.settings.templateLinkBackToList +
+    this._templateCircList = HandleBars.compile(this.settings.templateCircularList);
+    this._templateCircPopup = HandleBars.compile(this.settings.templateCircularPopup);
+    this._templateCircPopupTitle = HandleBars.compile(this.settings.templateCircularPopupTitle);
+    this._templateCircSingle = HandleBars.compile(this.settings.templateLinkBackToList +
         this.settings.templatePagerTop +
         this.settings.templateCircularSingle +
         this.settings.templatePagerBottom);
@@ -292,4 +292,4 @@
     });
   };
 
-})(jQuery, Handlebars, window, document);
+})(jQuery, window, document);

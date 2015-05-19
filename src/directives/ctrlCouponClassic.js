@@ -160,10 +160,10 @@
     
     // trigger modal
     $scope.$on('gsnevent:gcprinter-not-supported', function() {
-      $scope.printer.blocked++;
+      $scope.printer.notsupported++;
     });
     $scope.$on('gsnevent:gcprinter-blocked', function() {
-      $scope.printer.notsupported++;
+      $scope.printer.blocked++;
     });
     $scope.$on('gsnevent:gcprinter-not-found', function() {
       $scope.printer.notinstalled++;
