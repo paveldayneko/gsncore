@@ -1,0 +1,20 @@
+{
+  "name": "gsncore",
+  "version": "1.4.15",
+  "description": "gsncore",
+  "homepage": "http://www.groceryshopping.net",
+  "author": "Tom Nguyen",
+  "main": [
+    "gsncore.js",
+    "gsncore.min.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:gsn/gsncore.git"
+  },
+  "keywords": [
+    "website"
+  ],
+  "dependencies": {},
+  "development": {}
+}

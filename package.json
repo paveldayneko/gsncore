@@ -23,9 +23,12 @@
     "website"
   ],
   "directories": {
-    "example": "example",
     "test": "test"
   },
+  "main": [
+    "gsncore.js",
+    "gsncore.min.js"
+  ],
   "dependencies": {},
   "devDependencies": {
     "gulp": "~3.8.10",
