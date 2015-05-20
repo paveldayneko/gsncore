@@ -1,4 +1,6 @@
 (function (gsn, angular, undefined) {
+  
+
   'use strict';
   /* fake definition of angular-facebook if there is none */ 
   angular.module('facebook', []).provider('Facebook', function test(){
@@ -19,6 +21,18 @@
     }
    ])
   .run(['$rootScope', 'gsnGlobal', 'gsnApi', '$window', function ($rootScope, gsnGlobal, gsnApi, $window) {
+    var head = angular.element('head');
+    var myHtml = '<!--[if lt IE 10]>\n' +
+      '<script src="@this.ViewBag.CdnUrl/script/lib/proxy/xdomain.min.js" data-slave="@this.ViewBag.CdnUrl/script/lib/proxy/proxy.html"></script>' +
+      '<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script>' +
+      '<script src="//cdnjs.cloudflare.com/ajax/libs/es5-shim/2.2.0/es5-shim.min.js"></script>' +
+      '<script src="//cdnjs.cloudflare.com/ajax/libs/es5-shim/2.2.0/es5-sham.min.js"></script>' +
+      '<script src="//cdnjs.cloudflare.com/ajax/libs/json2/20130526/json2.min.js"></script>' +
+      '\n<![endif]-->';
+    var contentBaseUrl = gsn.config.ContentBaseUrl;
+    var lastSlash = contentBaseUrl.indexOf('/asset');
+    head.append(myHtml.replace(/@this.ViewBag.CdnUrl/gi, contentBaseUrl.substr(0, lastSlash - 1)));
+
     $rootScope.siteMenu = gsnApi.getConfig().SiteMenu;
     $rootScope.win = $window;
     gsnGlobal.init(true);
@@ -305,6 +319,10 @@
         i++;
 
         if (storeId <= 0) {
+          if (gsn.config.StoreList.length == v.StoreIds.length) {
+            contentDataResult = v;
+          }
+          
           return;
         }
 

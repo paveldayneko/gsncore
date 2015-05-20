@@ -59,6 +59,8 @@
                 item.isStuck = false;
               }
             });
+            
+            return true;
           });
 
           var recheckPositions = function () {

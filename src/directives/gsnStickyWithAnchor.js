@@ -33,6 +33,7 @@
         }
         
         element.css({ 'position': isScticky ? 'fixed' : 'relative' });
+        return true;
       }
 
       angular.element($window).on('scroll', checkSticky);
