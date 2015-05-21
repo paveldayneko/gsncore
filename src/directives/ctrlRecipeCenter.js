@@ -121,8 +121,8 @@
         resultString += 'AttributeList:|' + gsnApi.isNull(attributes, '') + ';';
       }
 
-      $scope.goUrl('/recipe/search?q=' + encodeURIComponent(resultString));
       $scope.$emit('gsnevent:closemodal');
+      $scope.goUrl('/recipe/search?q=' + encodeURIComponent(resultString));
     };
 
     $scope.activate();
