@@ -176,13 +176,13 @@
         if ($target.hasClass('pager-previous') || realTarget.hasClass('pager-previous')){
           idx = (pageIdx || 0);
           if (idx <= 0){
-            idx = 1;
+            idx = circ.Pages.length;
           }
         }
         else if ($target.hasClass('pager-next') || realTarget.hasClass('pager-next')) {
           idx = (pageIdx || 0) + 2;
           if (circ.Pages.length < idx) {
-            idx = circ.Pages.length;
+            idx = 1;
           }
         }
 
