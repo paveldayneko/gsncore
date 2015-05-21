@@ -173,13 +173,16 @@
         var $target = $(evt.target);
         var realTarget = $target.parent('a');
         var idx = $target.html();
-        if (realTarget.hasClass('pager-previous')){
-          idx = pageIdx + 1;
+        if ($target.hasClass('pager-previous') || realTarget.hasClass('pager-previous')){
+          idx = (pageIdx || 0);
+          if (idx <= 0){
+            idx = 1;
+          }
         }
-        else if (realTarget.hasClass('pager-next')) {
-          idx = pageIdx + 2;
-          if ($this.settings.data.Circulars.length < idx) {
-            idx = $this.settings.data.Circulars.length;
+        else if ($target.hasClass('pager-next') || realTarget.hasClass('pager-next')) {
+          idx = (pageIdx || 0) + 2;
+          if (circ.Pages.length < idx) {
+            idx = circ.Pages.length;
           }
         }
 
