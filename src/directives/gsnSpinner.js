@@ -2,7 +2,7 @@
   'use strict';
   var myModule = angular.module('gsn.core');
 
-  myModule.directive('gsnSpinner', ['$window', '$timeout', function ($window, $timeout) {
+  myModule.directive('gsnSpinner', ['$window', '$timeout', 'gsnApi', function ($window, $timeout, gsnApi) {
     // Usage:   Display spinner
     // 
     // Creates: 2014-01-06
@@ -35,41 +35,59 @@
     return directive;
 
     function link(scope, element, attrs) {
-      if (!$window.Spinner) return;
-      
-      var options = scope.$eval(attrs.gsnSpinner);
-      options.stopDelay = options.stopDelay || 200;
-      
-      function stopSpinner() {
-        if (scope.gsnSpinner) {
-          scope.gsnSpinner.stop();
-          scope.gsnSpinner = null;
+      function activate() {
+        if (typeof(Spinner) === 'undefined') {
+          $timeout(activate, 200);
+
+          if (scope.loadingScript) return;
+          scope.loadingScript = true;
+
+          // dynamically load google
+          var src = '//cdnjs.cloudflare.com/ajax/libs/spin.js/1.3.2/spin.min.js';
+
+          // Prefix protocol
+          if ($window.location.protocol === 'file') {
+            src = 'https:' + src;
+          }
+
+          gsnApi.loadScripts([src]);
+          return;
         }
-      }
-
-      scope.$watch(attrs.showIf, function (newValue) {
-        stopSpinner();
-        if (newValue) {
-          scope.gsnSpinner = new $window.Spinner(options);
-          scope.gsnSpinner.spin(element[0]);
-
-          if (options.timeout) {
-            $timeout(function () {
-              var val = scope[attrs.showIf];
-              if (typeof (val) == 'boolean') {
-                // this should cause it to stop spinner
-                scope[attrs.showIf] = false;
-              } else {
-                $timeout(stopSpinner, options.stopDelay);
-              }
-            }, options.timeout);
+        
+        var options = scope.$eval(attrs.gsnSpinner);
+        options.stopDelay = options.stopDelay || 200;
+        
+        function stopSpinner() {
+          if (scope.gsnSpinner) {
+            scope.gsnSpinner.stop();
+            scope.gsnSpinner = null;
           }
         }
-      }, true);
 
-      scope.$on('$destroy', function () {
-        $timeout(stopSpinner, options.stopDelay);
-      });
+        scope.$watch(attrs.showIf, function (newValue) {
+          stopSpinner();
+          if (newValue) {
+            scope.gsnSpinner = new $window.Spinner(options);
+            scope.gsnSpinner.spin(element[0]);
+
+            if (options.timeout) {
+              $timeout(function () {
+                var val = scope[attrs.showIf];
+                if (typeof (val) == 'boolean') {
+                  // this should cause it to stop spinner
+                  scope[attrs.showIf] = false;
+                } else {
+                  $timeout(stopSpinner, options.stopDelay);
+                }
+              }, options.timeout);
+            }
+          }
+        }, true);
+
+        scope.$on('$destroy', function () {
+          $timeout(stopSpinner, options.stopDelay);
+        });
+      }
     }
   }]);
 })(angular);

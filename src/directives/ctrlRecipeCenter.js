@@ -122,6 +122,7 @@
       }
 
       $scope.goUrl('/recipe/search?q=' + encodeURIComponent(resultString));
+      $scope.$emit('gsnevent:closemodal');
     };
 
     $scope.activate();
