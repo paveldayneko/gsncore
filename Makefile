@@ -27,7 +27,7 @@ default: build
 
 clean:
 	@rm -rf components $(BUILD)
-	@rm -f gsncore.js gsncore.min.js
+	@rm -f gsncore.js gsncore.min.js gsncore-basic.js gsncore-basic.min.js
 	@rm -rf node_modules npm-debug.log
 #
 # Test with phantomjs.

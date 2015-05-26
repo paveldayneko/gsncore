@@ -70,7 +70,6 @@
 
       if (!$scope.vmsl.activated) {
         $scope.vmsl.activated = true;
-        var geocoder = new google.maps.Geocoder();
         $scope.mapOptions = {
           center: new google.maps.LatLng(0, 0),
           zoom: defaultZoom,
@@ -268,6 +267,7 @@
           $scope.setSearchResult(point);
         } else {
 
+          var geocoder = new google.maps.Geocoder();
           geocoder.geocode({ 'address': newValue }, function (results, status) {
             if (status == google.maps.GeocoderStatus.OK) {
               point = new google.maps.LatLng(results[0].geometry.location.lat(), results[0].geometry.location.lng());
