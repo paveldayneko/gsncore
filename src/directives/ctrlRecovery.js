@@ -49,7 +49,7 @@
       /// <summary>submit handler for recover username</summary>    
       var payload = $scope.profile;
       if ($scope.myRecoveryForm.$valid) {
-        payload.ReturnUrl = $scope.getFullPath('/profile');
+        payload.ReturnUrl = gsn.config.hasRoundyProfile ? $scope.getFullPath('/myaccount') : $scope.getFullPath('/profile');
         payload.Email = $scope.profile.Email;
         $scope.hasSubmitted = true;
         $scope.isSubmitting = true;
