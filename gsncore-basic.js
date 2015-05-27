@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.15
  * gsncore repository
- * Build date: Tue May 26 2015 10:28:16 GMT-0500 (CDT)
+ * Build date: Wed May 27 2015 13:53:02 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -3231,6 +3231,17 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       });
     }
   }]);
+
+  myModule.directive('stopEvent', function () {
+    return {
+        restrict: 'A',
+        link: function (scope, element, attr) {
+            element.bind(attr.stopEvent, function (e) {
+                e.stopPropagation();
+            });
+        }
+    };
+  });
 
 })(angular);
 (function (angular, undefined) {
