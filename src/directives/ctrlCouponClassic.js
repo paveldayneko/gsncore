@@ -107,7 +107,7 @@
           
         $scope.selectedCoupons.totalSavings = totalSavings.toFixed(2);
       } else if ($scope.couponType == 'printable') {
-        gcprinter.init();
+        gsnCouponPrinter.init();
         gsnStore.getManufacturerCouponTotalSavings().then(function (rst) {
           $scope.selectedCoupons.totalSavings = parseFloat(rst.response).toFixed(2);
         });

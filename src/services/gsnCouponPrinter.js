@@ -8,6 +8,7 @@
       print: print,
       init: init,
       loadingScript: false,
+      isScriptReady: false,
       activated: false
     };
     var couponClasses = [];
@@ -74,18 +75,25 @@
           $rootScope.$broadcast('gsnevent:gcprinter-printfail', rsp);
         }, 5);
       });
+
+     // keep trying to init until ready
+      gcprinter.on('initcomplete', function() {
+        service.isScriptReady = true;
+        init();
+      });
       return;
     }
 
     function init() {
-       if (!gcprinter.isReady) {
-        // keep trying to init until ready
-        gcprinter.on('initcomplete', function() {
-          $timeout(printInternal, 5);
-        });
+      if (typeof(gcprinter) === 'undefined') {
+        $timeout(init, 500);
+      }
+
+      if (!service.isScriptReady) {
         gcprinter.init();
         return;
       }
+
       $timeout(printInternal, 5);
     }
 
