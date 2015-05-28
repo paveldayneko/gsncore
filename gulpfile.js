@@ -49,7 +49,12 @@ gulp.task('build-basic', function() {
     , 'src/directives/gsn*.js'
     , 'src/directives/ngGiveHead.js'
     , 'src/directives/placeholder.js'
+    , 'vendor/angular-facebook.js'
     , 'vendor/angulartics.min.js'
+    , 'vendor/fastclick.js'
+    , 'vendor/loading-bar.min.js'
+    , 'vendor/ng-infinite-scroll.min.js'
+    , 'vendor/ui-utils.min.js'
     ])
     .pipe(concat('gsncore-basic.js'))
     .pipe(header(banner, {pkg: pkg}))
