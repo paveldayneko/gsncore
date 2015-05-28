@@ -88,6 +88,7 @@
     ChainId: 0,
     ChainName: 'Grocery Shopping Network',
     DfpNetworkId: '/6394/digitalstore.test',
+    GoogleTagId: null,
     GoogleAnalyticAccountId1: null,
     GoogleAnalyticAccountId2: null,
     GoogleSiteVerificationId: null,
@@ -388,6 +389,10 @@
   };
 
   gsn.initAnalytics = function($analyticsProvider) {
+    // provide backward compatibility if not googletag
+    if (gsn.config.GoogleTagId) {
+      return;
+    }
 
     // GA already supports buffered invocations so we don't need
     // to wrap these inside angulartics.waitForVendorApi

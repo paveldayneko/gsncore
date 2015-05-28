@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.4.15
+ * version 1.4.16
  * gsncore repository
- * Build date: Wed May 27 2015 13:53:02 GMT-0500 (CDT)
+ * Build date: Thu May 28 2015 09:42:01 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -94,6 +94,7 @@
     ChainId: 0,
     ChainName: 'Grocery Shopping Network',
     DfpNetworkId: '/6394/digitalstore.test',
+    GoogleTagId: null,
     GoogleAnalyticAccountId1: null,
     GoogleAnalyticAccountId2: null,
     GoogleSiteVerificationId: null,
@@ -394,6 +395,10 @@
   };
 
   gsn.initAnalytics = function($analyticsProvider) {
+    // provide backward compatibility if not googletag
+    if (gsn.config.GoogleTagId) {
+      return;
+    }
 
     // GA already supports buffered invocations so we don't need
     // to wrap these inside angulartics.waitForVendorApi
@@ -656,9 +661,8 @@
 }).call(this);
 
 (function (gsn, angular, undefined) {
-  
-
   'use strict';
+  
   /* fake definition of angular-facebook if there is none */ 
   angular.module('facebook', []).provider('Facebook', function test(){
     return { init: function() {}, $get: function() { return new test(); } };
@@ -1166,7 +1170,7 @@
     //  -- it will create a defer and return promise
     //  -- it will make http request and call defer resolve on success
     // when it has defer or data, it will return the promise
-    returnObj.httpGetOrPostWithCache = function (cacheObject, url, payload) {
+    returnObj.http = function (cacheObject, url, payload) {
       // when it has data, it will simulate resolve and return promise
       // when it doesn't have defer, it will create a defer and trigger request
       // otherwise, just return the promise
@@ -1203,6 +1207,8 @@
 
       return cacheObject.deferred.promise;
     };
+
+    returnObj.httpGetOrPostWithCache = returnObj.http;
 
     returnObj.isValidCaptcha = function (challenge, response) {
       var defer = $q.defer();
@@ -2242,6 +2248,14 @@ provides: [facebook]
  * License: MIT
  */
 !function(a){"use strict";var b=window.angulartics||(window.angulartics={});b.waitForVendorCount=0,b.waitForVendorApi=function(a,c,d,e,f){f||b.waitForVendorCount++,e||(e=d,d=void 0),!Object.prototype.hasOwnProperty.call(window,a)||void 0!==d&&void 0===window[a][d]?setTimeout(function(){b.waitForVendorApi(a,c,d,e,!0)},c):(b.waitForVendorCount--,e(window[a]))},a.module("angulartics",[]).provider("$analytics",function(){var c={pageTracking:{autoTrackFirstPage:!0,autoTrackVirtualPages:!0,trackRelativePath:!1,autoBasePath:!1,basePath:""},eventTracking:{},bufferFlushDelay:1e3,developerMode:!1},d=["pageTrack","eventTrack","setAlias","setUsername","setAlias","setUserProperties","setUserPropertiesOnce","setSuperProperties","setSuperPropertiesOnce"],e={},f={},g=function(a){return function(){b.waitForVendorCount&&(e[a]||(e[a]=[]),e[a].push(arguments))}},h=function(b,c){return f[b]||(f[b]=[]),f[b].push(c),function(){var c=arguments;a.forEach(f[b],function(a){a.apply(this,c)},this)}},i={settings:c},j=function(a,b){b?setTimeout(a,b):a()},k={$get:function(){return i},api:i,settings:c,virtualPageviews:function(a){this.settings.pageTracking.autoTrackVirtualPages=a},firstPageview:function(a){this.settings.pageTracking.autoTrackFirstPage=a},withBase:function(b){this.settings.pageTracking.basePath=b?a.element("base").attr("href").slice(0,-1):""},withAutoBase:function(a){this.settings.pageTracking.autoBasePath=a},developerMode:function(a){this.settings.developerMode=a}},l=function(b,d){i[b]=h(b,d);var f=c[b],g=f?f.bufferFlushDelay:null,k=null!==g?g:c.bufferFlushDelay;a.forEach(e[b],function(a,b){j(function(){d.apply(this,a)},b*k)})},m=function(a){return a.replace(/^./,function(a){return a.toUpperCase()})},n=function(a){var b="register"+m(a);k[b]=function(b){l(a,b)},i[a]=h(a,g(a))};return a.forEach(d,n),k}).run(["$rootScope","$window","$analytics","$injector",function(b,c,d,e){d.settings.pageTracking.autoTrackFirstPage&&e.invoke(["$location",function(a){var b=!0;if(e.has("$route")){var f=e.get("$route");for(var g in f.routes){b=!1;break}}else if(e.has("$state")){var h=e.get("$state");for(var i in h.get()){b=!1;break}}if(b)if(d.settings.pageTracking.autoBasePath&&(d.settings.pageTracking.basePath=c.location.pathname),d.settings.trackRelativePath){var j=d.settings.pageTracking.basePath+a.url();d.pageTrack(j,a)}else d.pageTrack(a.absUrl(),a)}]),d.settings.pageTracking.autoTrackVirtualPages&&e.invoke(["$location",function(a){d.settings.pageTracking.autoBasePath&&(d.settings.pageTracking.basePath=c.location.pathname+"#"),e.has("$route")&&b.$on("$routeChangeSuccess",function(b,c){if(!c||!(c.$$route||c).redirectTo){var e=d.settings.pageTracking.basePath+a.url();d.pageTrack(e,a)}}),e.has("$state")&&b.$on("$stateChangeSuccess",function(){var b=d.settings.pageTracking.basePath+a.url();d.pageTrack(b,a)})}]),d.settings.developerMode&&a.forEach(d,function(a,b){"function"==typeof a&&(d[b]=function(){})})}]).directive("analyticsOn",["$analytics",function(b){function c(a){return["a:","button:","button:button","button:submit","input:button","input:submit"].indexOf(a.tagName.toLowerCase()+":"+(a.type||""))>=0}function d(a){return c(a)?"click":"click"}function e(a){return c(a)?a.innerText||a.value:a.id||a.name||a.tagName}function f(a){return"analytics"===a.substr(0,9)&&-1===["On","Event","If","Properties","EventType"].indexOf(a.substr(9))}function g(a){var b=a.slice(9);return"undefined"!=typeof b&&null!==b&&b.length>0?b.substring(0,1).toLowerCase()+b.substring(1):b}return{restrict:"A",link:function(c,h,i){var j=i.analyticsOn||d(h[0]),k={};a.forEach(i.$attr,function(a,b){f(b)&&(k[g(b)]=i[b],i.$observe(b,function(a){k[g(b)]=a}))}),a.element(h[0]).bind(j,function(d){var f=i.analyticsEvent||e(h[0]);k.eventType=d.type,(!i.analyticsIf||c.$eval(i.analyticsIf))&&(i.analyticsProperties&&a.extend(k,c.$eval(i.analyticsProperties)),b.eventTrack(f,k))})}}}])}(angular);
+
+/**
+ * @license Angulartics v0.17.2
+ * (c) 2013 Luis Farzati http://luisfarzati.github.io/angulartics
+ * Google Tag Manager Plugin Contributed by http://github.com/danrowe49
+ * License: MIT
+ */
+!function(a){"use strict";a.module("angulartics").config(["$analyticsProvider",function(a){a.registerPageTrack(function(a){var b=window.dataLayer=window.dataLayer||[];b.push({event:"content-view","content-name":a})}),a.registerEventTrack(function(a,b){var c=window.dataLayer=window.dataLayer||[];c.push({event:"interaction",target:b.category,action:a,"target-properties":b.label,value:b.value,"interaction-type":b.noninteraction})})}])}(angular);
 ;(function () {
 	'use strict';
 
@@ -12180,52 +12194,52 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
     returnObj.getMyCircularItems = function () {
       var url = gsnApi.getProfileApiUrl() + '/GetCircularItems/' + gsnApi.getProfileId();
-      return gsnApi.httpGetOrPostWithCache($savedData.profileData.circularItems, url);
+      return gsnApi.http($savedData.profileData.circularItems, url);
     };
 
     returnObj.getMyPantry = function (departmentId, categoryId) {
       var url = gsnApi.getProfileApiUrl() + '/GetPantry/' + gsnApi.getProfileId() + '?' + 'departmentId=' + gsnApi.isNull(departmentId, '') + '&categoryId=' + gsnApi.isNull(categoryId, '');
-      return gsnApi.httpGetOrPostWithCache($savedData.profileData.myPantry, url);
+      return gsnApi.http($savedData.profileData.myPantry, url);
     };
 
     returnObj.getMyProducts = function () {
       var url = gsnApi.getProfileApiUrl() + '/GetScoredProducts/' + gsnApi.getProfileId();
-      return gsnApi.httpGetOrPostWithCache($savedData.profileData.scoredProducts, url);
+      return gsnApi.http($savedData.profileData.scoredProducts, url);
     };
 
     returnObj.getMyRecipes = function () {
       var url = gsnApi.getProfileApiUrl() + '/GetSavedRecipes/' + gsnApi.getProfileId();
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.rateRecipe = function (recipeId, rating) {
       var url = gsnApi.getProfileApiUrl() + '/RateRecipe/' + recipeId + '/' + gsnApi.getProfileId() + '/' + rating;
-      return gsnApi.httpGetOrPostWithCache({}, url, {});
+      return gsnApi.http({}, url, {});
     };
 
     returnObj.getMyRecipe = function (recipeId) {
       var url = gsnApi.getProfileApiUrl() + '/GetSavedRecipe/' + gsnApi.getProfileId() + '/' + recipeId;
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.saveRecipe = function (recipeId, comment) {
       var url = gsnApi.getProfileApiUrl() + '/SaveRecipe/' + recipeId + '/' + gsnApi.getProfileId() + '?comment=' + encodeURIComponent(comment);
-      return gsnApi.httpGetOrPostWithCache({}, url, {});
+      return gsnApi.http({}, url, {});
     };
 
     returnObj.saveProduct = function (productId, comment) {
       var url = gsnApi.getProfileApiUrl() + '/SaveProduct/' + productId + '/' + gsnApi.getProfileId() + '?comment=' + encodeURIComponent(comment);
-      return gsnApi.httpGetOrPostWithCache({}, url, {});
+      return gsnApi.http({}, url, {});
     };
 
     returnObj.selectStore = function (storeId) {
       var url = gsnApi.getProfileApiUrl() + '/SelectStore/' + gsnApi.getProfileId() + '/' + storeId;
-      return gsnApi.httpGetOrPostWithCache({}, url, {});
+      return gsnApi.http({}, url, {});
     };
 
     returnObj.getCampaign = function () {
       var url = gsnApi.getProfileApiUrl() + '/GetCampaign/' + gsnApi.getProfileId();
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.resetCampaign = function () {
@@ -12879,13 +12893,13 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     // get inventory categories
     returnObj.getInventoryCategories = function () {
       var url = gsnApi.getStoreUrl() + '/GetInventoryCategories/' + gsnApi.getChainId() + '/' + gsnApi.getSelectedStoreId();
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     // get sale item categories
     returnObj.getSaleItemCategories = function () {
       var url = gsnApi.getStoreUrl() + '/GetSaleItemCategories/' + gsnApi.getChainId() + '/' + gsnApi.getSelectedStoreId();
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     // refresh current store circular
@@ -12908,7 +12922,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       $rootScope.$broadcast("gsnevent:circular-loading");
 
       var url = gsnApi.getStoreUrl() + '/AllContent/' + $localCache.storeId;
-      gsnApi.httpGetOrPostWithCache({}, url).then(function (rst) {
+      gsnApi.http({}, url).then(function (rst) {
         if (rst.success) {
           $localCache.circular = rst.response;
           betterStorage.circular = rst.response;
@@ -12926,22 +12940,22 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
     returnObj.searchProducts = function (searchTerm) {
       var url = gsnApi.getStoreUrl() + '/SearchProduct/' + gsnApi.getSelectedStoreId() + '?q=' + encodeURIComponent(searchTerm);
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.searchRecipes = function (searchTerm) {
       var url = gsnApi.getStoreUrl() + '/SearchRecipe/' + gsnApi.getChainId() + '?q=' + encodeURIComponent(searchTerm);
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.getAvailableVarieties = function (circularItemId) {
       var url = gsnApi.getStoreUrl() + '/GetAvailableVarieties/' + circularItemId;
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.getQuickSearchItems = function () {
       var url = gsnApi.getStoreUrl() + '/GetQuickSearchItems/' + gsnApi.getChainId();
-      return gsnApi.httpGetOrPostWithCache($localCache.quickSearchItems, url);
+      return gsnApi.http($localCache.quickSearchItems, url);
     };
 
     // get all stores from cache
@@ -12996,37 +13010,37 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
     returnObj.getAskTheChef = function () {
       var url = gsnApi.getStoreUrl() + '/FeaturedArticle/' + gsnApi.getChainId() + '/1';
-      return gsnApi.httpGetOrPostWithCache($localCache.faAskTheChef, url);
+      return gsnApi.http($localCache.faAskTheChef, url);
     };
 
     returnObj.getFeaturedArticle = function () {
       var url = gsnApi.getStoreUrl() + '/FeaturedArticle/' + gsnApi.getChainId() + '/2';
-      return gsnApi.httpGetOrPostWithCache($localCache.faArticle, url);
+      return gsnApi.http($localCache.faArticle, url);
     };
 
     returnObj.getFeaturedVideo = function () {
       var url = gsnApi.getStoreUrl() + '/FeaturedVideo/' + gsnApi.getChainId();
-      return gsnApi.httpGetOrPostWithCache($localCache.faVideo, url);
+      return gsnApi.http($localCache.faVideo, url);
     };
 
     returnObj.getRecipeVideos = function() {
       var url = gsnApi.getStoreUrl() + '/RecipeVideos/' + gsnApi.getChainId();
-      return gsnApi.httpGetOrPostWithCache($localCache.allVideos, url);
+      return gsnApi.http($localCache.allVideos, url);
     };
 
     returnObj.getCookingTip = function () {
       var url = gsnApi.getStoreUrl() + '/FeaturedArticle/' + gsnApi.getChainId() + '/3';
-      return gsnApi.httpGetOrPostWithCache($localCache.faCookingTip, url);
+      return gsnApi.http($localCache.faCookingTip, url);
     };
 
     returnObj.getTopRecipes = function () {
       var url = gsnApi.getStoreUrl() + '/TopRecipes/' + gsnApi.getChainId() + '/' + 50;
-      return gsnApi.httpGetOrPostWithCache($localCache.topRecipes, url);
+      return gsnApi.http($localCache.topRecipes, url);
     };
 
     returnObj.getFeaturedRecipe = function () {
       var url = gsnApi.getStoreUrl() + '/FeaturedRecipe/' + gsnApi.getChainId();
-      return gsnApi.httpGetOrPostWithCache($localCache.faRecipe, url);
+      return gsnApi.http($localCache.faRecipe, url);
     };
 
     returnObj.getCoupon = function (couponId, couponType) {
@@ -13039,12 +13053,12 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
     returnObj.getManufacturerCouponTotalSavings = function () {
       var url = gsnApi.getStoreUrl() + '/GetManufacturerCouponTotalSavings/' + gsnApi.getChainId();
-      return gsnApi.httpGetOrPostWithCache($localCache.manuCouponTotalSavings, url);
+      return gsnApi.http($localCache.manuCouponTotalSavings, url);
     };
 
     returnObj.getStates = function () {
       var url = gsnApi.getStoreUrl() + '/GetStates';
-      return gsnApi.httpGetOrPostWithCache($localCache.states, url);
+      return gsnApi.http($localCache.states, url);
     };
 
     returnObj.getInstoreCoupons = function () {
@@ -13057,7 +13071,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
     returnObj.getRecipe = function (recipeId) {
       var url = gsnApi.getStoreUrl() + '/RecipeBy/' + recipeId;
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.getStaticContent = function (contentName) {
@@ -13068,44 +13082,44 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       }
       url += '?name=' + encodeURIComponent(contentName);
 
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.getPartial = function (contentName) {
       var url = gsnApi.getContentServiceUrl('GetPartial');
       url += '?name=' + encodeURIComponent(contentName);
 
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.getArticle = function (articleId) {
       var url = gsnApi.getStoreUrl() + '/ArticleBy/' + articleId;
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.getSaleItems = function (departmentId, categoryId) {
       var url = gsnApi.getStoreUrl() + '/FilterSaleItem/' + gsnApi.getSelectedStoreId() + '?' + 'departmentId=' + gsnApi.isNull(departmentId, '') + '&categoryId=' + gsnApi.isNull(categoryId, '');
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.getInventory = function (departmentId, categoryId) {
       var url = gsnApi.getStoreUrl() + '/FilterInventory/' + gsnApi.getSelectedStoreId() + '?' + 'departmentId=' + gsnApi.isNull(departmentId, '') + '&categoryId=' + gsnApi.isNull(categoryId, '');
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.getSpecialAttributes = function () {
       var url = gsnApi.getStoreUrl() + '/GetSpecialAttributes/' + gsnApi.getChainId();
-      return gsnApi.httpGetOrPostWithCache($localCache.specialAttributes, url);
+      return gsnApi.http($localCache.specialAttributes, url);
     };
 
     returnObj.getMealPlannerRecipes = function () {
       var url = gsnApi.getStoreUrl() + '/GetMealPlannerRecipes/' + gsnApi.getChainId();
-      return gsnApi.httpGetOrPostWithCache($localCache.mealPlanners, url);
+      return gsnApi.http($localCache.mealPlanners, url);
     };
 
     returnObj.getAdPods = function () {
       var url = gsnApi.getStoreUrl() + '/ListSlots/' + gsnApi.getChainId();
-      return gsnApi.httpGetOrPostWithCache($localCache.adPods, url);
+      return gsnApi.http($localCache.adPods, url);
     };
 
     // similar to getStores except the data is from cache

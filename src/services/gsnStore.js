@@ -62,13 +62,13 @@
     // get inventory categories
     returnObj.getInventoryCategories = function () {
       var url = gsnApi.getStoreUrl() + '/GetInventoryCategories/' + gsnApi.getChainId() + '/' + gsnApi.getSelectedStoreId();
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     // get sale item categories
     returnObj.getSaleItemCategories = function () {
       var url = gsnApi.getStoreUrl() + '/GetSaleItemCategories/' + gsnApi.getChainId() + '/' + gsnApi.getSelectedStoreId();
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     // refresh current store circular
@@ -91,7 +91,7 @@
       $rootScope.$broadcast("gsnevent:circular-loading");
 
       var url = gsnApi.getStoreUrl() + '/AllContent/' + $localCache.storeId;
-      gsnApi.httpGetOrPostWithCache({}, url).then(function (rst) {
+      gsnApi.http({}, url).then(function (rst) {
         if (rst.success) {
           $localCache.circular = rst.response;
           betterStorage.circular = rst.response;
@@ -109,22 +109,22 @@
 
     returnObj.searchProducts = function (searchTerm) {
       var url = gsnApi.getStoreUrl() + '/SearchProduct/' + gsnApi.getSelectedStoreId() + '?q=' + encodeURIComponent(searchTerm);
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.searchRecipes = function (searchTerm) {
       var url = gsnApi.getStoreUrl() + '/SearchRecipe/' + gsnApi.getChainId() + '?q=' + encodeURIComponent(searchTerm);
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.getAvailableVarieties = function (circularItemId) {
       var url = gsnApi.getStoreUrl() + '/GetAvailableVarieties/' + circularItemId;
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.getQuickSearchItems = function () {
       var url = gsnApi.getStoreUrl() + '/GetQuickSearchItems/' + gsnApi.getChainId();
-      return gsnApi.httpGetOrPostWithCache($localCache.quickSearchItems, url);
+      return gsnApi.http($localCache.quickSearchItems, url);
     };
 
     // get all stores from cache
@@ -179,37 +179,37 @@
 
     returnObj.getAskTheChef = function () {
       var url = gsnApi.getStoreUrl() + '/FeaturedArticle/' + gsnApi.getChainId() + '/1';
-      return gsnApi.httpGetOrPostWithCache($localCache.faAskTheChef, url);
+      return gsnApi.http($localCache.faAskTheChef, url);
     };
 
     returnObj.getFeaturedArticle = function () {
       var url = gsnApi.getStoreUrl() + '/FeaturedArticle/' + gsnApi.getChainId() + '/2';
-      return gsnApi.httpGetOrPostWithCache($localCache.faArticle, url);
+      return gsnApi.http($localCache.faArticle, url);
     };
 
     returnObj.getFeaturedVideo = function () {
       var url = gsnApi.getStoreUrl() + '/FeaturedVideo/' + gsnApi.getChainId();
-      return gsnApi.httpGetOrPostWithCache($localCache.faVideo, url);
+      return gsnApi.http($localCache.faVideo, url);
     };
 
     returnObj.getRecipeVideos = function() {
       var url = gsnApi.getStoreUrl() + '/RecipeVideos/' + gsnApi.getChainId();
-      return gsnApi.httpGetOrPostWithCache($localCache.allVideos, url);
+      return gsnApi.http($localCache.allVideos, url);
     };
 
     returnObj.getCookingTip = function () {
       var url = gsnApi.getStoreUrl() + '/FeaturedArticle/' + gsnApi.getChainId() + '/3';
-      return gsnApi.httpGetOrPostWithCache($localCache.faCookingTip, url);
+      return gsnApi.http($localCache.faCookingTip, url);
     };
 
     returnObj.getTopRecipes = function () {
       var url = gsnApi.getStoreUrl() + '/TopRecipes/' + gsnApi.getChainId() + '/' + 50;
-      return gsnApi.httpGetOrPostWithCache($localCache.topRecipes, url);
+      return gsnApi.http($localCache.topRecipes, url);
     };
 
     returnObj.getFeaturedRecipe = function () {
       var url = gsnApi.getStoreUrl() + '/FeaturedRecipe/' + gsnApi.getChainId();
-      return gsnApi.httpGetOrPostWithCache($localCache.faRecipe, url);
+      return gsnApi.http($localCache.faRecipe, url);
     };
 
     returnObj.getCoupon = function (couponId, couponType) {
@@ -222,12 +222,12 @@
 
     returnObj.getManufacturerCouponTotalSavings = function () {
       var url = gsnApi.getStoreUrl() + '/GetManufacturerCouponTotalSavings/' + gsnApi.getChainId();
-      return gsnApi.httpGetOrPostWithCache($localCache.manuCouponTotalSavings, url);
+      return gsnApi.http($localCache.manuCouponTotalSavings, url);
     };
 
     returnObj.getStates = function () {
       var url = gsnApi.getStoreUrl() + '/GetStates';
-      return gsnApi.httpGetOrPostWithCache($localCache.states, url);
+      return gsnApi.http($localCache.states, url);
     };
 
     returnObj.getInstoreCoupons = function () {
@@ -240,7 +240,7 @@
 
     returnObj.getRecipe = function (recipeId) {
       var url = gsnApi.getStoreUrl() + '/RecipeBy/' + recipeId;
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.getStaticContent = function (contentName) {
@@ -251,44 +251,44 @@
       }
       url += '?name=' + encodeURIComponent(contentName);
 
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.getPartial = function (contentName) {
       var url = gsnApi.getContentServiceUrl('GetPartial');
       url += '?name=' + encodeURIComponent(contentName);
 
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.getArticle = function (articleId) {
       var url = gsnApi.getStoreUrl() + '/ArticleBy/' + articleId;
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.getSaleItems = function (departmentId, categoryId) {
       var url = gsnApi.getStoreUrl() + '/FilterSaleItem/' + gsnApi.getSelectedStoreId() + '?' + 'departmentId=' + gsnApi.isNull(departmentId, '') + '&categoryId=' + gsnApi.isNull(categoryId, '');
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.getInventory = function (departmentId, categoryId) {
       var url = gsnApi.getStoreUrl() + '/FilterInventory/' + gsnApi.getSelectedStoreId() + '?' + 'departmentId=' + gsnApi.isNull(departmentId, '') + '&categoryId=' + gsnApi.isNull(categoryId, '');
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.getSpecialAttributes = function () {
       var url = gsnApi.getStoreUrl() + '/GetSpecialAttributes/' + gsnApi.getChainId();
-      return gsnApi.httpGetOrPostWithCache($localCache.specialAttributes, url);
+      return gsnApi.http($localCache.specialAttributes, url);
     };
 
     returnObj.getMealPlannerRecipes = function () {
       var url = gsnApi.getStoreUrl() + '/GetMealPlannerRecipes/' + gsnApi.getChainId();
-      return gsnApi.httpGetOrPostWithCache($localCache.mealPlanners, url);
+      return gsnApi.http($localCache.mealPlanners, url);
     };
 
     returnObj.getAdPods = function () {
       var url = gsnApi.getStoreUrl() + '/ListSlots/' + gsnApi.getChainId();
-      return gsnApi.httpGetOrPostWithCache($localCache.adPods, url);
+      return gsnApi.http($localCache.adPods, url);
     };
 
     // similar to getStores except the data is from cache

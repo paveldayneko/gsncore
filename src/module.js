@@ -1,7 +1,6 @@
 (function (gsn, angular, undefined) {
-  
-
   'use strict';
+  
   /* fake definition of angular-facebook if there is none */ 
   angular.module('facebook', []).provider('Facebook', function test(){
     return { init: function() {}, $get: function() { return new test(); } };
@@ -509,7 +508,7 @@
     //  -- it will create a defer and return promise
     //  -- it will make http request and call defer resolve on success
     // when it has defer or data, it will return the promise
-    returnObj.httpGetOrPostWithCache = function (cacheObject, url, payload) {
+    returnObj.http = function (cacheObject, url, payload) {
       // when it has data, it will simulate resolve and return promise
       // when it doesn't have defer, it will create a defer and trigger request
       // otherwise, just return the promise
@@ -546,6 +545,8 @@
 
       return cacheObject.deferred.promise;
     };
+
+    returnObj.httpGetOrPostWithCache = returnObj.http;
 
     returnObj.isValidCaptcha = function (challenge, response) {
       var defer = $q.defer();

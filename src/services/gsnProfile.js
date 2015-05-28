@@ -348,52 +348,52 @@
 
     returnObj.getMyCircularItems = function () {
       var url = gsnApi.getProfileApiUrl() + '/GetCircularItems/' + gsnApi.getProfileId();
-      return gsnApi.httpGetOrPostWithCache($savedData.profileData.circularItems, url);
+      return gsnApi.http($savedData.profileData.circularItems, url);
     };
 
     returnObj.getMyPantry = function (departmentId, categoryId) {
       var url = gsnApi.getProfileApiUrl() + '/GetPantry/' + gsnApi.getProfileId() + '?' + 'departmentId=' + gsnApi.isNull(departmentId, '') + '&categoryId=' + gsnApi.isNull(categoryId, '');
-      return gsnApi.httpGetOrPostWithCache($savedData.profileData.myPantry, url);
+      return gsnApi.http($savedData.profileData.myPantry, url);
     };
 
     returnObj.getMyProducts = function () {
       var url = gsnApi.getProfileApiUrl() + '/GetScoredProducts/' + gsnApi.getProfileId();
-      return gsnApi.httpGetOrPostWithCache($savedData.profileData.scoredProducts, url);
+      return gsnApi.http($savedData.profileData.scoredProducts, url);
     };
 
     returnObj.getMyRecipes = function () {
       var url = gsnApi.getProfileApiUrl() + '/GetSavedRecipes/' + gsnApi.getProfileId();
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.rateRecipe = function (recipeId, rating) {
       var url = gsnApi.getProfileApiUrl() + '/RateRecipe/' + recipeId + '/' + gsnApi.getProfileId() + '/' + rating;
-      return gsnApi.httpGetOrPostWithCache({}, url, {});
+      return gsnApi.http({}, url, {});
     };
 
     returnObj.getMyRecipe = function (recipeId) {
       var url = gsnApi.getProfileApiUrl() + '/GetSavedRecipe/' + gsnApi.getProfileId() + '/' + recipeId;
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.saveRecipe = function (recipeId, comment) {
       var url = gsnApi.getProfileApiUrl() + '/SaveRecipe/' + recipeId + '/' + gsnApi.getProfileId() + '?comment=' + encodeURIComponent(comment);
-      return gsnApi.httpGetOrPostWithCache({}, url, {});
+      return gsnApi.http({}, url, {});
     };
 
     returnObj.saveProduct = function (productId, comment) {
       var url = gsnApi.getProfileApiUrl() + '/SaveProduct/' + productId + '/' + gsnApi.getProfileId() + '?comment=' + encodeURIComponent(comment);
-      return gsnApi.httpGetOrPostWithCache({}, url, {});
+      return gsnApi.http({}, url, {});
     };
 
     returnObj.selectStore = function (storeId) {
       var url = gsnApi.getProfileApiUrl() + '/SelectStore/' + gsnApi.getProfileId() + '/' + storeId;
-      return gsnApi.httpGetOrPostWithCache({}, url, {});
+      return gsnApi.http({}, url, {});
     };
 
     returnObj.getCampaign = function () {
       var url = gsnApi.getProfileApiUrl() + '/GetCampaign/' + gsnApi.getProfileId();
-      return gsnApi.httpGetOrPostWithCache({}, url);
+      return gsnApi.http({}, url);
     };
 
     returnObj.resetCampaign = function () {
