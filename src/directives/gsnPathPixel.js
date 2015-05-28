@@ -2,7 +2,7 @@
   'use strict';
   var myModule = angular.module('gsn.core');
 
-  myModule.directive('gsnPathPixel', ['$sce', 'gsnApi', '$interpolate', '$timeout', function ($sce, gsnApi, $interpolate, $timeout) {
+  myModule.directive('gsnPathPixel', ['$sce', 'gsnApi', '$interpolate', function ($sce, gsnApi, $interpolate) {
     // Usage: add pixel tracking on a page/path basis
     // 
     // Creates: 2013-12-12 TomN
@@ -23,8 +23,9 @@
           if (currentPath == scope.currentPath) {
             return;
           }
-          
-          $timeout(function() {
+
+          // push this to non-ui thread
+          setTimeout(function() {
             element.html('');
             currentPath = scope.currentPath;
             scope.ProfileId = gsnApi.getProfileId();
@@ -38,8 +39,9 @@
             scope.StoreId = gsnApi.getSelectedStoreId();
             scope.ChainId = gsnApi.getChainId();
             var url = $sce.trustAsResourceUrl($interpolate(attrs.gsnPathPixel.replace(/\[+/gi, '{{').replace(/\]+/gi, '}}'))(scope));
-            element.html('<img src="' + url + '" style="visibility: hidden !important; width: 0px; height: 0px; display: none !important; opacity: 0 !important;" class="trackingPixel hidden" alt="tracking pixel"/>');
-          }, 50);
+            var img = new Image(1,1);
+            img.src = url;
+          }, 500);
         }
       });
     }
