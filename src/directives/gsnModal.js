@@ -81,14 +81,6 @@
           }
         });
       }
-
-      if (!attrs.hideEvent) {
-        attrs.hideEvent = "gsnevent:closemodal"
-      }
-      
-      scope.$on(attrs.hideEvent, function() {
-        return $timeout(scope.closeModal, 550);
-      });
     };
   }]);
 })(angular);

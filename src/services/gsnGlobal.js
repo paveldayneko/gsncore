@@ -265,6 +265,12 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         });
       }
 
+      $scope.$on('gsnevent:closemodal', function(){ 
+        if (typeof gmodal !== 'undefined') {
+          gmodal.hide();
+        }
+      });
+
       //#region analytics
       $scope.$on('gsnevent:shoppinglistitem-updating', function (event, shoppingList, item) {
         var currentListId = gsnApi.getShoppingListId();
