@@ -168,7 +168,7 @@
     $scope.$on('gsnevent:gcprinter-not-found', function() {
       $scope.printer.notinstalled++;
     });
-    $scope.$on('gsnevent:gcprinter-printed', function(e, rsp) {
+    $scope.$on('gsnevent:gcprinter-printed', function(evt, e, rsp) {
       $scope.printer.printed = e;
       if (rsp) {
         $scope.printer.errors = gsnApi.isNull(rsp.ErrorCoupons, []);

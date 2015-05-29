@@ -46,7 +46,7 @@
 
     $scope.updateProfile = function () {
       $scope.$broadcast("autofill:update");
-	  var profile = $scope.profile;
+	    var profile = $scope.profile;
       if ($scope.myForm.$valid) {
 
         // prevent double submit
