@@ -45,12 +45,7 @@
           // dynamically load google
           var src = '//cdnjs.cloudflare.com/ajax/libs/spin.js/1.3.2/spin.min.js';
 
-          // Prefix protocol
-          if ($window.location.protocol === 'file') {
-            src = 'https:' + src;
-          }
-
-          gsnApi.loadScripts([src]);
+          gsnApi.loadScripts([src], activate);
           return;
         }
         

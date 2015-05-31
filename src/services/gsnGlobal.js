@@ -43,8 +43,8 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       $scope.goUrl = gsnApi.goUrl;
       $scope.encodeURIComponent = encodeURIComponent;
       $scope.isOnList = gsnProfile.isOnList;
-      $scope.printScriptUrl = gsnApi.getApiUrl() + '/ShoppingList/CouponInitScriptFromBrowser/' + gsnApi.getChainId() + '?callbackFunc=showResultOfDetectControl';
       $scope.getShoppingListCount = gsnProfile.getShoppingListCount;
+      $scope.$win = $window;
 
       $scope.validateRegistration = function (rsp) {
         // attempt to authenticate user with facebook
@@ -128,7 +128,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         }
       };
 
-      $scope.logoutWithPromt = function () {
+      $scope.logoutWithPrompt = function () {
         try {
           $scope.goOutPromt(null, '/', $scope.logout, true);
         } catch (e) {
@@ -136,6 +136,8 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         }
 
       };
+
+      $scope.logoutWithPromt = $scope.logoutWithPrompt;
 
       $scope.doToggleCartItem = function (evt, item, linkedItem) {
         /// <summary>Toggle the shoping list item checked state</summary>
@@ -247,7 +249,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       });
 
       // trigger facebook init if there is appId
-      if (gsnApi.getConfig().FacebookAppId) {
+      if (typeof(Facebook.isReady) !== 'undefined' && gsnApi.getConfig().FacebookAppId) {
         $scope.$watch(function () {
           return Facebook.isReady(); // This is for convenience, to notify if Facebook is loaded and ready to go.
         }, function (newVal) {

@@ -5,14 +5,13 @@
   myModule.filter('tel', function () {
     // Usage: phone number formating phoneNumber | tel
     // 
-    // Creates: 2014-9-1
-    // 
-
-    return function (tel) {
+    return function (tel, format, regex) {
       if (!tel) return '';
 
-      var value = tel.toString();    
-      return  value.slice(0, 3) + '-' + value.slice(3, 6) + '-' + value.slice(6);        
+      regex = regex ? new RegEx(regex) : /(\d{3})(\d{3})(\d{4})/;
+      var value = (""+tel).replace(/\D/g, '');  
+      
+      return  value.replace(regex, format || "$1-$2-$3");
     };
   });
 

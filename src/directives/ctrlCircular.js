@@ -23,13 +23,13 @@
     $scope.pageId = 99; // it's always all items for desktop     
     $scope.loadAll = $scope.loadAll || false;
     $scope.itemsPerPage = $scope.itemsPerPage || 10;
-    $scope.sortBy = $scope.sortBy || 'CategoryName';
-    $scope.sortByName = $scope.sortByName || 'department';
+    $scope.sortBy = $scope.sortBy || 'Page.PageNumber';
+    $scope.sortByName = $scope.sortByName || 'Page';
     $scope.actualSortBy = $scope.sortBy;
 
     $scope.allItems = [];
     $scope.loadMore = loadMore;
-    $scope.vm = { cacheItems: [], digitalCirc: null };
+    $scope.vm = { cacheItems: [], digitalCirc: null, filterBy: $location.search().q };
 
     function activate() {
       

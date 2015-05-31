@@ -1,14 +1,13 @@
 ﻿(function (angular, Gsn, undefined) {
   'use strict';
   var serviceId = 'gsnDfp';
-  angular.module('gsn.core').service(serviceId, ['$rootScope', 'gsnApi', 'gsnStore', 'gsnProfile', '$sessionStorage', '$window', '$timeout', '$location', gsnDfp]);
+  angular.module('gsn.core').service(serviceId, ['$rootScope', 'gsnApi', 'gsnStore', 'gsnProfile', '$sessionStorage', '$window', '$timeout', '$location', 'debounce', gsnDfp]);
 
-  function gsnDfp($rootScope, gsnApi, gsnStore, gsnProfile, $sessionStorage, $window, $timeout, $location) {
+  function gsnDfp($rootScope, gsnApi, gsnStore, gsnProfile, $sessionStorage, $window, $timeout, $location, debounce) {
     var service = {
       forceRefresh: true,
-      hasShoppingList: false,
       actionParam: null,
-      lastRefreshTime: (new Date().getTime())
+      doRefresh: debounce(doRefresh, 1000)
     };
 
     $rootScope.$on('gsnevent:shoppinglistitem-updating', function (event, shoppingList, item) {
@@ -17,7 +16,7 @@
         var cat = gsnStore.getCategories()[item.CategoryId];
         Gsn.Advertising.addDept(cat.CategoryName);
         service.actionParam = {evtname: event.name, dept: cat.CategoryName, pdesc: item.Description, pcode: item.Id, brand: item.BrandName};
-        $timeout(doRefresh, 50);
+        service.doRefresh();
       }
     });
 
@@ -53,13 +52,13 @@
           });
         });
         service.forceRefresh = true;
-        doRefresh();
+        service.doRefresh();
       }, 50);
     });
 
     $rootScope.$on('gsnevent:loadads', function (event, next) {
       service.actionParam = {evtname: event.name};
-      $timeout(doRefresh, 50);
+      service.doRefresh();
     });
 
     $rootScope.$on('gsnevent:digitalcircular-pagechanging', function (event, data) {
@@ -70,7 +69,7 @@
         $window.scrollTo(0, 120);
       }
 
-      $timeout(doRefresh, 50);
+      service.doRefresh();
     });
 
     init();
@@ -102,14 +101,23 @@
     // refresh method
     function doRefresh() {
       updateNetworkId();
-      var currentTime = (new Date().getTime());
-      if (currentTime - service.lastRefreshTime < 1000) return;
-      service.lastRefreshTime = currentTime;
 
       // targetted campaign
       if (parseFloat(gsnApi.isNull($sessionStorage.GsnCampaign, 0)) <= 0) {
 
-        doCampaignRefresh();
+        $sessionStorage.GsnCampaign = gsnApi.getProfileId();
+
+        // try to get campaign
+        gsnProfile.getCampaign().then(function (rst) {
+          if (rst.success) {
+            angular.forEach(rst.response, function (v, k) {
+              Gsn.Advertising.addDept(v.Value);
+            });
+          }
+          Gsn.Advertising.refresh(service.actionParam, service.forceRefresh);
+          service.forceRefresh = false;
+        });
+
         // don't need to continue with the refresh since it's being patched through get campaign above
         return;
       }
@@ -117,25 +125,6 @@
       Gsn.Advertising.refresh(service.actionParam, service.forceRefresh);
       service.forceRefresh = false;
     }
-
-    // campaign refresh
-    function doCampaignRefresh()
-    {
-      $sessionStorage.GsnCampaign = gsnApi.getProfileId();
-
-      // try to get campaign
-      gsnProfile.getCampaign().then(function (rst) {
-        if (rst.success) {
-          angular.forEach(rst.response, function (v, k) {
-            Gsn.Advertising.addDept(v.Value);
-          });
-        }
-        Gsn.Advertising.refresh(service.actionParam, service.forceRefresh);
-        service.hasShoppingList = false;
-        service.forceRefresh = false;
-      });
-    }
-
   }
 })(angular, window.Gsn);
 

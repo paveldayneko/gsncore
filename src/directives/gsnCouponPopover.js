@@ -17,7 +17,7 @@
 
          var isOpenedByClick = false;
           $(element).css('height', '96px');
-          $(element).append('<button class="ellipsis  pull-right">...</button>');
+          $(element).append('<button class="ellipsis pull-right">...</button>');
 
           $(element.find('.ellipsis')).popover({
             html: true,
@@ -74,7 +74,6 @@
         $(element.find('.ellipsis')).remove();
         $(element.find('p')).unbind('click');
       }
-      
     }
 
     function link(scope, element, attrs) {

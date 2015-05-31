@@ -2,7 +2,7 @@
   'use strict';
   var myModule = angular.module('gsn.core');
 
-  myModule.directive('gsnFlexibleWidth', [function () {
+  myModule.directive('gsnFlexibleWidth', ['debounce', '$window', function (debounce, $window) {
     var directive = {
       restrict: 'EA',
       scope: true,
@@ -17,8 +17,9 @@
         });
       }
 
-      updateWidth();
-      $(window).resize(updateWidth);
+      var myUpdateWith = debounce(updateWidth, 200);
+      $window.on('resize', myUpdateWith);
+      myUpdateWith();
     }
   }]);
 })(angular);

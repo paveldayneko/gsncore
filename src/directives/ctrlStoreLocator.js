@@ -28,7 +28,7 @@
     $scope.currentMarker = null;
     $scope.showIntermission = 0;
     $scope.distanceOrigin = null;
-    $scope.storeList = gsnStore.getStoreList();
+    $scope.storeList = [];
     $scope.currentStoreId = gsnApi.getSelectedStoreId();
     $scope.searchCompleted = false;
     $scope.searchRadius = 10;
@@ -42,7 +42,11 @@
       myMarkerGrouping: [],
       activated: false
     };
-    
+
+    gsnStore.getStores().then(function(rsp){
+      $scope.storeList = rsp.response;
+    });
+
     function activate() {
       var gmap = (window.google || {}).maps || {};
       if ((typeof( gmap.Geocoder ) === 'undefined') 
@@ -58,12 +62,6 @@
 
         // dynamically load google
         var src = '//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=geometry&&callback=' + myCallback;
-
-        // Prefix protocol
-        if (window.location.protocol === 'file') {
-          src = 'https:' + src;
-        }
-
         gsnApi.loadScripts(src, activate);
         return;
       }
@@ -95,6 +93,13 @@
           if (store) {
             $location.url($scope.decodeServerUrl(store.Redirect));
           }
+        }
+        else {
+          // set default search with query string
+          $timeout(function() {
+            $scope.search.storeLocator = $location.search().search;
+            $scope.doSearch(true);
+          }, 50);
         }
       });
     }
@@ -316,7 +321,7 @@
       if (newValue) {
         if ($scope.storeList) {
           newValue.setCenter(new google.maps.LatLng($scope.storeList[0].Latitude, $scope.storeList[0].Longitude), defaultZoom);
-          $scope.initializeMarker(gsnStore.getStoreList());
+          $scope.initializeMarker($scope.storeList);
 
           if (gsnApi.isNull($scope.fromUrl, null) !== null && gsnApi.isNull(gsnApi.getSelectedStoreId(), 0) <= 0) {
             $scope.showIntermission++;

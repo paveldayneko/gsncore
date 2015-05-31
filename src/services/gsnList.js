@@ -50,7 +50,6 @@
           // build new item to make sure posting of only required fields
           var itemToPost = angular.copy(existingItem);
 
-          /* jshint -W069 */
           itemToPost['BarcodeImageUrl'] = undefined;
           itemToPost['BottomTagLine'] = undefined;
           itemToPost['Description1'] = undefined;
@@ -65,7 +64,7 @@
           itemToPost['TotalDownloads'] = undefined;
           itemToPost['TotalDownloadsAllowed'] = undefined;
           itemToPost['Varieties'] = undefined;
-          /* jshint +W069 */
+          itemToPost['Page'] = undefined;
 
           $rootScope.$broadcast('gsnevent:shoppinglistitem-updating', returnObj, existingItem, $mySavedData);
 

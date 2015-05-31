@@ -15,8 +15,6 @@
     });
 
     myGsn.on('clickProduct', function (data) {
-      if (data.type != "gsnevent:clickProduct") return;
-
       $timeout(function () {
         var product = data.detail;
         if (product) {
@@ -35,8 +33,6 @@
     });
 
     myGsn.on('clickLink', function (data) {
-      if (data.type != "gsnevent:clickLink") return;
-
       $timeout(function () {
         var linkData = data.detail;
         if (linkData) {
@@ -54,20 +50,6 @@
             // assume this is an internal redirect
             $location.url(url);
           }
-        }
-      });
-    });
-
-    myGsn.on('clickBrickOffer', function (data) {
-      if (data.type != "gsnevent:clickBrickOffer") return;
-
-      $timeout(function () {
-        var linkData = data.detail;
-        if (linkData) {
-          var url = gsnApi.getProfileApiUrl() + '/BrickOffer/' + gsnApi.getProfileId() + '/' + linkData.OfferCode;
-
-          // open brick offer
-          $window.open(url, '');
         }
       });
     });

@@ -27,12 +27,7 @@
           // dynamically load google
           var src = '//www.google.com/jsapi';
 
-          // Prefix protocol
-          if ($window.location.protocol === 'file') {
-            src = 'https:' + src;
-          }
-
-          gsnApi.loadScripts([src]);
+          gsnApi.loadScripts([src], loadSearch);
           return;
         }
 

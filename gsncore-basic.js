@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.4.17
+ * version 1.4.18
  * gsncore repository
- * Build date: Fri May 29 2015 17:41:20 GMT-0500 (CDT)
+ * Build date: Sun May 31 2015 10:22:13 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -553,6 +553,15 @@
 
   //#region dynamic script loader
   function loadSingleScript(uri, callbackFunc) {
+    if (uri.indexOf('//') == 0) {
+      url = 'http:' + uri;
+    }
+
+    // Prefix protocol
+    if ((root.location || {}).protocol === 'file') {
+      uri = url.replace('http://', 'https://')
+    }
+
     var tag = document.createElement('script');
     tag.type = 'text/javascript';
     tag.src = uri;
@@ -686,10 +695,10 @@
   .run(['$rootScope', 'gsnGlobal', 'gsnApi', '$window', function ($rootScope, gsnGlobal, gsnApi, $window) {
     var head = angular.element('head');
     var myHtml = '<!--[if lt IE 10]>\n' +
-      '<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script>' +
-      '<script src="//cdnjs.cloudflare.com/ajax/libs/es5-shim/2.2.0/es5-shim.min.js"></script>' +
-      '<script src="//cdnjs.cloudflare.com/ajax/libs/es5-shim/2.2.0/es5-sham.min.js"></script>' +
-      '<script src="//cdnjs.cloudflare.com/ajax/libs/json2/20130526/json2.min.js"></script>' +
+      '<script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script>' +
+      '<script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/2.2.0/es5-shim.min.js"></script>' +
+      '<script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/2.2.0/es5-sham.min.js"></script>' +
+      '<script src="https://cdnjs.cloudflare.com/ajax/libs/json2/20130526/json2.min.js"></script>' +
       '\n<![endif]-->';
     head.append(myHtml);
 
@@ -1566,13 +1575,7 @@
 
           // dynamically load google
           var src = '//www.google.com/recaptcha/api/js/recaptcha_ajax.js';
-
-          // Prefix protocol
-          if ($window.location.protocol === 'file') {
-            src = 'https:' + src;
-          }
-
-          gsnApi.loadScripts([src]);
+          gsnApi.loadScripts([src], loadRecaptcha);
           return;
         }
 
@@ -1698,9 +1701,7 @@
   myModule.filter('defaultIf', ['gsnApi', function (gsnApi) {
     // Usage: testValue | defaultIf:testValue == 'test' 
     //    or: testValue | defaultIf:someTest():defaultValue
-    // 
-    // Creates: 2014-04-02
-    // 
+    //
 
     return function (input, conditional, defaultOrFalseValue) {
       var localCondition = conditional;
@@ -1719,8 +1720,6 @@
   myModule.filter('groupBy', ['gsnApi', function (gsnApi) {
     // Usage: for doing grouping
     // 
-    // Creates: 2013-12-26
-    // 
 
     return function (input, attribute) {
       return gsnApi.groupBy(input, attribute);
@@ -1734,8 +1733,6 @@
 
   myModule.filter('pagingFilter', function () {
     // Usage: for doing paging, item in list | pagingFilter:2:1
-    // 
-    // Creates: 2013-12-26
     // 
 
     return function (input, pageSize, currentPage) {
@@ -1751,14 +1748,13 @@
   myModule.filter('tel', function () {
     // Usage: phone number formating phoneNumber | tel
     // 
-    // Creates: 2014-9-1
-    // 
-
-    return function (tel) {
+    return function (tel, format, regex) {
       if (!tel) return '';
 
-      var value = tel.toString();    
-      return  value.slice(0, 3) + '-' + value.slice(3, 6) + '-' + value.slice(6);        
+      regex = regex ? new RegEx(regex) : /(\d{3})(\d{3})(\d{4})/;
+      var value = (""+tel).replace(/\D/g, '');  
+      
+      return  value.replace(regex, format || "$1-$2-$3");
     };
   });
 
@@ -1792,14 +1788,26 @@
   myModule.filter('removeAspx', ['gsnApi', function (gsnApi) {
     // Usage: for removing aspx
     // 
-    // Creates: 2014-01-05
-    // 
 
     return function (text) {
       return gsnApi.isNull(text, '').replace(/(.aspx\"|.gsn\")+/gi, '"');
     };
   }]);
 
+})(angular);
+(function (angular, undefined) {
+  'use strict';
+  var myModule = angular.module('gsn.core');
+
+  myModule.filter('replaceWith', function() {
+    // Usage: testValue | replaceWith:'\\s+':'gi':' ' 
+    // 
+    return function(input, regex, flag, replaceWith) {
+     var patt = new RegExp(regex, flag);      
+     
+     return input.replace(patt, replaceWith);
+   };
+ });
 })(angular);
 (function (angular, undefined) {
   'use strict';
@@ -1842,9 +1850,6 @@
   myModule.filter('trustedHtml', ['gsnApi', '$sce', function (gsnApi, $sce) {
     // Usage: allow for binding html
     // 
-    // Creates: 2014-01-05
-    // 
-
     return function (text) {
       return $sce.trustAsHtml(text);
     };
@@ -1868,8 +1873,6 @@
     });
 
     myGsn.on('clickProduct', function (data) {
-      if (data.type != "gsnevent:clickProduct") return;
-
       $timeout(function () {
         var product = data.detail;
         if (product) {
@@ -1888,8 +1891,6 @@
     });
 
     myGsn.on('clickLink', function (data) {
-      if (data.type != "gsnevent:clickLink") return;
-
       $timeout(function () {
         var linkData = data.detail;
         if (linkData) {
@@ -1907,20 +1908,6 @@
             // assume this is an internal redirect
             $location.url(url);
           }
-        }
-      });
-    });
-
-    myGsn.on('clickBrickOffer', function (data) {
-      if (data.type != "gsnevent:clickBrickOffer") return;
-
-      $timeout(function () {
-        var linkData = data.detail;
-        if (linkData) {
-          var url = gsnApi.getProfileApiUrl() + '/BrickOffer/' + gsnApi.getProfileId() + '/' + linkData.OfferCode;
-
-          // open brick offer
-          $window.open(url, '');
         }
       });
     });
@@ -1960,12 +1947,7 @@
         // dynamically load google
         var src = '//cdn.gsngrocers.com/script/gcprinter/gcprinter.min.js';
 
-        // Prefix protocol
-        if ($window.location.protocol === 'file') {
-          src = 'https:' + src;
-        }
-
-        gsnApi.loadScripts(src, activate);
+        gsnApi.loadScripts([src], activate);
         return;
       }
 
@@ -2085,14 +2067,13 @@
 (function (angular, Gsn, undefined) {
   'use strict';
   var serviceId = 'gsnDfp';
-  angular.module('gsn.core').service(serviceId, ['$rootScope', 'gsnApi', 'gsnStore', 'gsnProfile', '$sessionStorage', '$window', '$timeout', '$location', gsnDfp]);
+  angular.module('gsn.core').service(serviceId, ['$rootScope', 'gsnApi', 'gsnStore', 'gsnProfile', '$sessionStorage', '$window', '$timeout', '$location', 'debounce', gsnDfp]);
 
-  function gsnDfp($rootScope, gsnApi, gsnStore, gsnProfile, $sessionStorage, $window, $timeout, $location) {
+  function gsnDfp($rootScope, gsnApi, gsnStore, gsnProfile, $sessionStorage, $window, $timeout, $location, debounce) {
     var service = {
       forceRefresh: true,
-      hasShoppingList: false,
       actionParam: null,
-      lastRefreshTime: (new Date().getTime())
+      doRefresh: debounce(doRefresh, 1000)
     };
 
     $rootScope.$on('gsnevent:shoppinglistitem-updating', function (event, shoppingList, item) {
@@ -2101,7 +2082,7 @@
         var cat = gsnStore.getCategories()[item.CategoryId];
         Gsn.Advertising.addDept(cat.CategoryName);
         service.actionParam = {evtname: event.name, dept: cat.CategoryName, pdesc: item.Description, pcode: item.Id, brand: item.BrandName};
-        $timeout(doRefresh, 50);
+        service.doRefresh();
       }
     });
 
@@ -2137,13 +2118,13 @@
           });
         });
         service.forceRefresh = true;
-        doRefresh();
+        service.doRefresh();
       }, 50);
     });
 
     $rootScope.$on('gsnevent:loadads', function (event, next) {
       service.actionParam = {evtname: event.name};
-      $timeout(doRefresh, 50);
+      service.doRefresh();
     });
 
     $rootScope.$on('gsnevent:digitalcircular-pagechanging', function (event, data) {
@@ -2154,7 +2135,7 @@
         $window.scrollTo(0, 120);
       }
 
-      $timeout(doRefresh, 50);
+      service.doRefresh();
     });
 
     init();
@@ -2186,14 +2167,23 @@
     // refresh method
     function doRefresh() {
       updateNetworkId();
-      var currentTime = (new Date().getTime());
-      if (currentTime - service.lastRefreshTime < 1000) return;
-      service.lastRefreshTime = currentTime;
 
       // targetted campaign
       if (parseFloat(gsnApi.isNull($sessionStorage.GsnCampaign, 0)) <= 0) {
 
-        doCampaignRefresh();
+        $sessionStorage.GsnCampaign = gsnApi.getProfileId();
+
+        // try to get campaign
+        gsnProfile.getCampaign().then(function (rst) {
+          if (rst.success) {
+            angular.forEach(rst.response, function (v, k) {
+              Gsn.Advertising.addDept(v.Value);
+            });
+          }
+          Gsn.Advertising.refresh(service.actionParam, service.forceRefresh);
+          service.forceRefresh = false;
+        });
+
         // don't need to continue with the refresh since it's being patched through get campaign above
         return;
       }
@@ -2201,25 +2191,6 @@
       Gsn.Advertising.refresh(service.actionParam, service.forceRefresh);
       service.forceRefresh = false;
     }
-
-    // campaign refresh
-    function doCampaignRefresh()
-    {
-      $sessionStorage.GsnCampaign = gsnApi.getProfileId();
-
-      // try to get campaign
-      gsnProfile.getCampaign().then(function (rst) {
-        if (rst.success) {
-          angular.forEach(rst.response, function (v, k) {
-            Gsn.Advertising.addDept(v.Value);
-          });
-        }
-        Gsn.Advertising.refresh(service.actionParam, service.forceRefresh);
-        service.hasShoppingList = false;
-        service.forceRefresh = false;
-      });
-    }
-
   }
 })(angular, window.Gsn);
 
@@ -2269,8 +2240,8 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       $scope.goUrl = gsnApi.goUrl;
       $scope.encodeURIComponent = encodeURIComponent;
       $scope.isOnList = gsnProfile.isOnList;
-      $scope.printScriptUrl = gsnApi.getApiUrl() + '/ShoppingList/CouponInitScriptFromBrowser/' + gsnApi.getChainId() + '?callbackFunc=showResultOfDetectControl';
       $scope.getShoppingListCount = gsnProfile.getShoppingListCount;
+      $scope.$win = $window;
 
       $scope.validateRegistration = function (rsp) {
         // attempt to authenticate user with facebook
@@ -2354,7 +2325,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         }
       };
 
-      $scope.logoutWithPromt = function () {
+      $scope.logoutWithPrompt = function () {
         try {
           $scope.goOutPromt(null, '/', $scope.logout, true);
         } catch (e) {
@@ -2362,6 +2333,8 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         }
 
       };
+
+      $scope.logoutWithPromt = $scope.logoutWithPrompt;
 
       $scope.doToggleCartItem = function (evt, item, linkedItem) {
         /// <summary>Toggle the shoping list item checked state</summary>
@@ -2473,7 +2446,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       });
 
       // trigger facebook init if there is appId
-      if (gsnApi.getConfig().FacebookAppId) {
+      if (typeof(Facebook.isReady) !== 'undefined' && gsnApi.getConfig().FacebookAppId) {
         $scope.$watch(function () {
           return Facebook.isReady(); // This is for convenience, to notify if Facebook is loaded and ready to go.
         }, function (newVal) {
@@ -2635,7 +2608,6 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           // build new item to make sure posting of only required fields
           var itemToPost = angular.copy(existingItem);
 
-          /* jshint -W069 */
           itemToPost['BarcodeImageUrl'] = undefined;
           itemToPost['BottomTagLine'] = undefined;
           itemToPost['Description1'] = undefined;
@@ -2650,7 +2622,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           itemToPost['TotalDownloads'] = undefined;
           itemToPost['TotalDownloadsAllowed'] = undefined;
           itemToPost['Varieties'] = undefined;
-          /* jshint +W069 */
+          itemToPost['Page'] = undefined;
 
           $rootScope.$broadcast('gsnevent:shoppinglistitem-updating', returnObj, existingItem, $mySavedData);
 
@@ -3079,12 +3051,14 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
   'use strict';
   var myModule = angular.module('gsn.core');
 
-  // $notication
+  /**
+   * allow for cross platform notification
+   */
   myModule.service('$notification', ['$rootScope', '$window', function ($rootScope, $window) {
     var service = {
       alert: function (message) {
         if (!$window.isPhoneGap) {
-          $window.alert(message);
+          gmodal.show({content: '<div class="myModalForm modal" style="display: block"><div class="modal-dialog"><div class="modal-content"><div class="modal-body">' + message + '<br /><br/><button class="btn btn-primary gmodal-close pull-right" style="width: 80px">OK</button><br /></div></div></div></div>', hideOn: "click,esc,tap"})
           return;
         }
 
@@ -3135,10 +3109,25 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     };
 
     return service;
+  }]);
 
-    //#region Internal Methods        
-
-    //#endregion
+  // debounce: for performance
+  myModule.factory('debounce', ['$timeout', function($timeout) {
+    // The service is actually this function, which we call with the func
+    // that should be debounced and how long to wait in between calls
+    return function debounce(func, wait, immediate) {
+      var timeout;
+      return function() {
+        var context = this, args = arguments;
+        var later = function() {
+          timeout = null;
+          if (!immediate) func.apply(context, args);
+        };
+        var callNow = immediate && !timeout;
+        timeout = $timeout(later, wait);
+        if (callNow) func.apply(context, args);
+      };
+    };
   }]);
 
   // FeedService: google feed
@@ -3176,6 +3165,9 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     //#endregion
   }]);
 
+  /**
+   * Detect display mode
+   */
   myModule.directive('bsDisplayMode', ['$window', '$timeout', function ($window, $timeout) {
     return {
       template: '<div class="visible-xs"></div><div class="visible-sm"></div><div class="visible-md"></div><div class="visible-lg"></div>',
@@ -3202,6 +3194,9 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     };
   }]);
 
+  /**
+   * bind scrollTo event on click
+   */
   myModule.directive('scrollTo', ['$location', function ($location) {
     return function(scope, element, attrs) {
 
@@ -3217,7 +3212,10 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     };
   }]);
 
-  myModule.directive('ngScrollTop', ['$window', '$timeout', function ($window, $timeout) {
+  /**
+   * create scrollTop marker
+   */
+  myModule.directive('ngScrollTop', ['$window', '$timeout', 'debounce', function ($window, $timeout, debounce) {
     var directive = {
       link: link,
       restrict: 'A',
@@ -3230,22 +3228,14 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     
     function link(scope, element, attrs) {
       countScrollTop++;
-      var scrollTop = parseInt(angular.element($window).scrollTop());
-      scope[attrs.ngScrollTop] = scrollTop;
+      var myScrollTop = debouce(function () {
+        $scope.scrollTop = $window.scrollTop();
+        element.css({ 'display': (($scope.scrollTop > parseInt(attrs.offset)) && countScrollTop == 1) ? 'block' : '' });
+      }, 300);
       
-      angular.element($window).on('scroll', function () {
-        
-        $timeout(function () {
-          // else use timeout to overcome scope apply
-          scrollTop = parseInt(angular.element($window).scrollTop());
-          scope[attrs.ngScrollTop] = scrollTop;
-
-          element.css({ 'display': ((scrollTop > parseInt(attrs.offset)) && countScrollTop == 1) ? 'block' : '' });
-        }, 300);
-      });
-
+      $window.on('scroll', myScrollTop);
       element.on('click', function () {
-        angular.element($window).scrollTop(0);
+        $window.scrollTop(0);
       });
       
       scope.$on('$destroy', function() {
@@ -3254,6 +3244,9 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     }
   }]);
 
+  /**
+   * stop event probagation
+   */
   myModule.directive('stopEvent', function () {
     return {
         restrict: 'A',
@@ -4254,15 +4247,16 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 (function (angular, undefined) {
   'use strict';
   var serviceId = 'gsnStore';
-  angular.module('gsn.core').service(serviceId, ['$rootScope', '$http', 'gsnApi', '$q', '$window', '$timeout', '$sessionStorage', '$localStorage', '$location', gsnStore]);
+  angular.module('gsn.core').service(serviceId, ['$rootScope', '$http', 'gsnApi', '$q', '$timeout', '$location', gsnStore]);
 
-  function gsnStore($rootScope, $http, gsnApi, $q, $window, $timeout, $sessionStorage, $localStorage, $location) {
+  function gsnStore($rootScope, $http, gsnApi, $q, $timeout, $location) {
     var returnObj = {};
 
     $rootScope[serviceId] = returnObj;
 
     // cache current user selection
-    var $localCache = {
+    var _lc = {
+      previousGetStore: null,
       manufacturerCoupons: {},
       instoreCoupons: {},
       youtechCoupons: {},
@@ -4279,15 +4273,13 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       adPods: {},
       specialAttributes: {},
       circular: null,
-      storeList: null,
-      rewardProfile: {},
       allVideos: []
     };
 
     var betterStorage = {};
 
     // cache current processed circular data
-    var $circularProcessed = {
+    var _cp = {
       circularByTypeId: {},
       categoryById: {},
       itemsById: {},
@@ -4298,18 +4290,17 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       lastProcessDate: 0    // number represent a date in month
     };
 
-    var $previousGetStore,
-        processingQueue = [];
+    var processingQueue = [];
 
     // get circular by type id
     returnObj.getCircular = function (circularTypeId) {
-      var result = $circularProcessed.circularByTypeId[circularTypeId];
+      var result = _cp.circularByTypeId[circularTypeId];
       return result;
     };
 
     // get all categories
     returnObj.getCategories = function () {
-      return $circularProcessed.categoryById;
+      return _cp.categoryById;
     };
 
     // get inventory categories
@@ -4326,34 +4317,34 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
     // refresh current store circular
     returnObj.refreshCircular = function () {
-      if ($localCache.circularIsLoading) return;
+      if (_lc.circularIsLoading) return;
       var config = gsnApi.getConfig();
       if (config.AllContent) {
-        $localCache.circularIsLoading = true;
+        _lc.circularIsLoading = true;
         processCircularData(function(){
-          $localCache.circularIsLoading = false;
+          _lc.circularIsLoading = false;
         });
         return;
       }
 
-      $localCache.storeId = gsnApi.getSelectedStoreId();
-      if ($localCache.storeId <= 0 ) return;
+      _lc.storeId = gsnApi.getSelectedStoreId();
+      if (_lc.storeId <= 0 ) return;
 
-      $localCache.circular = {};
-      $localCache.circularIsLoading = true;
+      _lc.circular = {};
+      _lc.circularIsLoading = true;
       $rootScope.$broadcast("gsnevent:circular-loading");
 
-      var url = gsnApi.getStoreUrl() + '/AllContent/' + $localCache.storeId;
+      var url = gsnApi.getStoreUrl() + '/AllContent/' + _lc.storeId;
       gsnApi.http({}, url).then(function (rst) {
         if (rst.success) {
-          $localCache.circular = rst.response;
+          _lc.circular = rst.response;
           betterStorage.circular = rst.response;
 
           // resolve is done inside of method below
           processCircularData();
-          $localCache.circularIsLoading = false;
+          _lc.circularIsLoading = false;
         } else {
-          $localCache.circularIsLoading = false;
+          _lc.circularIsLoading = false;
           $rootScope.$broadcast("gsnevent:circular-failed", rst);
         }
       });
@@ -4377,30 +4368,30 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
     returnObj.getQuickSearchItems = function () {
       var url = gsnApi.getStoreUrl() + '/GetQuickSearchItems/' + gsnApi.getChainId();
-      return gsnApi.http($localCache.quickSearchItems, url);
+      return gsnApi.http(_lc.quickSearchItems, url);
     };
 
     // get all stores from cache
     returnObj.getStores = function () {
       var deferred = $q.defer();
-      if (gsnApi.isNull($previousGetStore, null) !== null) {
-        return $previousGetStore.promise;
+      if (gsnApi.isNull(_lc.previousGetStore, null) !== null) {
+        return _lc.previousGetStore.promise;
       }
 
-      $previousGetStore = deferred;
+      _lc.previousGetStore = deferred;
       var storeList = betterStorage.storeList;
       if (gsnApi.isNull(storeList, []).length > 0) {
         $timeout(function () {
-          $previousGetStore = null;
-          deferred.resolve({ success: true, response: storeList });
+          _lc.previousGetStore = null;
           parseStoreList(storeList);
+          deferred.resolve({ success: true, response: storeList });
         }, 10);
       } else {
         $rootScope.$broadcast("gsnevent:storelist-loading");
         gsnApi.getAccessToken().then(function () {
           var url = gsnApi.getStoreUrl() + '/List/' + gsnApi.getChainId();
           $http.get(url, { headers: gsnApi.getApiHeaders() }).success(function (response) {
-            $previousGetStore = null;
+            _lc.previousGetStore = null;
             var stores = response;
             parseStoreList(stores, true);
             deferred.resolve({ success: true, response: stores });
@@ -4426,69 +4417,69 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
     // get item by id
     returnObj.getItem = function (id) {
-      var result = $circularProcessed.itemsById[id];
+      var result = _cp.itemsById[id];
       return (gsn.isNull(result, null) !== null) ? result : null;
     };
 
     returnObj.getAskTheChef = function () {
       var url = gsnApi.getStoreUrl() + '/FeaturedArticle/' + gsnApi.getChainId() + '/1';
-      return gsnApi.http($localCache.faAskTheChef, url);
+      return gsnApi.http(_lc.faAskTheChef, url);
     };
 
     returnObj.getFeaturedArticle = function () {
       var url = gsnApi.getStoreUrl() + '/FeaturedArticle/' + gsnApi.getChainId() + '/2';
-      return gsnApi.http($localCache.faArticle, url);
+      return gsnApi.http(_lc.faArticle, url);
     };
 
     returnObj.getFeaturedVideo = function () {
       var url = gsnApi.getStoreUrl() + '/FeaturedVideo/' + gsnApi.getChainId();
-      return gsnApi.http($localCache.faVideo, url);
+      return gsnApi.http(_lc.faVideo, url);
     };
 
     returnObj.getRecipeVideos = function() {
       var url = gsnApi.getStoreUrl() + '/RecipeVideos/' + gsnApi.getChainId();
-      return gsnApi.http($localCache.allVideos, url);
+      return gsnApi.http(_lc.allVideos, url);
     };
 
     returnObj.getCookingTip = function () {
       var url = gsnApi.getStoreUrl() + '/FeaturedArticle/' + gsnApi.getChainId() + '/3';
-      return gsnApi.http($localCache.faCookingTip, url);
+      return gsnApi.http(_lc.faCookingTip, url);
     };
 
     returnObj.getTopRecipes = function () {
       var url = gsnApi.getStoreUrl() + '/TopRecipes/' + gsnApi.getChainId() + '/' + 50;
-      return gsnApi.http($localCache.topRecipes, url);
+      return gsnApi.http(_lc.topRecipes, url);
     };
 
     returnObj.getFeaturedRecipe = function () {
       var url = gsnApi.getStoreUrl() + '/FeaturedRecipe/' + gsnApi.getChainId();
-      return gsnApi.http($localCache.faRecipe, url);
+      return gsnApi.http(_lc.faRecipe, url);
     };
 
     returnObj.getCoupon = function (couponId, couponType) {
-      return couponType == 2 ? $circularProcessed.manuCouponById[couponId] : (couponType == 10 ? $circularProcessed.storeCouponById[couponId] : $circularProcessed.youtechCouponById[couponId]);
+      return couponType == 2 ? _cp.manuCouponById[couponId] : (couponType == 10 ? _cp.storeCouponById[couponId] : _cp.youtechCouponById[couponId]);
     };
 
     returnObj.getManufacturerCoupons = function () {
-      return $localCache.manufacturerCoupons;
+      return _lc.manufacturerCoupons;
     };
 
     returnObj.getManufacturerCouponTotalSavings = function () {
       var url = gsnApi.getStoreUrl() + '/GetManufacturerCouponTotalSavings/' + gsnApi.getChainId();
-      return gsnApi.http($localCache.manuCouponTotalSavings, url);
+      return gsnApi.http(_lc.manuCouponTotalSavings, url);
     };
 
     returnObj.getStates = function () {
       var url = gsnApi.getStoreUrl() + '/GetStates';
-      return gsnApi.http($localCache.states, url);
+      return gsnApi.http(_lc.states, url);
     };
 
     returnObj.getInstoreCoupons = function () {
-      return $localCache.instoreCoupons;
+      return _lc.instoreCoupons;
     };
 
     returnObj.getYoutechCoupons = function () {
-      return $localCache.youtechCoupons;
+      return _lc.youtechCoupons;
     };
 
     returnObj.getRecipe = function (recipeId) {
@@ -4531,26 +4522,17 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
     returnObj.getSpecialAttributes = function () {
       var url = gsnApi.getStoreUrl() + '/GetSpecialAttributes/' + gsnApi.getChainId();
-      return gsnApi.http($localCache.specialAttributes, url);
+      return gsnApi.http(_lc.specialAttributes, url);
     };
 
     returnObj.getMealPlannerRecipes = function () {
       var url = gsnApi.getStoreUrl() + '/GetMealPlannerRecipes/' + gsnApi.getChainId();
-      return gsnApi.http($localCache.mealPlanners, url);
+      return gsnApi.http(_lc.mealPlanners, url);
     };
 
     returnObj.getAdPods = function () {
       var url = gsnApi.getStoreUrl() + '/ListSlots/' + gsnApi.getChainId();
-      return gsnApi.http($localCache.adPods, url);
-    };
-
-    // similar to getStores except the data is from cache
-    returnObj.getStoreList = function () {
-      if (gsnApi.isNull($localCache.storeList, null) === null) {
-        $localCache.storeList = betterStorage.storeList;
-      }
-
-      return $localCache.storeList;
+      return gsnApi.http(_lc.adPods, url);
     };
 
     returnObj.hasCompleteCircular = function () {
@@ -4569,24 +4551,20 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     };
 
     returnObj.getCircularData = function (forProcessing) {
-      if (!$localCache.circular) {
-        $localCache.circular = betterStorage.circular;
+      if (!_lc.circular) {
+        _lc.circular = betterStorage.circular;
         if (!forProcessing) {
           processCircularData();
         }
       }
 
-      return $localCache.circular;
+      return _lc.circular;
     };
 
     returnObj.initialize = function (isApi) {
       /// <summary>Initialze store data. this method should be
       /// written such that, it should do a server retrieval when parameter is null.
       /// </summary>
-
-      if (gsnApi.getUseLocalStorage()) {
-        betterStorage = $localStorage;
-      }
 
       gsnApi.initApp();
 
@@ -4618,30 +4596,24 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         returnObj.getAdPods();
         returnObj.getManufacturerCouponTotalSavings();
       }
-
-
-      var gourl = ($location.search()).gourl || ($location.search()).goUrl;
-      if (gourl) {
-        gsnApi.goUrl(gourl);
-      }
     };
 
     $rootScope.$on('gsnevent:store-setid', function (event, values) {
       var storeId = values.newValue;
       var config = gsnApi.getConfig();
-      var hasNewStoreId = (gsnApi.isNull($localCache.storeId, 0) != storeId);
+      var hasNewStoreId = (gsnApi.isNull(_lc.storeId, 0) != storeId);
       var requireRefresh = hasNewStoreId && !config.AllContent;
 
       // attempt to load circular
       if (hasNewStoreId) {
-        $localCache.storeId = storeId;
-        $localCache.circularIsLoading = false;
+        _lc.storeId = storeId;
+        _lc.circularIsLoading = false;
       }
 
       // always call update circular on set storeId or if it has been more than 20 minutes
       var currentTime = new Date().getTime();
       var seconds = (currentTime - gsnApi.isNull(betterStorage.circularLastUpdate, 0)) / 1000;
-      if ((requireRefresh && !$localCache.circularIsLoading) || (seconds > 1200)) {
+      if ((requireRefresh && !_lc.circularIsLoading) || (seconds > 1200)) {
         returnObj.refreshCircular();
       }
       else if (hasNewStoreId) {
@@ -4674,16 +4646,16 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     }
 
     function processManufacturerCoupon() {
-      if (gsnApi.isNull($localCache.manufacturerCoupons.items, []).length > 0) return;
+      if (gsnApi.isNull(_lc.manufacturerCoupons.items, []).length > 0) return;
 
       // process manufacturer coupon
       var circular = returnObj.getCircularData();
-      $localCache.manufacturerCoupons.items = circular.ManufacturerCoupons;
-      angular.forEach($localCache.manufacturerCoupons.items, function (item) {
-        item.CategoryName = gsnApi.isNull($circularProcessed.categoryById[item.CategoryId], { CategoryName: '' }).CategoryName;
-        $circularProcessed.manuCouponById[item.ItemId] = item;
+      _lc.manufacturerCoupons.items = circular.ManufacturerCoupons;
+      angular.forEach(_lc.manufacturerCoupons.items, function (item) {
+        item.CategoryName = gsnApi.isNull(_cp.categoryById[item.CategoryId], { CategoryName: '' }).CategoryName;
+        _cp.manuCouponById[item.ItemId] = item;
       });
-      gsnApi.getConfig().hasPrintableCoupon = $localCache.manufacturerCoupons.items.length > 0;
+      gsnApi.getConfig().hasPrintableCoupon = _lc.manufacturerCoupons.items.length > 0;
     }
 
     function processInstoreCoupon() {
@@ -4691,35 +4663,35 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       // process in-store coupon
       var items = [];
       angular.forEach(circular.InstoreCoupons, function (item) {
-        if (item.StoreIds.length <= 0 || item.StoreIds.indexOf($localCache.storeId) >= 0) {
-          item.CategoryName = gsnApi.isNull($circularProcessed.categoryById[item.CategoryId], { CategoryName: '' }).CategoryName;
-          $circularProcessed.storeCouponById[item.ItemId] = item;
+        if (item.StoreIds.length <= 0 || item.StoreIds.indexOf(_lc.storeId) >= 0) {
+          item.CategoryName = gsnApi.isNull(_cp.categoryById[item.CategoryId], { CategoryName: '' }).CategoryName;
+          _cp.storeCouponById[item.ItemId] = item;
           items.push(item);
         }
       });
 
       gsnApi.getConfig().hasStoreCoupon = items.length > 0;
 
-      $localCache.instoreCoupons.items = items;
+      _lc.instoreCoupons.items = items;
     }
 
     function processYoutechCoupon() {
-      if (gsnApi.isNull($localCache.youtechCoupons.items, []).length > 0) return;
+      if (gsnApi.isNull(_lc.youtechCoupons.items, []).length > 0) return;
 
       var circular = returnObj.getCircularData();
 
       // process youtech coupon
-      $localCache.youtechCoupons.items = circular.YoutechCoupons;
-      angular.forEach($localCache.youtechCoupons.items, function (item) {
-        item.CategoryName = gsnApi.isNull($circularProcessed.categoryById[item.CategoryId], {CategoryName: ''}).CategoryName;
-        $circularProcessed.youtechCouponById[item.ItemId] = item;
+      _lc.youtechCoupons.items = circular.YoutechCoupons;
+      angular.forEach(_lc.youtechCoupons.items, function (item) {
+        item.CategoryName = gsnApi.isNull(_cp.categoryById[item.CategoryId], {CategoryName: ''}).CategoryName;
+        _cp.youtechCouponById[item.ItemId] = item;
       });
 
-      gsnApi.getConfig().hasDigitalCoupon = $localCache.youtechCoupons.items.length > 0;
+      gsnApi.getConfig().hasDigitalCoupon = _lc.youtechCoupons.items.length > 0;
     }
 
     function processCoupon() {
-      if ($circularProcessed) {
+      if (_cp) {
         $timeout(processManufacturerCoupon, 50);
         $timeout(processInstoreCoupon, 50);
         $timeout(processYoutechCoupon, 50);
@@ -4732,19 +4704,19 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       if (!circularData.CircularTypes) return;
 
       betterStorage.circularLastUpdate = new Date().getTime();
-      $localCache.storeId = gsnApi.getSelectedStoreId();
+      _lc.storeId = gsnApi.getSelectedStoreId();
       processingQueue.length = 0;
 
       // process category into key value pair
       processingQueue.push(function () {
-        if ($circularProcessed.lastProcessDate == (new Date().getDate()) && $circularProcessed.categoryById[-1]) return;
+        if (_cp.lastProcessDate == (new Date().getDate()) && _cp.categoryById[-1]) return;
 
         var categoryById = gsnApi.mapObject(circularData.Categories, 'CategoryId');
 
         categoryById[null] = { CategoryId: null, CategoryName: '' };
         categoryById[-1] = { CategoryId: -1, CategoryName: 'Misc. Items' };
         categoryById[-2] = { CategoryId: -2, CategoryName: 'Ingredients' };
-        $circularProcessed.categoryById = categoryById;
+        _cp.categoryById = categoryById;
 
         return;
       });
@@ -4759,7 +4731,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       // foreach Circular
       angular.forEach(circulars, function (circ) {
         circ.StoreIds = circ.StoreIds || [];
-        if (circ.StoreIds.length <= 0 || circ.StoreIds.indexOf($localCache.storeId) >= 0) {
+        if (circ.StoreIds.length <= 0 || circ.StoreIds.indexOf(_lc.storeId) >= 0) {
           circularData.Circulars.push(circ);
           if (!circ.Pagez) {
             circ.Pagez = circ.Pages;
@@ -4769,7 +4741,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           circ.Pages = [];
 
           angular.forEach(pages, function (page) {
-            if (page.StoreIds.length <= 0 || page.StoreIds.indexOf($localCache.storeId) >= 0) {
+            if (page.StoreIds.length <= 0 || page.StoreIds.indexOf(_lc.storeId) >= 0) {
               circ.Pages.push(page);
             }
           });
@@ -4787,17 +4759,17 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
       // set result
       processingQueue.push(function () {
-        $circularProcessed.itemsById = gsnApi.mapObject(items, 'ItemId');
+        _cp.itemsById = gsnApi.mapObject(items, 'ItemId');
         return;
       });
 
       processingQueue.push(function () {
-        $circularProcessed.circularByTypeId = gsnApi.mapObject(circularByTypes, 'CircularTypeId');
+        _cp.circularByTypeId = gsnApi.mapObject(circularByTypes, 'CircularTypeId');
         return;
       });
 
       processingQueue.push(function () {
-        $circularProcessed.staticCircularById = gsnApi.mapObject(staticCirculars, 'CircularTypeId');
+        _cp.staticCircularById = gsnApi.mapObject(staticCirculars, 'CircularTypeId');
         return;
       });
 
@@ -4805,7 +4777,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
       processingQueue.push(function () {
         if (cb) cb();
-        $circularProcessed.lastProcessDate = new Date().getDate();
+        _cp.lastProcessDate = new Date().getDate();
         $rootScope.$broadcast('gsnevent:circular-loaded', { success: true, response: circularData });
         return;
       });
@@ -4841,6 +4813,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       // foreach Page in Circular
       angular.forEach(pages, function (page) {
         itemCount += page.Items.length;
+        page.Circular = circ;
 
         processingQueue.push(function () {
           processCircularPage(items, circularMaster, page);
@@ -4860,6 +4833,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     function processCircularPage(items, circularMaster, page) {
       // foreach Item on Page
       angular.forEach(page.Items, function (item) {
+        item.Page = page;
         circularMaster.items.push(item);
         items.push(item);
       });
@@ -5460,7 +5434,6 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         var templateLoader = $http.get(templateUrl, { cache: $templateCache });
         var hasTile = false;
 
-
         templateLoader.success(function(html) {
           scope.templateHtml = html;
         }).then(linkTile);
@@ -5530,43 +5503,6 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           ngModel.$setViewValue(elm.val());
       });
     }
-  }]);
-})(angular);
-(function (angular, undefined) {
-  'use strict';
-  var myModule = angular.module('gsn.core');
-
-  myModule.directive('gsnAutoFocus', ['$timeout', function ($timeout) {
-    var directive = {
-      restrict: 'EA',
-      link: link
-    };
-    return directive;
-
-    function link(scope, element, attrs) {
-
-      function focusIt() {
-        $timeout(function() {
-          element[0].focus();
-        }, 0);
-      }
-
-      scope.$watch(function () {
-        if (attrs.watch) {
-          var parentArr = $('.' + attrs.watch);
-          if (parentArr.length > 0) {
-            var parent = parentArr[parentArr.length - 1];
-            return (window.getComputedStyle(parent).display === 'block');
-          }
-        }
-        return false;
-      }, function () {
-        $timeout(function () {
-          focusIt();
-        }, 300);
-      });
-    }
-    
   }]);
 })(angular);
 (function (angular, undefined) {
@@ -5763,7 +5699,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
          var isOpenedByClick = false;
           $(element).css('height', '96px');
-          $(element).append('<button class="ellipsis  pull-right">...</button>');
+          $(element).append('<button class="ellipsis pull-right">...</button>');
 
           $(element.find('.ellipsis')).popover({
             html: true,
@@ -5820,7 +5756,6 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         $(element.find('.ellipsis')).remove();
         $(element.find('p')).unbind('click');
       }
-      
     }
 
     function link(scope, element, attrs) {
@@ -5992,7 +5927,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
   'use strict';
   var myModule = angular.module('gsn.core');
 
-  myModule.directive('gsnFlexibleWidth', [function () {
+  myModule.directive('gsnFlexibleWidth', ['debounce', '$window', function (debounce, $window) {
     var directive = {
       restrict: 'EA',
       scope: true,
@@ -6007,8 +5942,9 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         });
       }
 
-      updateWidth();
-      $(window).resize(updateWidth);
+      var myUpdateWith = debounce(updateWidth, 200);
+      $window.on('resize', myUpdateWith);
+      myUpdateWith();
     }
   }]);
 })(angular);
@@ -6697,27 +6633,6 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
   'use strict';
   var myModule = angular.module('gsn.core');
 
-  myModule.directive('gsnRedirectOnResize', ['$window', '$location', function ($window, $location) {
-    var directive = {
-      restrict: 'EA',
-      scope: true,
-      link: link
-    };
-    return directive;
-
-    function link(scope, element, attrs) {
-      $(window).resize(function () {
-        if (angular.element($window).width() < attrs.min) {
-          $location.url(attrs.url);
-        }
-      });
-    }
-  }]);
-})(angular);
-(function (angular, undefined) {
-  'use strict';
-  var myModule = angular.module('gsn.core');
-
   myModule.directive('gsnRssFeed', ['FeedService', '$timeout', function (FeedService, $timeout) {
     // Usage:   bind rss feed to some property
     // 
@@ -7108,7 +7023,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
               $scope.$on('gsnevent:gcprinter-not-found', function() {
                 $scope.printer.notinstalled++;
               });
-              $scope.$on('gsnevent:gcprinter-printed', function(e, rsp) {
+              $scope.$on('gsnevent:gcprinter-printed', function(evt, e, rsp) {
                 $scope.printer.printed = e;
                 if (rsp) {
                   $scope.printer.errors = gsnApi.isNull(rsp.ErrorCoupons, []);
@@ -7152,12 +7067,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           // dynamically load google
           var src = '//www.google.com/jsapi';
 
-          // Prefix protocol
-          if ($window.location.protocol === 'file') {
-            src = 'https:' + src;
-          }
-
-          gsnApi.loadScripts([src]);
+          gsnApi.loadScripts([src], loadSearch);
           return;
         }
 
@@ -7228,12 +7138,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           // dynamically load google
           var src = '//cdnjs.cloudflare.com/ajax/libs/spin.js/1.3.2/spin.min.js';
 
-          // Prefix protocol
-          if ($window.location.protocol === 'file') {
-            src = 'https:' + src;
-          }
-
-          gsnApi.loadScripts([src]);
+          gsnApi.loadScripts([src], activate);
           return;
         }
         
@@ -7278,97 +7183,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
   'use strict';
   var myModule = angular.module('gsn.core');
 
-  myModule.directive("gsnSticky", ['gsnApi', '$timeout', '$window', function (gsnApi, $timeout, $window) {
-    // Usage: make an element sticky 
-    // 
-    // Creates: 2014-06-13 TomN
-    // 
-    var directive = {
-      restrict: 'EA',
-      scope: true,
-      link: link
-    };
-    return directive;
-
-    function link(scope, element, attrs) {
-      var $win = angular.element($window);
-      var myWidth = 0;
-      var offsetTop = gsnApi.isNaN(parseInt(attrs.offsetTop), 20);
-      var timeout = gsnApi.isNaN(parseInt(attrs.timeout), 2000);
-
-      if (attrs.fixedWidth) {
-        if (element.width() > 0) {
-          myWidth = element.width();
-        }
-      }
-      
-      // make sure UI is completed before taking first snapshot
-      $timeout(function () {
-        if (scope._stickyElements === undefined) {
-          scope._stickyElements = [];
-
-          $win.bind("scroll", function (e) {
-            var pos = $win.scrollTop();
-            
-            angular.forEach(scope._stickyElements, function(item, k) {
-              var bottom = gsnApi.isNaN(parseInt(attrs.bottom), 0);
-              var top = gsnApi.isNaN(parseInt(attrs.top), 0);
-              
-              // if screen is too small, don't do sticky
-              if ($win.height() < (top + bottom + element.height())) {
-                item.isStuck = true;
-                pos = -1;
-              }
-
-              if (!item.isStuck && pos > (item.start + offsetTop)) {
-                item.element.addClass("stuck");
-                if (myWidth > 0) {
-                  item.element.css({ top: top + 'px', width: myWidth + 'px' });
-                } else {
-                  item.element.css({ top: top + 'px' });
-                }
-
-                item.isStuck = true;
-              } else if (item.isStuck && pos <= item.start) {
-                item.element.removeClass("stuck");
-                item.element.css({ top: null });
-                item.isStuck = false;
-              }
-            });
-            
-            return true;
-          });
-
-          var recheckPositions = function () {
-            for (var i = 0; i < scope._stickyElements.length; i++) {
-              var myItem = scope._stickyElements[i];
-              if (!myItem.isStuck) {
-                myItem.start = myItem.element.offset().top;
-              }
-            }
-          };
-
-          $win.bind("load", recheckPositions);
-          $win.bind("resize", recheckPositions);
-        }
-
-        var newItem = {
-          element: element,
-          isStuck: false,
-          start: element.offset().top
-        };
-
-        scope._stickyElements.push(newItem);
-      }, timeout);
-
-    }
-  }]);
-})(angular);
-(function (angular, undefined) {
-  'use strict';
-  var myModule = angular.module('gsn.core');
-
-  myModule.directive("gsnStickyWithAnchor", ['$window', '$timeout', function ($window, $timeout) {
+  myModule.directive("gsnSticky", ['$window', '$timeout', 'debounce', function ($window, $timeout, debounce) {
 
     var directive = {
       link: link,
@@ -7377,19 +7192,22 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     return directive;
 
     function link(scope, element, attrs) {
-      var anchor = angular.element('<div class="sticky-anchor"></div>');
-      angular.element(element[0]).before(anchor);
+      var anchor = angular.element('<div class="sticky-anchor" style="display: none"></div>');
+      element.before(anchor);
+
       if (attrs.bottom) {
         element.css({ 'bottom': parseInt(attrs.bottom) });
       }
+
       if (attrs.top) {
         element.css({ 'top': parseInt(attrs.top) });
       }
 
       function checkSticky() {
-        var scrollTop = angular.element($window).scrollTop();
-        var screenHight = angular.element($window).height();
+        var scrollTop = $window.scrollTop();
+        var screenHight = $window.height();
         var isScticky = false;
+
         if (attrs.bottom) {
           isScticky = (scrollTop + screenHight < angular.element(anchor).offset().top + parseInt(attrs.bottom));
         }
@@ -7399,14 +7217,14 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         }
         
         element.css({ 'position': isScticky ? 'fixed' : 'relative' });
+
         return true;
       }
 
-      angular.element($window).on('scroll', checkSticky);
-      
-      scope.$watch(attrs.reloadOnChange, function () {
-        $timeout(checkSticky, 300);
-      });
+      var myCheckSticky = debounce(checkSticky, 200);
+
+      $window.on('scroll', myCheckSticky);
+      scope.$watch(attrs.reloadOnChange, myCheckSticky);
     }
   }]);
 })(angular);
@@ -7796,17 +7614,6 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     },
     set: function (e, v) {
       return e.attr('content', v);
-    }
-  });
-
-  ngModifyElementDirective({
-    name: 'gsnFavIcon',
-    selector: 'link[rel="shortcut icon"]',
-    get: function (e) {
-      return e.attr('href');
-    },
-    set: function (e, v) {
-      return e.attr('href', v);
     }
   });
 

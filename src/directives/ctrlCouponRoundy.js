@@ -78,13 +78,9 @@
       var manuCoupons = gsnStore.getManufacturerCoupons(),
           youtechCouponsOriginal = gsnStore.getYoutechCoupons(),
           instoreCoupons = gsnStore.getInstoreCoupons();
-      if ($scope.couponType == 'digital' && gsnApi.isNull(youtechCouponsOriginal.items, []).length <= 0) {
-        gsnStore.refreshCircular();
-        return;
-      }
-      else if ($scope.couponType == 'printable' && gsnApi.isNull(!manuCoupons.items, []).length <= 0) {
-        gsnStore.refreshCircular();
-        return;
+  
+      if ($scope.couponType == 'printable') {
+        gsnCouponPrinter.init();
       }
       
       preprocessCoupons(manuCoupons, youtechCouponsOriginal, instoreCoupons);
@@ -133,7 +129,6 @@
           });
         }
       } else if ($scope.couponType == 'printable') {
-        gsnCouponPrinter.init();
         gsnStore.getManufacturerCouponTotalSavings().then(function (rst) {
           $scope.selectedCoupons.totalSavings = parseFloat(rst.response).toFixed(2);
         });

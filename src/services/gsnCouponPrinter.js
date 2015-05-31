@@ -30,12 +30,7 @@
         // dynamically load google
         var src = '//cdn.gsngrocers.com/script/gcprinter/gcprinter.min.js';
 
-        // Prefix protocol
-        if ($window.location.protocol === 'file') {
-          src = 'https:' + src;
-        }
-
-        gsnApi.loadScripts(src, activate);
+        gsnApi.loadScripts([src], activate);
         return;
       }
 

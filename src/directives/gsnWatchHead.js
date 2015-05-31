@@ -143,17 +143,6 @@
     }
   });
 
-  ngModifyElementDirective({
-    name: 'gsnFavIcon',
-    selector: 'link[rel="shortcut icon"]',
-    get: function (e) {
-      return e.attr('href');
-    },
-    set: function (e, v) {
-      return e.attr('href', v);
-    }
-  });
-
   // Facebook OpenGraph integration
   //  og:title - The title of your object as it should appear within the graph, e.g., "The Rock". 
   ngModifyElementDirective({

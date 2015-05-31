@@ -547,6 +547,15 @@
 
   //#region dynamic script loader
   function loadSingleScript(uri, callbackFunc) {
+    if (uri.indexOf('//') == 0) {
+      url = 'http:' + uri;
+    }
+
+    // Prefix protocol
+    if ((root.location || {}).protocol === 'file') {
+      uri = url.replace('http://', 'https://')
+    }
+
     var tag = document.createElement('script');
     tag.type = 'text/javascript';
     tag.src = uri;

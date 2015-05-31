@@ -54,13 +54,7 @@
 
           // dynamically load google
           var src = '//www.google.com/recaptcha/api/js/recaptcha_ajax.js';
-
-          // Prefix protocol
-          if ($window.location.protocol === 'file') {
-            src = 'https:' + src;
-          }
-
-          gsnApi.loadScripts([src]);
+          gsnApi.loadScripts([src], loadRecaptcha);
           return;
         }
 

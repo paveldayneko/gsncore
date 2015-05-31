@@ -21,7 +21,6 @@
         var templateLoader = $http.get(templateUrl, { cache: $templateCache });
         var hasTile = false;
 
-
         templateLoader.success(function(html) {
           scope.templateHtml = html;
         }).then(linkTile);

@@ -5,9 +5,7 @@
   myModule.filter('defaultIf', ['gsnApi', function (gsnApi) {
     // Usage: testValue | defaultIf:testValue == 'test' 
     //    or: testValue | defaultIf:someTest():defaultValue
-    // 
-    // Creates: 2014-04-02
-    // 
+    //
 
     return function (input, conditional, defaultOrFalseValue) {
       var localCondition = conditional;
