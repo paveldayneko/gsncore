@@ -185,7 +185,7 @@
         element.css({ 'display': (($scope.scrollTop > parseInt(attrs.offset)) && countScrollTop == 1) ? 'block' : '' });
       }, 300);
       
-      $window.on('scroll', myScrollTop);
+      angular.element($window).on('scroll', myScrollTop);
       element.on('click', function () {
         $window.scrollTop(0);
       });

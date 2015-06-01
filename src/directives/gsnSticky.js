@@ -23,8 +23,8 @@
       }
 
       function checkSticky() {
-        var scrollTop = $window.scrollTop();
-        var screenHight = $window.height();
+        var scrollTop = angular.element($window).scrollTop();
+        var screenHight = angular.element($window).height();
         var isScticky = false;
 
         if (attrs.bottom) {
@@ -42,7 +42,7 @@
 
       var myCheckSticky = debounce(checkSticky, 200);
 
-      $window.on('scroll', myCheckSticky);
+      angular.element($window).on('scroll', myCheckSticky);
       scope.$watch(attrs.reloadOnChange, myCheckSticky);
     }
   }]);
