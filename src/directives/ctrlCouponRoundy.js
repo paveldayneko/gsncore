@@ -46,7 +46,7 @@
       isFailedLoading: false
     };
     $scope.gcprinter = gcprinter;
-    $scope.printer = { blocked: 0, notsupported: 0, notinstalled: 0, printed: null, count: 0, total: 0 };
+    $scope.printer = { blocked: 0, notsupported: 0, notinstalled: 0, printed: null, count: 0, total: 0, isChrome: /chrome/gi.test(gsnApi.userAgent) };
     $scope.preSelectedCoupons = {
       items: [],
       targeted: []
