@@ -548,12 +548,12 @@
   //#region dynamic script loader
   function loadSingleScript(uri, callbackFunc) {
     if (uri.indexOf('//') == 0) {
-      url = 'http:' + uri;
+      uri = 'http:' + uri;
     }
 
     // Prefix protocol
     if ((root.location || {}).protocol === 'file') {
-      uri = url.replace('http://', 'https://')
+      uri = uri.replace('http://', 'https://')
     }
 
     var tag = document.createElement('script');

@@ -11,32 +11,47 @@
     return directive;
 
     function link(scope, element, attrs) {
-      var anchor = angular.element('<div class="sticky-anchor" style="display: none"></div>');
+      var anchor = angular.element('<div class="sticky-anchor"></div>');
       element.before(anchor);
-
-      if (attrs.bottom) {
-        element.css({ 'bottom': parseInt(attrs.bottom) });
-      }
-
-      if (attrs.top) {
-        element.css({ 'top': parseInt(attrs.top) });
-      }
+      element.css( { bottom: 'auto', top: 'auto' } );
 
       function checkSticky() {
         var scrollTop = angular.element($window).scrollTop();
-        var screenHight = angular.element($window).height();
-        var isScticky = false;
+        var screenHeight = angular.element($window).height();
+        var anchorTop = anchor.offset().top;
+        var elementHeight = element.height();
+        var top = parseInt(attrs.top) || 0;
+        var bottom = parseInt(attrs.bottom);
+        var isStuck = false;
 
-        if (attrs.bottom) {
-          isScticky = (scrollTop + screenHight < angular.element(anchor).offset().top + parseInt(attrs.bottom));
+      
+        if (!isNaN(bottom)) {
+          // only sticky to bottom if scroll beyond anchor
+          isStuck = scrollTop + screenHeight < anchorTop + bottom;
+          if (isStuck) {
+            element.css( { bottom: bottom, top: 'auto' } );
+          }
+        } else if (!isNaN(top)) {
+          isStuck = scrollTop > anchorTop + top;
+          if (isStuck) {
+            element.css( { bottom: 'auto', top: top } );
+          }
         }
-        
-        if (attrs.top) {
-          isScticky = (scrollTop > angular.element(anchor).offset().top - parseInt(attrs.top));
-        }
-        
-        element.css({ 'position': isScticky ? 'fixed' : 'relative' });
 
+        // if screen is too small, don't do sticky
+        if (screenHeight < (top + (bottom || 0) + elementHeight)) {
+          isStuck = false;
+        }
+
+        if (isStuck) {
+          element.addClass('stuck');
+        } 
+        else {
+          element.css( { bottom: 'auto', top: 'auto' } );
+          element.removeClass('stuck')
+        }
+
+        // probagate
         return true;
       }
 

@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.18
  * gsncore repository
- * Build date: Mon Jun 01 2015 09:32:47 GMT-0500 (CDT)
+ * Build date: Mon Jun 01 2015 11:47:52 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -554,12 +554,12 @@
   //#region dynamic script loader
   function loadSingleScript(uri, callbackFunc) {
     if (uri.indexOf('//') == 0) {
-      url = 'http:' + uri;
+      uri = 'http:' + uri;
     }
 
     // Prefix protocol
     if ((root.location || {}).protocol === 'file') {
-      uri = url.replace('http://', 'https://')
+      uri = uri.replace('http://', 'https://')
     }
 
     var tag = document.createElement('script');
@@ -3110,7 +3110,8 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           if (!immediate) func.apply(context, args);
         };
         var callNow = immediate && !timeout;
-        timeout = $timeout(later, wait);
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
         if (callNow) func.apply(context, args);
       };
     };
@@ -4793,16 +4794,21 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         CircularTypeId: circ.CircularTypeId,
         ImageUrl: pages[0].ImageUrl,
         SmallImageUrl: pages[0].SmallImageUrl,
-        items: []
+        items: [],
+        PageCount: pages.length
       };
+      circ.PageCount = circularMaster.PageCount;
 
       // foreach Page in Circular
+      var pageIdx = 0;
       angular.forEach(pages, function (page) {
+        pageIdx++;
         itemCount += page.Items.length;
         page.Circular = circ;
+        page.PageIdx = pageIdx;
 
         processingQueue.push(function () {
-          processCircularPage(items, circularMaster, page);
+          processCircularPage(items, circularMaster, page, pageIdx);
         });
       });
 
@@ -4816,9 +4822,10 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       });
     }
 
-    function processCircularPage(items, circularMaster, page) {
+    function processCircularPage(items, circularMaster, page, pageIdx) {
       // foreach Item on Page
       angular.forEach(page.Items, function (item) {
+        item.PageNumber = 'Page ' + (pageIdx < 10 ? '0' : '') + pageIdx + ' of ' + circularMaster.PageCount
         item.Page = page;
         circularMaster.items.push(item);
         items.push(item);
@@ -7182,32 +7189,47 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     return directive;
 
     function link(scope, element, attrs) {
-      var anchor = angular.element('<div class="sticky-anchor" style="display: none"></div>');
+      var anchor = angular.element('<div class="sticky-anchor"></div>');
       element.before(anchor);
-
-      if (attrs.bottom) {
-        element.css({ 'bottom': parseInt(attrs.bottom) });
-      }
-
-      if (attrs.top) {
-        element.css({ 'top': parseInt(attrs.top) });
-      }
+      element.css( { bottom: 'auto', top: 'auto' } );
 
       function checkSticky() {
         var scrollTop = angular.element($window).scrollTop();
-        var screenHight = angular.element($window).height();
-        var isScticky = false;
+        var screenHeight = angular.element($window).height();
+        var anchorTop = anchor.offset().top;
+        var elementHeight = element.height();
+        var top = parseInt(attrs.top) || 0;
+        var bottom = parseInt(attrs.bottom);
+        var isStuck = false;
 
-        if (attrs.bottom) {
-          isScticky = (scrollTop + screenHight < angular.element(anchor).offset().top + parseInt(attrs.bottom));
+      
+        if (!isNaN(bottom)) {
+          // only sticky to bottom if scroll beyond anchor
+          isStuck = scrollTop + screenHeight < anchorTop + bottom;
+          if (isStuck) {
+            element.css( { bottom: bottom, top: 'auto' } );
+          }
+        } else if (!isNaN(top)) {
+          isStuck = scrollTop > anchorTop + top;
+          if (isStuck) {
+            element.css( { bottom: 'auto', top: top } );
+          }
         }
-        
-        if (attrs.top) {
-          isScticky = (scrollTop > angular.element(anchor).offset().top - parseInt(attrs.top));
-        }
-        
-        element.css({ 'position': isScticky ? 'fixed' : 'relative' });
 
+        // if screen is too small, don't do sticky
+        if (screenHeight < (top + (bottom || 0) + elementHeight)) {
+          isStuck = false;
+        }
+
+        if (isStuck) {
+          element.addClass('stuck');
+        } 
+        else {
+          element.css( { bottom: 'auto', top: 'auto' } );
+          element.removeClass('stuck')
+        }
+
+        // probagate
         return true;
       }
 
