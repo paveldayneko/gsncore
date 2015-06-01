@@ -561,21 +561,16 @@
         CircularTypeId: circ.CircularTypeId,
         ImageUrl: pages[0].ImageUrl,
         SmallImageUrl: pages[0].SmallImageUrl,
-        items: [],
-        PageCount: pages.length
+        items: []
       };
-      circ.PageCount = circularMaster.PageCount;
 
       // foreach Page in Circular
-      var pageIdx = 0;
       angular.forEach(pages, function (page) {
-        pageIdx++;
         itemCount += page.Items.length;
         page.Circular = circ;
-        page.PageIdx = pageIdx;
 
         processingQueue.push(function () {
-          processCircularPage(items, circularMaster, page, pageIdx);
+          processCircularPage(items, circularMaster, page);
         });
       });
 
@@ -589,10 +584,9 @@
       });
     }
 
-    function processCircularPage(items, circularMaster, page, pageIdx) {
-      // foreach Item on Page
+    function processCircularPage(items, circularMaster, page) {
       angular.forEach(page.Items, function (item) {
-        item.PageNumber = 'Page ' + (pageIdx < 10 ? '0' : '') + pageIdx + ' of ' + circularMaster.PageCount
+        item.PageNumber = 'Page ' + (parseInt(page.PageNumber) < 10 ? '0' : '') + page.PageNumber
         item.Page = page;
         circularMaster.items.push(item);
         items.push(item);

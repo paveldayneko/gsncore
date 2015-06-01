@@ -27,7 +27,9 @@
   },
   "main": [
     "gsncore.js",
-    "gsncore.min.js"
+    "gsncore.min.js",
+    "gsncore-basic.js",
+    "gsncore-basic.min.js"
   ],
   "dependencies": {},
   "devDependencies": {
