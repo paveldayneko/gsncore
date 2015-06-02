@@ -23,8 +23,8 @@
     $scope.pageId = 99; // it's always all items for desktop     
     $scope.loadAll = $scope.loadAll || false;
     $scope.itemsPerPage = $scope.itemsPerPage || 10;
-    $scope.sortBy = $scope.sortBy || 'Page.PageNumber';
-    $scope.sortByName = $scope.sortByName || 'Page';
+    $scope.sortBy = $scope.sortBy || 'CategoryName';
+    $scope.sortByName = $scope.sortByName || 'department';
     $scope.actualSortBy = $scope.sortBy;
 
     $scope.allItems = [];
