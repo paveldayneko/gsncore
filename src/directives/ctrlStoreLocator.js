@@ -45,6 +45,7 @@
 
     gsnStore.getStores().then(function(rsp){
       $scope.storeList = rsp.response;
+      $scope.showAllStores()
     });
 
     function activate() {
