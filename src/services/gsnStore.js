@@ -390,12 +390,20 @@
         }
       }
       var search = $location.search();
-      var selectFirstStore = search.sft || search.selectFirstStore || search.selectfirststore;
+      var selectFirstStore = search.sfs || search.selectFirstStore || search.selectfirststore;
       storeList = gsnApi.isNull(storeList, []);
       if (storeList.length == 1 || selectFirstStore) {
         if (storeList[0].StoreId != gsnApi.isNull(gsnApi.getSelectedStoreId(), 0)) {
           gsnApi.setSelectedStoreId(storeList[0].StoreId);
         }
+      }
+      else if (search.storeid) {
+        var storeById = gsnApi.mapObject(storeList, 'StoreId');
+        gsnApi.setSelectedStoreId(storeById[search.storeid].StoreId);
+      }
+      else if (search.storenbr) {
+        var storeByNumber = gsnApi.mapObject(storeList, 'StoreNumber');
+        gsnApi.setSelectedStoreId(storeByNumber[search.storenbr].StoreId);
       }
     }
 
