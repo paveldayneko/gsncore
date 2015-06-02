@@ -257,8 +257,9 @@
 
     function printClippedCoupons() {
       $scope.printer.printed = null; 
-      var clippedCouponsInArr = Object.keys($scope.clippedCoupons).map(function (key) {
-        return $scope.clippedCoupons[key];
+      var clippedCouponsInArr = [];
+      angular.forEach($scope.clippedCoupons, function (v, k) {
+        clippedCouponsInArr.push(v);
       });
       $scope.printer.total = clippedCouponsInArr.length;
       gsnCouponPrinter.print(clippedCouponsInArr);
@@ -319,7 +320,7 @@
     }
 
     function countClippedCoupons() {
-      $scope.clippedCount = Object.keys($scope.clippedCoupons).length;
+      $scope.clippedCount = gsnApi.keys($scope.clippedCoupons).length;
       return $scope.clippedCount;
     }
 

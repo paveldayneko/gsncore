@@ -504,7 +504,7 @@
     //#region security config
     // For security reason, please do not disable $sce
     // instead, please use trustHtml filter with data-ng-bind-html for specific trust
-    $sceProvider.enabled(!gsn.browser.isIE);
+    $sceProvider.enabled(!gsn.browser.isIE && root.location.protocol.indexOf('http') >= 0);
 
     $sceDelegateProvider.resourceUrlWhitelist(gsn.config.SceWhiteList || [
       'self',
@@ -547,13 +547,13 @@
 
   //#region dynamic script loader
   function loadSingleScript(uri, callbackFunc) {
-    if (uri.indexOf('//') == 0) {
+    if (uri.indexOf('//') === 0) {
       uri = 'http:' + uri;
     }
 
     // Prefix protocol
     if ((root.location || {}).protocol === 'file') {
-      uri = uri.replace('http://', 'https://')
+      uri = uri.replace('https://', 'http://')
     }
 
     var tag = document.createElement('script');
