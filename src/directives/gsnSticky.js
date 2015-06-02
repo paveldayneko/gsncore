@@ -26,8 +26,8 @@
 
       
         if (!isNaN(bottom)) {
-          // only sticky to bottom if scroll beyond anchor
-          isStuck = scrollTop + screenHeight < anchorTop + bottom;
+          // only sticky to bottom if scroll beyond anchor or it's beyound bottom of screen
+          isStuck = (scrollTop > anchorTop + elementHeight) || (scrollTop + screenHeight < anchorTop + bottom);
           if (isStuck) {
             element.css( { bottom: bottom, top: 'auto' } );
           }
