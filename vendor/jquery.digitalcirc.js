@@ -39,10 +39,10 @@
 '	</div>' +
 '</div><div class="dcircular-single"></div>',
             templateLinkBackToList: '{{#if HasMultipleCircular}}<a href="?" class="dcircular-back-to-list">&larr; Choose Another Ad</a><br />{{/if}}',
-            templatePagerTop: '<div class="dcircular-pager-top"><ul class="pagination"><li><a href="javascript:void(0)" aria-label="Previous" class="pager-previous">' +
+            templatePagerTop: '<div class="dcircular-pager dcircular-pager-top"><ul class="pagination"><li><a href="javascript:void(0)" aria-label="Previous" class="pager-previous">' +
 '<span aria-hidden="true">&laquo;</span></a></li>{{#Circular.Pages}}<li{{#ifeq PageIndex ../CurrentPageIndex}} class="active"{{/ifeq}}>' + 
 '<a href="?c={{CircularIndex}}&p={{PageIndex}}">{{PageIndex}}</a></li>{{/Circular.Pages}}<li><a href="javascript:void(0)" aria-label="Next" class="pager-next"><span aria-hidden="true">&raquo;</span></a></li></ul></div>',
-            templatePagerBottom:'<div class="dcircular-pager-bottom"><ul class="pagination"><li><a href="javascript:void(0)" aria-label="Previous" class="pager-previous">' +
+            templatePagerBottom:'<div class="dcircular-pager dcircular-pager-bottom"><ul class="pagination"><li><a href="javascript:void(0)" aria-label="Previous" class="pager-previous">' +
 '<span aria-hidden="true">&laquo;</span></a></li>{{#Circular.Pages}}<li{{#ifeq PageIndex ../CurrentPageIndex}} class="active"{{/ifeq}}>' + 
 '<a href="?c={{CircularIndex}}&p={{PageIndex}}">{{PageIndex}}</a></li>{{/Circular.Pages}}<li><a href="javascript:void(0)" aria-label="Next" class="pager-next"><span aria-hidden="true">&raquo;</span></a></li></ul></div>',
             templateCircularSingle: '<div class="dcircular-content">' +
@@ -51,7 +51,7 @@
 '{{#Page.Items}}<area shape="rect" data-circularitemid="{{ItemId}}" coords="{{AreaCoordinates}}">{{/Page.Items}}' +
 '</map>' +
 '	</div>',
-            templateCircularPopup: '<div class="row dcircular-popup-content" data-circularitemid="{{ItemId}}">' +
+            templateCircularPopup: '<div class="dcircular-popup-content" data-circularitemid="{{ItemId}}">' +
 '		<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 thumbnail dcircular-popup-thumbnail" style="padding-left: 5px;"><img alt="{{Description}}" src="{{ImageUrl}}" class="dcircular-popup-image"/></div>' +
 '		<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 dcircular-popup-content">' +
 '			<h4 style="word-wrap: normal;" class=" dcircular-popup-caption">{{Description}}</h2>' +
@@ -185,9 +185,10 @@
       var htmlCirc = $this._templateCircSingle({ HasMultipleCircular: $this.settings.data.Circulars.length > 1, Circular: circ, CircularIndex: circularIdx, CurrentPageIndex: (pageIdx + 1), Page: circPage });
       el.find('.dcircular-single').html(htmlCirc);
 
-      el.find('.pager-previous, .pager-next').click(function(evt) {
+      el.find('.dcircular-pager li a').click(function(evt) {
         var $target = $(evt.target);
         var realTarget = $target.parent('a');
+        var idx = $target.html();
         if ($target.hasClass('pager-previous') || realTarget.hasClass('pager-previous')){
           idx = (pageIdx || 0);
           if (idx <= 0){
@@ -202,56 +203,92 @@
         }
 
         $this.displayCircular($this.circularIdx, parseInt(idx) - 1);
+        return false;
       });
       
+      function hidePopup(){
+        setTimeout(function() {
+          $('.qtip').slideUp();
+          $('.dcircular-popup').slideUp();
+        }, 500);
+      }
+
       function handleSelect(evt) {
         if (typeof($this.settings.onItemSelect) == 'function') {
           var itemId = $(this).data().circularitemid;
           var item = $this.getCircularItem(itemId);
-
-          $('.qtip').attr('data-ng-non-bindable', '').hide();
-
           if (typeof($this.settings.onItemSelect) === 'function') {
             $this.settings.onItemSelect($this, evt, item);
           }
         }
-        setTimeout(function() {
-          $('.qtip').slideUp();
-        }, 500);
+        hidePopup();
       }
 
       var areas = el.find('area').click(handleSelect);
-      areas.qtip({
-        content: {
-          text: function (evt, api) {
-            // Retrieve content from custom attribute of the $('.selector') elements.
-            var itemId = $(this).data().circularitemid;
-            var item = $this.getCircularItem(itemId);
-            return $this._templateCircPopup(item);
+      
+      var popover = $('.dcircular-popup');
+      if (popover.length > 0) {
+        var myTimeout = undefined;
+        areas.mousemove(function(e){
+          var itemId = $(this).data().circularitemid;
+          var item = $this.getCircularItem(itemId);
+          $('.dcircular-popup .popup-title').html($this._templateCircPopupTitle(item));
+          $('.dcircular-popup .popup-content').html($this._templateCircPopup(item));
+
+          // reposition
+          var offset = $(this).offset();
+          var height = popover.show().height();
+
+          $('.dcircular-popup').css( { top: e.clientY + 15, left: e.clientX - (height / 2) }).show();
+          if (myTimeout){
+            clearTimeout(myTimeout);
+          }
+          myTimeout = setTimeout(hidePopup, 1500);
+        }).mouseleave(function(e){
+          if (myTimeout){
+            clearTimeout(myTimeout);
+          }
+          myTimeout = setTimeout(hidePopup, 500);
+        });
+        popover.mousemove(function(e){
+          if (myTimeout){
+            clearTimeout(myTimeout);
+          }
+          myTimeout = setTimeout(hidePopup, 1500);
+        });
+      } else { // fallback with qtip
+        areas.qtip({
+          content: {
+            text: function (evt, api) {
+              // Retrieve content from custom attribute of the $('.selector') elements.
+              var itemId = $(this).data().circularitemid;
+              var item = $this.getCircularItem(itemId);
+              return $this._templateCircPopup(item);
+            },
+            title: function () {
+              var itemId = $(this).data().circularitemid;
+              var item = $this.getCircularItem(itemId);
+              return $this._templateCircPopupTitle(item);
+            },
+            attr: 'data-ng-non-bindable'
           },
-          title: function () {
-            var itemId = $(this).data().circularitemid;
-            var item = $this.getCircularItem(itemId);
-            return $this._templateCircPopupTitle(item);
+          style: {
+            classes: 'qtip-light qtip-rounded'
           },
-          attr: 'data-ng-non-bindable'
-        },
-        style: {
-          classes: 'qtip-light qtip-rounded'
-        },
-        position: {
-          target: 'mouse',
-          adjust: { x: 10, y: 10 },
-          viewport: $(this.element)
-        },
-        show: {
-          event: 'click mouseover',
-          solo: true
-        },
-        hide: {
-          inactive: 15000
-        }
-      });
+          position: {
+            target: 'mouse',
+            adjust: { x: 10, y: 10 },
+            viewport: $(this.element)
+          },
+          show: {
+            event: 'click mouseover',
+            solo: true
+          },
+          hide: {
+            inactive: 15000
+          }
+        });
+      }
 
       if (typeof ($this.settings.onCircularDisplayed) === 'function') {
         try {
