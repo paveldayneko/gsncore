@@ -28,7 +28,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       $scope.defaultLayout = $scope.defaultLayout || gsnApi.getThemeUrl('/views/layout.html');
       $scope.currentLayout = $scope.defaultLayout;
       $scope.currentPath = '/';
-      $scope.gvm = { loginCounter: 0, menuInactive: false, shoppingListActive: false, profile: {}, noCircular: true, reloadOnStoreSelection: false };
+      $scope.gvm = { loginCounter: 0, menuInactive: false, shoppingListActive: false, profile: {}, noCircular: true, reloadOnStoreSelection: false, currentStore: {} };
       $scope.youtech = gsnYoutech;
       $scope.search = { site: '', item: '' };
       $scope.facebookReady = false;
@@ -228,6 +228,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       $scope.$on('gsnevent:store-setid', function (event, result) {
         gsnStore.getStore().then(function (store) {
           $analytics.eventTrack('StoreSelected', { category: store.StoreName, label: store.StoreNumber + '', value: store.StoreId });
+          $scope.gvm.currentStore = store;
 
           gsnProfile.getProfile().then(function (rst) {
             if (rst.success) {
