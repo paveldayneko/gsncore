@@ -45,6 +45,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       $scope.isOnList = gsnProfile.isOnList;
       $scope.getShoppingListCount = gsnProfile.getShoppingListCount;
       $scope.$win = $window;
+      $scope._tk = $window._tk;
 
       $scope.validateRegistration = function (rsp) {
         // attempt to authenticate user with facebook
@@ -162,6 +163,8 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
         $rootScope.$broadcast('gsnevent:shoppinglist-toggle-item', item);
       };
+
+      // events handling
 
       $scope.$on('$routeChangeStart', function (evt, next, current) {
         /// <summary>Listen to route change</summary>

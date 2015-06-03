@@ -60,7 +60,7 @@
               $scope.isValidSubmit = result.success;
               if (result.success) {
                 gsnApi.setSelectedStoreId(profile.PrimaryStoreId);
-                $analytics.eventTrack('profile-update', { category: result.response.Id, label: result.response.ReceiveEmail });
+                $analytics.eventTrack('profile-update', { category: 'profile', label: result.response.ReceiveEmail });
                 
                 // trigger profile retrieval
                 gsnProfile.getProfile(true);

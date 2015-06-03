@@ -133,7 +133,7 @@
           $scope.updateProfile();
           $scope.updateSuccessful = true;
 
-          $analytics.eventTrack('profile-update', { category: rsp.response.Id, label: rsp.response.ReceiveEmail });
+          $analytics.eventTrack('profile-update', { category: 'profile', label: rsp.response.ReceiveEmail });
         }
       });
     }

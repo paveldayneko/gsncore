@@ -429,6 +429,9 @@
       return returnObj.isNull(accessTokenData.grant_type, '') == 'password';
     };
 
+    gsn.isLoggedIn = returnObj.isLoggedIn;
+    gsn.getUserId = returnObj.getProfileId;
+
     returnObj.logOut = function () {
       /// <summary>Log a user out.</summary>
 

@@ -100,7 +100,7 @@
                 $scope.isSubmitting = true;
 
                 $rootScope.$broadcast('gsnevent:registration-successful', result);
-                $analytics.eventTrack('profile-register', { category: result.response.Id, label: result.response.ReceiveEmail });
+                $analytics.eventTrack('profile-register', { category: 'registration', label: result.response.ReceiveEmail });
 
                 // since we have the password, automatically login the user
                 if ($scope.isFacebook) {
