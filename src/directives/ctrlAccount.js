@@ -4,7 +4,7 @@
   var myDirectiveName = 'ctrlAccount';
   
   angular.module('gsn.core')
-    .controller(myDirectiveName, ['$scope', 'gsnProfile', 'gsnApi', '$timeout', 'gsnStore', '$rootScope', myController])
+    .controller(myDirectiveName, ['$scope', 'gsnProfile', 'gsnApi', '$timeout', 'gsnStore', '$rootScope', '$analytics', myController])
     .directive(myDirectiveName, myDirective);
 
   function myDirective() {
@@ -17,7 +17,7 @@
     return directive;
   }
   
-  function myController($scope, gsnProfile, gsnApi, $timeout, gsnStore, $rootScope) {
+  function myController($scope, gsnProfile, gsnApi, $timeout, gsnStore, $rootScope, $analytics) {
     $scope.activate = activate;
     $scope.profile = { PrimaryStoreId: gsnApi.getSelectedStoreId(), ReceiveEmail: true };
 
@@ -60,7 +60,8 @@
               $scope.isValidSubmit = result.success;
               if (result.success) {
                 gsnApi.setSelectedStoreId(profile.PrimaryStoreId);
-
+                $analytics.eventTrack('profile-update', { category: result.response.Id, label: result.response.ReceiveEmail });
+                
                 // trigger profile retrieval
                 gsnProfile.getProfile(true);
 

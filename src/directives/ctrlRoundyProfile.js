@@ -4,7 +4,7 @@
   var myDirectiveName = 'ctrlRoundyProfile';
 
   angular.module('gsn.core')
-    .controller(myDirectiveName, ['$scope', 'gsnStore', 'gsnRoundyProfile', 'gsnProfile', '$modal', '$location', '$rootScope', '$window', '$timeout', myController])
+    .controller(myDirectiveName, ['$scope', 'gsnStore', 'gsnRoundyProfile', 'gsnProfile', '$modal', '$location', '$rootScope', '$window', '$timeout', 'gsnApi', '$analytics', myController])
     .directive(myDirectiveName, myDirective);
 
   function myDirective() {
@@ -17,7 +17,7 @@
     return directive;
   }
 
-  function myController($scope, gsnStore, gsnRoundyProfile, gsnProfile, $modal, $location, $rootScope, $window, $timeout) {
+  function myController($scope, gsnStore, gsnRoundyProfile, gsnProfile, $modal, $location, $rootScope, $window, $timeout, gsnApi, $analytics) {
     $scope.isLoading = false;
     $scope.activate = activate;
     $scope.updateProfile = updateProfile;
@@ -132,6 +132,8 @@
         else {
           $scope.updateProfile();
           $scope.updateSuccessful = true;
+
+          $analytics.eventTrack('profile-update', { category: rsp.response.Id, label: rsp.response.ReceiveEmail });
         }
       });
     }

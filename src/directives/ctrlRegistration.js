@@ -4,7 +4,7 @@
   var myDirectiveName = 'ctrlRegistration';
 
   angular.module('gsn.core')
-    .controller(myDirectiveName, ['$scope', 'gsnProfile', 'gsnApi', '$timeout', 'gsnStore', '$interpolate', '$http', '$rootScope', '$window', '$location', myController])
+    .controller(myDirectiveName, ['$scope', 'gsnProfile', 'gsnApi', '$timeout', 'gsnStore', '$interpolate', '$http', '$rootScope', '$window', '$location', '$analytics', myController])
     .directive(myDirectiveName, myDirective);
 
   function myDirective() {
@@ -17,7 +17,7 @@
     return directive;
   }
 
-  function myController($scope, gsnProfile, gsnApi, $timeout, gsnStore, $interpolate, $http, $rootScope, $window, $location) {
+  function myController($scope, gsnProfile, gsnApi, $timeout, gsnStore, $interpolate, $http, $rootScope, $window, $location, $analytics) {
     $scope.activate = activate;
     $scope.totalSavings = '';
     $scope.profile = { PrimaryStoreId: gsnApi.getSelectedStoreId(), ReceiveEmail: true };
@@ -100,6 +100,7 @@
                 $scope.isSubmitting = true;
 
                 $rootScope.$broadcast('gsnevent:registration-successful', result);
+                $analytics.eventTrack('profile-register', { category: result.response.Id, label: result.response.ReceiveEmail });
 
                 // since we have the password, automatically login the user
                 if ($scope.isFacebook) {
