@@ -63,12 +63,6 @@
 
     $rootScope.$on('gsnevent:digitalcircular-pagechanging', function (event, data) {
       service.actionParam = {evtname: event.name, evtcategory: data.circularIndex, pdesc: data.pageIndex};
-      service.forceRefresh = true;
-
-      if (angular.element($window).scrollTop() > 140) {
-        $window.scrollTo(0, 120);
-      }
-
       service.doRefresh();
     });
 

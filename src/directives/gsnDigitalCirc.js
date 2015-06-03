@@ -30,21 +30,6 @@
                 }, 50);
               },
               onCircularDisplaying: function (plug, circIdx, pageIdx) {
-                // switch circular with query string
-                var q = $location.search();
-                if (q.c) {
-                  $rootScope.previousQuery = angular.copy(q);
-                  $rootScope.previousQuery.$count = 2;
-                  $location.search('p', null);
-                  $location.search('c', null);
-                  $location.replace();
-                  return;
-                }
-                if ($rootScope.previousQuery)
-                {
-                  return;
-                }
-
                 // must use timeout to sync with UI thread
                 $timeout(function () {
                   // trigger ad refresh for circular page changed
@@ -55,18 +40,8 @@
                 if (circ) {
                   $analytics.eventTrack('PageChange', { category: 'Circular_Type' + circ.CircularTypeId + '_P' + (pageIdx + 1), label: circ.CircularDescription, value: pageIdx });
                 }
-              },
-              onCircularDisplayed: function(plug, circIdx, pageIdx) {
-                // switch circular with query string
-                if ($rootScope.previousQuery)
-                {
-                  var q = $rootScope.previousQuery;
-                  q.$count--;
-                  if (q.$count == 0) {
-                    $rootScope.previousQuery = null;
-                    plug.displayCircular(parseInt(q.c), parseInt(q.p));
-                  }
-                }
+
+                return false;
               }
             });
           }
