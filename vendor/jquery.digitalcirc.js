@@ -31,20 +31,20 @@
             templateCircularList: '<div class="dcircular-list">' +
 '	<div class="dcircular-list-content">' +
 '		{{#Circulars}}<div class="col-md-4 col-sm-6 dcircular-list-single"> ' +
-'		   <a class="thumbnail dcircular-thumbnail" href="?c={{CircularIndex}}&p=1">          ' +
+'		   <a class="thumbnail dcircular-thumbnail" href="javascript:void(0)" onclick="goUrl(\'?c={{CircularIndex}}&p=1\')">' +
 '			<img class="dcircular-image" alt="" src="{{SmallImageUrl}}"> ' +
 '			<div class="caption dcircular-caption"><h3 style="width: 100%; text-align: center;">{{CircularTypeName}}</h3></div>' +
 '		  </a>' +
 '		</div>{{/Circulars}}' +
 '	</div>' +
 '</div><div class="dcircular-single"></div>',
-            templateLinkBackToList: '{{#if HasMultipleCircular}}<a href="?" class="dcircular-back-to-list">&larr; Choose Another Ad</a><br />{{/if}}',
+            templateLinkBackToList: '{{#if HasMultipleCircular}}<a href="javascript:void(0)" onclick="gsn.goUrl(\'/\')" class="dcircular-back-to-list">&larr; Choose Another Ad</a><br />{{/if}}',
             templatePagerTop: '<div class="dcircular-pager dcircular-pager-top"><ul class="pagination"><li><a href="javascript:void(0)" aria-label="Previous" class="pager-previous">' +
 '<span aria-hidden="true">&laquo;</span></a></li>{{#Circular.Pages}}<li{{#ifeq PageIndex ../CurrentPageIndex}} class="active"{{/ifeq}}>' + 
-'<a href="?c={{CircularIndex}}&p={{PageIndex}}">{{PageIndex}}</a></li>{{/Circular.Pages}}<li><a href="javascript:void(0)" aria-label="Next" class="pager-next"><span aria-hidden="true">&raquo;</span></a></li></ul></div>',
+'<a href="javascript:void(0)" onclick="gsn.goUrl(\'?c={{CircularIndex}}&p={{PageIndex}}\')">{{PageIndex}}</a></li>{{/Circular.Pages}}<li><a href="javascript:void(0)" aria-label="Next" class="pager-next"><span aria-hidden="true">&raquo;</span></a></li></ul></div>',
             templatePagerBottom:'<div class="dcircular-pager dcircular-pager-bottom"><ul class="pagination"><li><a href="javascript:void(0)" aria-label="Previous" class="pager-previous">' +
 '<span aria-hidden="true">&laquo;</span></a></li>{{#Circular.Pages}}<li{{#ifeq PageIndex ../CurrentPageIndex}} class="active"{{/ifeq}}>' + 
-'<a href="?c={{CircularIndex}}&p={{PageIndex}}">{{PageIndex}}</a></li>{{/Circular.Pages}}<li><a href="javascript:void(0)" aria-label="Next" class="pager-next"><span aria-hidden="true">&raquo;</span></a></li></ul></div>',
+'<a href="javascript:void(0)" onclick="gsn.goUrl(\'?c={{CircularIndex}}&p={{PageIndex}}\')">{{PageIndex}}</a></li>{{/Circular.Pages}}<li><a href="javascript:void(0)" aria-label="Next" class="pager-next"><span aria-hidden="true">&raquo;</span></a></li></ul></div>',
             templateCircularSingle: '<div class="dcircular-content">' +
 '<img usemap="#dcircularMap{{CurrentPageIndex}}" src="{{Page.ImageUrl}}" class="dcircular-map-image"/>' +
 '<map name="dcircularMap{{CurrentPageIndex}}">' +

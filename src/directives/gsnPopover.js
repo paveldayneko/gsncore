@@ -85,7 +85,9 @@
       }
 
       scope.$on("$destroy", function () {
-        element.qtip('destroy', true); // Immediately destroy all tooltips belonging to the selected elements
+        if (popover.length <= 0) {
+          element.qtip('destroy', true); // Immediately destroy all tooltips belonging to the selected elements
+        }
       });
     }
   }]);
