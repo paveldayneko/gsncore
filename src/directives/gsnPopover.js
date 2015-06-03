@@ -38,7 +38,7 @@
           var offset = $(this).offset();
           var height = popover.show().height();
 
-          $('.gsn-popover').css( { top: e.clientY + 15, left: e.clientX - (height / 2) }).show();
+          $('.gsn-popover').css( { top: e.clientX + 15, left: e.clientY + 15 }).show();
           if (myTimeout){
             clearTimeout(myTimeout);
           }
