@@ -29,28 +29,7 @@
                   $rootScope.$broadcast('gsnevent:digitalcircular-itemselect', item);
                 }, 50);
               },
-              onCircularInit: function(plug){
-                // switch circular with query string
-                var q = $location.search();
-                if (q.c) {
-                  $rootScope.previousQuery = angular.copy(q);
-                  $location.search('p', null);
-                  $location.search('c', null);
-                  $location.replace();
-                  return true;
-                }
-                return false;
-              },
               onCircularDisplaying: function (plug, circIdx, pageIdx) {
-                // switch circular with query string
-                if ($rootScope.previousQuery)
-                {
-                  var q = $rootScope.previousQuery;
-                  $rootScope.previousQuery = null;
-                  plug.displayCircular(parseInt(q.c), parseInt(q.p));
-                  return true;
-                }
-
                 // must use timeout to sync with UI thread
                 $timeout(function () {
                   // trigger ad refresh for circular page changed
