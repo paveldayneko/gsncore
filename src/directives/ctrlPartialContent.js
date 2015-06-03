@@ -1,4 +1,4 @@
-﻿(function (angular, $, undefined) {
+﻿(function (angular, undefined) {
   'use strict';
 
   var myDirectiveName = 'ctrlPartialContent';
@@ -96,4 +96,4 @@
     //#endregion
   }
 
-})(angular, window.jQuery || window.Zepto || window.tire);
+})(angular);

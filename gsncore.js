@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.19
  * gsncore repository
- * Build date: Wed Jun 03 2015 17:05:19 GMT-0500 (CDT)
+ * Build date: Wed Jun 03 2015 17:16:00 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -3465,7 +3465,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 // use to proxy content loaded from CDN or CORS support for older browser
 // overriding respond.ajax
 // load after respond loaded
-(function (win, doc, $, undefined) {
+(function (win, doc, undefined) {
   var baseElem = doc.getElementsByTagName("base")[0];
 
   function fakejax(url, callback) {
@@ -5070,7 +5070,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
   }
 
 })(angular);
-(function (angular, $, undefined) {
+(function (angular, undefined) {
   'use strict';
 
   var myDirectiveName = 'ctrlPartialContent';
@@ -5168,7 +5168,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     //#endregion
   }
 
-})(angular, window.jQuery || window.Zepto || window.tire);
+})(angular);
 (function (angular, undefined) {
   'use strict';
 
@@ -7213,7 +7213,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     $scope.activate();
   }
 })(angular);
-(function (angular, $, undefined) {
+(function (angular, undefined) {
   'use strict';
 
   var myDirectiveName = 'ctrlStaticContent';
@@ -7294,7 +7294,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
         var item = data[i];
         if (item.Description) {
           // find scripts
-          hasScript = $('<div>' + item.Description + '</div>').find('script').length > 0;
+          hasScript = angular.element('<div>' + item.Description + '</div>').find('script').length > 0;
         }
       }
 
@@ -7312,7 +7312,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     //#endregion
   }
 
-})(angular, window.jQuery || window.Zepto || window.tire);
+})(angular);
 (function (angular, undefined) {
   'use strict';
 
@@ -8011,6 +8011,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     return directive;
 
     function appendEllipsis(element, attrs) {
+      var $ = angular.element;
       if ($(element)[0].scrollHeight>97 && !$(element.find('.ellipsis')).length) {
 
          var isOpenedByClick = false;
@@ -8663,7 +8664,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     }
   }]);
 })(angular);
-(function (angular, $, undefined) {
+(function (angular, undefined) {
   'use strict';
   var myModule = angular.module('gsn.core');
   
@@ -8849,18 +8850,18 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
         text = angular.element(attrs.selector).html() || '';
       }, 50);
 
-      var popover = $('.gsn-popover');
+      var popover = angular.element('.gsn-popover');
       if (popover.length > 0) {
         var myTimeout = undefined;
         element.mousemove(function(e){
-          $('.gsn-popover .popover-title').html($interpolate('<div>' + title + '</div>')(scope).replace('data-ng-src', 'src'));
-          $('.gsn-popover .popover-content').html($interpolate('<div>' + text + '</div>')(scope).replace('data-ng-src', 'src'));
+          angular.element('.gsn-popover .popover-title').html($interpolate('<div>' + title + '</div>')(scope).replace('data-ng-src', 'src'));
+          angular.element('.gsn-popover .popover-content').html($interpolate('<div>' + text + '</div>')(scope).replace('data-ng-src', 'src'));
 
           // reposition
-          var offset = $(this).offset();
+          var offset = angular.element(this).offset();
           var height = popover.show().height();
 
-          $('.gsn-popover').css( { top: e.clientX + 15, left: e.clientY + 15 }).show();
+          angular.element('.gsn-popover').css( { top: e.clientX + 15, left: e.clientY + 15 }).show();
           if (myTimeout){
             clearTimeout(myTimeout);
           }

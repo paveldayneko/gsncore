@@ -27,18 +27,18 @@
         text = angular.element(attrs.selector).html() || '';
       }, 50);
 
-      var popover = $('.gsn-popover');
+      var popover = angular.element('.gsn-popover');
       if (popover.length > 0) {
         var myTimeout = undefined;
         element.mousemove(function(e){
-          $('.gsn-popover .popover-title').html($interpolate('<div>' + title + '</div>')(scope).replace('data-ng-src', 'src'));
-          $('.gsn-popover .popover-content').html($interpolate('<div>' + text + '</div>')(scope).replace('data-ng-src', 'src'));
+          angular.element('.gsn-popover .popover-title').html($interpolate('<div>' + title + '</div>')(scope).replace('data-ng-src', 'src'));
+          angular.element('.gsn-popover .popover-content').html($interpolate('<div>' + text + '</div>')(scope).replace('data-ng-src', 'src'));
 
           // reposition
-          var offset = $(this).offset();
+          var offset = angular.element(this).offset();
           var height = popover.show().height();
 
-          $('.gsn-popover').css( { top: e.clientX + 15, left: e.clientY + 15 }).show();
+          angular.element('.gsn-popover').css( { top: e.clientX + 15, left: e.clientY + 15 }).show();
           if (myTimeout){
             clearTimeout(myTimeout);
           }

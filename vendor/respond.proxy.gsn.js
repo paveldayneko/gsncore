@@ -2,7 +2,7 @@
 // use to proxy content loaded from CDN or CORS support for older browser
 // overriding respond.ajax
 // load after respond loaded
-(function (win, doc, $, undefined) {
+(function (win, doc, undefined) {
   var baseElem = doc.getElementsByTagName("base")[0];
 
   function fakejax(url, callback) {

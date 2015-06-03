@@ -1,4 +1,4 @@
-﻿(function (angular, $, undefined) {
+﻿(function (angular, undefined) {
   'use strict';
 
   var myDirectiveName = 'ctrlStaticContent';
@@ -79,7 +79,7 @@
         var item = data[i];
         if (item.Description) {
           // find scripts
-          hasScript = $('<div>' + item.Description + '</div>').find('script').length > 0;
+          hasScript = angular.element('<div>' + item.Description + '</div>').find('script').length > 0;
         }
       }
 
@@ -97,4 +97,4 @@
     //#endregion
   }
 
-})(angular, window.jQuery || window.Zepto || window.tire);
+})(angular);

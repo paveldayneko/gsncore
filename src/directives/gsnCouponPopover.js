@@ -13,6 +13,7 @@
     return directive;
 
     function appendEllipsis(element, attrs) {
+      var $ = angular.element;
       if ($(element)[0].scrollHeight>97 && !$(element.find('.ellipsis')).length) {
 
          var isOpenedByClick = false;

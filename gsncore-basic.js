@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.19
  * gsncore repository
- * Build date: Wed Jun 03 2015 17:05:19 GMT-0500 (CDT)
+ * Build date: Wed Jun 03 2015 17:16:00 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -5711,6 +5711,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     return directive;
 
     function appendEllipsis(element, attrs) {
+      var $ = angular.element;
       if ($(element)[0].scrollHeight>97 && !$(element.find('.ellipsis')).length) {
 
          var isOpenedByClick = false;
@@ -6363,7 +6364,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     }
   }]);
 })(angular);
-(function (angular, $, undefined) {
+(function (angular, undefined) {
   'use strict';
   var myModule = angular.module('gsn.core');
   
@@ -6549,18 +6550,18 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         text = angular.element(attrs.selector).html() || '';
       }, 50);
 
-      var popover = $('.gsn-popover');
+      var popover = angular.element('.gsn-popover');
       if (popover.length > 0) {
         var myTimeout = undefined;
         element.mousemove(function(e){
-          $('.gsn-popover .popover-title').html($interpolate('<div>' + title + '</div>')(scope).replace('data-ng-src', 'src'));
-          $('.gsn-popover .popover-content').html($interpolate('<div>' + text + '</div>')(scope).replace('data-ng-src', 'src'));
+          angular.element('.gsn-popover .popover-title').html($interpolate('<div>' + title + '</div>')(scope).replace('data-ng-src', 'src'));
+          angular.element('.gsn-popover .popover-content').html($interpolate('<div>' + text + '</div>')(scope).replace('data-ng-src', 'src'));
 
           // reposition
-          var offset = $(this).offset();
+          var offset = angular.element(this).offset();
           var height = popover.show().height();
 
-          $('.gsn-popover').css( { top: e.clientX + 15, left: e.clientY + 15 }).show();
+          angular.element('.gsn-popover').css( { top: e.clientX + 15, left: e.clientY + 15 }).show();
           if (myTimeout){
             clearTimeout(myTimeout);
           }

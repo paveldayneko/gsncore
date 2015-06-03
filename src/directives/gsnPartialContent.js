@@ -1,4 +1,4 @@
-﻿(function (angular, $, undefined) {
+﻿(function (angular, undefined) {
   'use strict';
   var myModule = angular.module('gsn.core');
   
