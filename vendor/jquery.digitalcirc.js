@@ -2,7 +2,7 @@
  *  Project:        Digital Circular
  *  Description:    create a digital circular
  *  Author:         Tom Noogen
- *  License:        Copyright 2014 - Grocery Shopping Network 
+ *  License:        Copyright 2014 - Grocery Shƒopping Network 
  *  Version:        1.0.9
  *
  */
@@ -31,7 +31,7 @@
             templateCircularList: '<div class="dcircular-list">' +
 '	<div class="dcircular-list-content">' +
 '		{{#Circulars}}<div class="col-md-4 col-sm-6 dcircular-list-single"> ' +
-'		   <a class="thumbnail dcircular-thumbnail" href="javascript:void(0)" onclick="goUrl(\'?c={{CircularIndex}}&p=1\')">' +
+'		   <a class="thumbnail dcircular-thumbnail" href="javascript:void(0)" onclick="gsn.goUrl(\'?c={{CircularIndex}}&p=1\')">' +
 '			<img class="dcircular-image" alt="" src="{{SmallImageUrl}}"> ' +
 '			<div class="caption dcircular-caption"><h3 style="width: 100%; text-align: center;">{{CircularTypeName}}</h3></div>' +
 '		  </a>' +
