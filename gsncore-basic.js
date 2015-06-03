@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.4.18
+ * version 1.4.19
  * gsncore repository
- * Build date: Wed Jun 03 2015 16:28:31 GMT-0500 (CDT)
+ * Build date: Wed Jun 03 2015 16:41:45 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -6559,7 +6559,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           var offset = $(this).offset();
           var height = popover.show().height();
 
-          $('.gsn-popover').css( { top: e.pageX + 15, left: e.pageY - (height / 2) }).show();
+          $('.gsn-popover').css( { top: e.clientX + 15, left: e.clientY + 15 }).show();
           if (myTimeout){
             clearTimeout(myTimeout);
           }
