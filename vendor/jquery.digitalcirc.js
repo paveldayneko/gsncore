@@ -137,6 +137,14 @@
         $this.displayCircular(idx);
       });
 
+      if (typeof($this.onCircularInit) === 'function'){
+         try {
+          if ($this.settings.onCircularInit($this)){
+            return;
+          }
+        } catch(e) {
+        }
+      }
       if (myData.Circulars.length <= 1) {
         $this.displayCircular(0);
       }
@@ -152,7 +160,9 @@
 
       if (typeof($this.settings.onCircularDisplaying) === 'function') {
         try {
-          $this.settings.onCircularDisplaying($this, circularIdx, pageIdx);
+          if ($this.settings.onCircularDisplaying($this, circularIdx, pageIdx)) {
+            return;
+          }
         } catch(e) {
         }
       }
