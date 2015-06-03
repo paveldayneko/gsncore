@@ -100,6 +100,7 @@
 
     // refresh method
     function doRefresh() {
+      angular.element('.stuck-collapsed').removeClass('stuck-collapsed');
       updateNetworkId();
 
       // targetted campaign

@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.18
  * gsncore repository
- * Build date: Tue Jun 02 2015 16:49:03 GMT-0500 (CDT)
+ * Build date: Wed Jun 03 2015 08:26:11 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -2167,6 +2167,7 @@
 
     // refresh method
     function doRefresh() {
+      angular.element('.stuck-collapsed').removeClass('stuck-collapsed');
       updateNetworkId();
 
       // targetted campaign
