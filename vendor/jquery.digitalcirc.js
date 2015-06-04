@@ -142,6 +142,14 @@
         }
       }
       var search = window.location.search.replace('?', '');
+      if(window.location.hash) {
+        var hash = window.location.hash;
+        var sqi = hash.indexOf('?');
+        if (sqi > 0) {
+          search = hash.substr(sqi);
+        }
+      }
+      
       var searches = search.split('&');
       var q = {};
       for(var i = 0; i < searches.length; i++){
