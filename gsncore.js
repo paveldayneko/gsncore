@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.4.19
+ * version 1.4.20
  * gsncore repository
- * Build date: Wed Jun 03 2015 19:43:25 GMT-0500 (CDT)
+ * Build date: Wed Jun 03 2015 20:09:50 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -8860,7 +8860,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
           var offset = angular.element(this).offset();
           var height = popover.show().height();
 
-          angular.element('.gsn-popover').css( { top: e.clientX + 15, left: e.clientY + 15 }).show();
+          angular.element('.gsn-popover').css( { top: e.clientY + 15, left: e.clientX + 15 }).show();
           if (myTimeout){
             clearTimeout(myTimeout);
           }

@@ -38,7 +38,7 @@
           var offset = angular.element(this).offset();
           var height = popover.show().height();
 
-          angular.element('.gsn-popover').css( { top: e.clientX + 15, left: e.clientY + 15 }).show();
+          angular.element('.gsn-popover').css( { top: e.clientY + 15, left: e.clientX + 15 }).show();
           if (myTimeout){
             clearTimeout(myTimeout);
           }
