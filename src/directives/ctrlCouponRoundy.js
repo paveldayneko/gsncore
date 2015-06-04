@@ -57,7 +57,7 @@
     $scope.sortBy = 'EndDate';
     $scope.sortByName = 'About to Expire';
     $scope.filterByComplex = '';
-    $scope.filterBy = '';
+    $scope.filterBy = $location.search().q;
     $scope.couponType = $scope.couponType || 'digital';  // 'digital', 'printable', 'instore'
     $scope.itemsPerPage = ($location.search()).itemsperpage || ($location.search()).itemsPerPage || $scope.itemsPerPage || 20;
 
