@@ -188,7 +188,7 @@
       
       angular.element($window).on('scroll', myScrollTop);
       element.on('click', function () {
-        $window.scrollTop(0);
+        angular.element($window).scrollTop(0);
       });
       
       scope.$on('$destroy', function() {
