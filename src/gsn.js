@@ -388,9 +388,6 @@
     // do nothing, dummy function to be polyfill later
   };
 
-  gsn.isLoggedIn = function() { return false; };
-  gsn.getUserId = function() { return 0; };
-
   gsn.initAnalytics = function($analyticsProvider) {
     // provide backward compatibility if not googletag
     if (gsn.config.GoogleTagId) {

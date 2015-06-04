@@ -40,8 +40,10 @@
     var profileStorage = $localStorage;
 
     $rootScope[serviceId] = returnObj;
-
     //#region gsn pass-through methods
+    returnObj.gsn = gsn;
+    gsn.$api = returnObj;
+
     // return defaultValue if null - isNull(val, defaultIfNull)
     returnObj.isNull = gsn.isNull;
 

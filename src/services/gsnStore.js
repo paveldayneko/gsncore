@@ -7,6 +7,7 @@
     var returnObj = {};
 
     $rootScope[serviceId] = returnObj;
+    gsnApi.gsn.$store = returnObj;
 
     // cache current user selection
     var _lc = {

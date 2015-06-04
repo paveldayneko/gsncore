@@ -12,6 +12,7 @@
     var $savedData = { allShoppingLists: {}, profile: null, profileData: { scoredProducts: {}, circularItems: {}, availableCoupons: {}, myPantry: {} } };
 
     $rootScope[serviceId] = returnObj;
+    gsnApi.gsn.$profile = returnObj;
     returnObj.getShoppingListId = gsnApi.getShoppingListId;
 
     returnObj.getProfileId = gsnApi.getProfileId;
