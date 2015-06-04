@@ -182,8 +182,8 @@
     function link(scope, element, attrs) {
       countScrollTop++;
       var myScrollTop = debounce(function () {
-        scope.scrollTop = $window.scrollTop();
-        element.css({ 'display': (($scope.scrollTop > parseInt(attrs.offset)) && countScrollTop == 1) ? 'block' : '' });
+        scope.scrollTop = angular.element($window).scrollTop();
+        element.css({ 'display': ((scope.scrollTop > parseInt(attrs.offset)) && countScrollTop == 1) ? 'block' : '' });
       }, 300);
       
       angular.element($window).on('scroll', myScrollTop);
