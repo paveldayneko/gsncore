@@ -216,6 +216,10 @@
     };
 
     $scope.showAllStores = function (distanceOrigin) {
+      if (!$scope.mapOptions) {
+        return;
+      }
+      
       $scope.distanceOrigin = gsnApi.isNull(distanceOrigin, null);
       $scope.mapOptions.zoom = defaultZoom;
       var result = $scope.storeList;
