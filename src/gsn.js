@@ -50,6 +50,7 @@
   } else {
     root.gsn = gsn;
   }
+  gsn.root = root;
 
   /**
    * The semantic version number.

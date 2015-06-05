@@ -60,13 +60,13 @@
               $scope.isValidSubmit = result.success;
               if (result.success) {
                 gsnApi.setSelectedStoreId(profile.PrimaryStoreId);
-                $analytics.eventTrack('profile-update', { category: 'profile', label: result.response.ReceiveEmail });
-                
                 // trigger profile retrieval
                 gsnProfile.getProfile(true);
 
                 // Broadcast the update.
                 $rootScope.$broadcast('gsnevent:updateprofile-successful', result);
+                $analytics.eventTrack('profile-update', { category: 'profile', label: result.response.ReceiveEmail });
+                $rootScope.$win.gmodal.emit('gsnevent:updateprofile-successful', result);
 
                 // If we have the cituation where we do not want to navigate.
                 if (!$scope.disableNavigation) {

@@ -1,9 +1,9 @@
 ﻿(function (angular, undefined) {
   'use strict';
   var serviceId = 'gsnRoundyProfile';
-  angular.module('gsn.core').service(serviceId, ['gsnApi', '$http', '$q', '$rootScope', '$timeout', gsnRoundyProfile]);
+  angular.module('gsn.core').service(serviceId, ['gsnApi', '$http', '$q', '$rootScope', '$timeout', '$analytics', gsnRoundyProfile]);
 
-  function gsnRoundyProfile(gsnApi, $http, $q, $rootScope, $timeout) {
+  function gsnRoundyProfile(gsnApi, $http, $q, $rootScope, $timeout, $analytics) {
 
     var returnObj = {};
 
@@ -41,6 +41,10 @@
         }
         $http.post(url, profile, { headers: gsnApi.getApiHeaders() }).success(function (response) {
           deferred.resolve({ success: true, response: response });
+
+          $rootScope.$broadcast('gsnevent:updateprofile-successful', response);
+          $analytics.eventTrack('profile-update', { category: 'profile', label: response.ReceiveEmail });
+          $rootScope.$win.gmodal.emit('gsnevent:updateprofile-successful', response);
         }).error(function (response) {
           errorBroadcast(response, deferred);
         });

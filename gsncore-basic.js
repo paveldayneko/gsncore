@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.4.21
+ * version 1.4.22
  * gsncore repository
- * Build date: Thu Jun 04 2015 21:27:37 GMT-0500 (CDT)
+ * Build date: Fri Jun 05 2015 11:58:38 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -56,6 +56,7 @@
   } else {
     root.gsn = gsn;
   }
+  gsn.root = root;
 
   /**
    * The semantic version number.
@@ -3918,9 +3919,9 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 (function (angular, undefined) {
   'use strict';
   var serviceId = 'gsnRoundyProfile';
-  angular.module('gsn.core').service(serviceId, ['gsnApi', '$http', '$q', '$rootScope', '$timeout', gsnRoundyProfile]);
+  angular.module('gsn.core').service(serviceId, ['gsnApi', '$http', '$q', '$rootScope', '$timeout', '$analytics', gsnRoundyProfile]);
 
-  function gsnRoundyProfile(gsnApi, $http, $q, $rootScope, $timeout) {
+  function gsnRoundyProfile(gsnApi, $http, $q, $rootScope, $timeout, $analytics) {
 
     var returnObj = {};
 
@@ -3958,6 +3959,10 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         }
         $http.post(url, profile, { headers: gsnApi.getApiHeaders() }).success(function (response) {
           deferred.resolve({ success: true, response: response });
+
+          $rootScope.$broadcast('gsnevent:updateprofile-successful', response);
+          $analytics.eventTrack('profile-update', { category: 'profile', label: response.ReceiveEmail });
+          $rootScope.$win.gmodal.emit('gsnevent:updateprofile-successful', response);
         }).error(function (response) {
           errorBroadcast(response, deferred);
         });
@@ -5140,13 +5145,13 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
               $scope.isValidSubmit = result.success;
               if (result.success) {
                 gsnApi.setSelectedStoreId(profile.PrimaryStoreId);
-                $analytics.eventTrack('profile-update', { category: 'profile', label: result.response.ReceiveEmail });
-                
                 // trigger profile retrieval
                 gsnProfile.getProfile(true);
 
                 // Broadcast the update.
                 $rootScope.$broadcast('gsnevent:updateprofile-successful', result);
+                $analytics.eventTrack('profile-update', { category: 'profile', label: result.response.ReceiveEmail });
+                $rootScope.$win.gmodal.emit('gsnevent:updateprofile-successful', result);
 
                 // If we have the cituation where we do not want to navigate.
                 if (!$scope.disableNavigation) {

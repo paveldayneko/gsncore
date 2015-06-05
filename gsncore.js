@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.4.21
+ * version 1.4.22
  * gsncore repository
- * Build date: Thu Jun 04 2015 21:27:37 GMT-0500 (CDT)
+ * Build date: Fri Jun 05 2015 11:58:38 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -56,6 +56,7 @@
   } else {
     root.gsn = gsn;
   }
+  gsn.root = root;
 
   /**
    * The semantic version number.
@@ -3577,13 +3578,13 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
               $scope.isValidSubmit = result.success;
               if (result.success) {
                 gsnApi.setSelectedStoreId(profile.PrimaryStoreId);
-                $analytics.eventTrack('profile-update', { category: 'profile', label: result.response.ReceiveEmail });
-                
                 // trigger profile retrieval
                 gsnProfile.getProfile(true);
 
                 // Broadcast the update.
                 $rootScope.$broadcast('gsnevent:updateprofile-successful', result);
+                $analytics.eventTrack('profile-update', { category: 'profile', label: result.response.ReceiveEmail });
+                $rootScope.$win.gmodal.emit('gsnevent:updateprofile-successful', result);
 
                 // If we have the cituation where we do not want to navigate.
                 if (!$scope.disableNavigation) {
@@ -6328,15 +6329,18 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     $scope.errorMessage = '';
     var template;
     var templateUrl = $scope.isFacebook ? '/views/email/registration-facebook.html' : '/views/email/registration.html';
-    if (gsnApi.getThemeConfigDescription('registration-custom-email', false)) {
-      templateUrl = $scope.getThemeUrl(templateUrl);
-    } else {
-      templateUrl = $scope.getContentUrl(templateUrl);
-    }
+    var myTemplateUrl = $scope.getContentUrl(templateUrl);
 
-    $http.get(templateUrl)
+    // try get template from content, if fail, get it from theme
+    $http.get(myTemplateUrl)
       .success(function (response) {
         template = response.replace(/data-ctrl-email-preview/gi, '');
+      }).error(function(response) {
+        myTemplateUrl = $scope.getThemeUrl(templateUrl);
+        $http.get(myTemplateUrl)
+          .success(function (response) {
+            template = response.replace(/data-ctrl-email-preview/gi, '');
+          });
       });
 
     function activate() {
@@ -6400,6 +6404,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 
                 $rootScope.$broadcast('gsnevent:registration-successful', result);
                 $analytics.eventTrack('profile-register', { category: 'registration', label: result.response.ReceiveEmail });
+                $rootScope.$win.gmodal.emit('gsnevent:registration-successful', result);
 
                 // since we have the password, automatically login the user
                 if ($scope.isFacebook) {
@@ -12408,9 +12413,9 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 (function (angular, undefined) {
   'use strict';
   var serviceId = 'gsnRoundyProfile';
-  angular.module('gsn.core').service(serviceId, ['gsnApi', '$http', '$q', '$rootScope', '$timeout', gsnRoundyProfile]);
+  angular.module('gsn.core').service(serviceId, ['gsnApi', '$http', '$q', '$rootScope', '$timeout', '$analytics', gsnRoundyProfile]);
 
-  function gsnRoundyProfile(gsnApi, $http, $q, $rootScope, $timeout) {
+  function gsnRoundyProfile(gsnApi, $http, $q, $rootScope, $timeout, $analytics) {
 
     var returnObj = {};
 
@@ -12448,6 +12453,10 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         }
         $http.post(url, profile, { headers: gsnApi.getApiHeaders() }).success(function (response) {
           deferred.resolve({ success: true, response: response });
+
+          $rootScope.$broadcast('gsnevent:updateprofile-successful', response);
+          $analytics.eventTrack('profile-update', { category: 'profile', label: response.ReceiveEmail });
+          $rootScope.$win.gmodal.emit('gsnevent:updateprofile-successful', response);
         }).error(function (response) {
           errorBroadcast(response, deferred);
         });
