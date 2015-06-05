@@ -94,7 +94,7 @@
 
     // refresh method
     function doRefresh() {
-      angular.element('.stuck-collapsed').removeClass('stuck-collapsed');
+      ($rootScope.gvm || {}).adsCollapsed = false;
       updateNetworkId();
 
       // targetted campaign

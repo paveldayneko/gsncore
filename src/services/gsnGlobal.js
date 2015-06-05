@@ -24,11 +24,21 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         gsnProfile.initialize();
       }
 
+      gsnApi.gsn.$rootScope = $rootScope
       $scope = $scope || $rootScope;
       $scope.defaultLayout = $scope.defaultLayout || gsnApi.getThemeUrl('/views/layout.html');
       $scope.currentLayout = $scope.defaultLayout;
       $scope.currentPath = '/';
-      $scope.gvm = { loginCounter: 0, menuInactive: false, shoppingListActive: false, profile: {}, noCircular: true, reloadOnStoreSelection: false, currentStore: {} };
+      $scope.gvm = { 
+        loginCounter: 0, 
+        menuInactive: false, 
+        shoppingListActive: false, 
+        profile: {}, 
+        noCircular: true, 
+        reloadOnStoreSelection: false, 
+        currentStore: {},
+        adsCollapsed: false
+      };
       $scope.youtech = gsnYoutech;
       $scope.search = { site: '', item: '' };
       $scope.facebookReady = false;
