@@ -38,7 +38,7 @@
 '		</div>{{/Circulars}}' +
 '	</div>' +
 '</div><div class="dcircular-single"></div>',
-            templateLinkBackToList: '{{#if HasMultipleCircular}}<a href="javascript:void(0)" onclick="gsn.goUrl(\'/\')" class="dcircular-back-to-list">&larr; Choose Another Ad</a><br />{{/if}}',
+            templateLinkBackToList: '{{#if HasMultipleCircular}}<a href="javascript:void(0)" onclick="gsn.goUrl(\'?\')" class="dcircular-back-to-list">&larr; Choose Another Ad</a><br />{{/if}}',
             templatePagerTop: '<div class="dcircular-pager dcircular-pager-top"><ul class="pagination"><li><a href="javascript:void(0)" aria-label="Previous" class="pager-previous">' +
 '<span aria-hidden="true">&laquo;</span></a></li>{{#Circular.Pages}}<li{{#ifeq PageIndex ../CurrentPageIndex}} class="active"{{/ifeq}}>' + 
 '<a href="?c={{CircularIndex}}&p={{PageIndex}}">{{PageIndex}}</a></li>{{/Circular.Pages}}<li><a href="javascript:void(0)" aria-label="Next" class="pager-next"><span aria-hidden="true">&raquo;</span></a></li></ul></div>',
