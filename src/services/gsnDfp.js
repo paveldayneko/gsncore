@@ -7,7 +7,7 @@
     var service = {
       forceRefresh: true,
       actionParam: null,
-      doRefresh: doRefresh
+      doRefresh: debounce(doRefresh, 500)
     };
 
     $rootScope.$on('gsnevent:shoppinglistitem-updating', function (event, shoppingList, item) {
@@ -38,21 +38,20 @@
     });
 
     $rootScope.$on('$locationChangeSuccess', function (event, next) {
-      $timeout(function() {
-        var currentPath = angular.lowercase(gsnApi.isNull($location.path(), ''));
-        gsnProfile.getProfile().then(function(p){
-          var isLoggedIn = gsnApi.isLoggedIn();
+      var currentPath = angular.lowercase(gsnApi.isNull($location.path(), ''));
+      gsnProfile.getProfile().then(function(p){
+        var isLoggedIn = gsnApi.isLoggedIn();
 
-          Gsn.Advertising.setDefault({ 
-            page: currentPath, 
-            storeid: gsnApi.getSelectedStoreId(), 
-            consumerid: gsnProfile.getProfileId(), 
-            isanon: !isLoggedIn,
-            loyaltyid: p.response.ExternalId
-          });
+        Gsn.Advertising.setDefault({ 
+          page: currentPath, 
+          storeid: gsnApi.getSelectedStoreId(), 
+          consumerid: gsnProfile.getProfileId(), 
+          isanon: !isLoggedIn,
+          loyaltyid: p.response.ExternalId
         });
-        service.doRefresh();
-      }, 50);
+      });
+      service.forceRefresh = true;
+      service.doRefresh();
     });
 
     $rootScope.$on('gsnevent:loadads', function (event, next) {
@@ -96,9 +95,6 @@
       ($rootScope.gvm || {}).adsCollapsed = false;
       updateNetworkId();
       
-      // force refresh if there are any empty unit
-      service.forceRefresh = angular.element('div.gsnunit:not([id])').length > 0;
-
       // targetted campaign
       if (parseFloat(gsnApi.isNull($sessionStorage.GsnCampaign, 0)) <= 0) {
 
