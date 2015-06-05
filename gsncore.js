@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.22
  * gsncore repository
- * Build date: Fri Jun 05 2015 11:58:38 GMT-0500 (CDT)
+ * Build date: Fri Jun 05 2015 15:02:48 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -7365,17 +7365,38 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     $scope.searchFailedResultCount = 1;
     $scope.pharmacyOnly = false;
     $scope.activated = false;
+    $scope.storeByNumber = {};
     $scope.vmsl = {
       myMarkerGrouping: [],
       activated: false
     };
 
     gsnStore.getStores().then(function(rsp){
-      $scope.storeList = rsp.response;
-      $scope.showAllStores()
+      var storeList = rsp.response;
+      var storeNumber =  angular.lowercase($location.path()).replace(/\D*/, '');
+      $scope.storeByNumber = gsnApi.mapObject(storeList, "StoreNumber");
+
+      var store = $scope.storeByNumber[storeNumber];
+      if (store){
+        $scope.storeList = [store];
+      }
+      else {
+        $scope.storeList = rsp.response;
+      }
+      $scope.showAllStores();
+    });
+
+    gsnStore.getStore().then(function (store) {
+      var show = gsnApi.isNull($location.search().show, '');
+      if (show == 'event') {
+        if (store) {
+          $location.url($scope.decodeServerUrl(store.Redirect));
+        }
+      }
     });
 
     function activate() {
+      
       var gmap = (window.google || {}).maps || {};
       if ((typeof( gmap.Geocoder ) === 'undefined') 
         || (typeof( gmap.InfoWindow ) === 'undefined')
@@ -7413,23 +7434,11 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
           mapTypeId: google.maps.MapTypeId.ROADMAP
         };
       }
-      
-
-      gsnStore.getStore().then(function (store) {
-        var show = gsnApi.isNull($location.search().show, '');
-        if (show == 'event') {
-          if (store) {
-            $location.url($scope.decodeServerUrl(store.Redirect));
-          }
-        }
-        else {
-          // set default search with query string
-          $timeout(function() {
-            $scope.search.storeLocator = $location.search().search;
-            $scope.doSearch(true);
-          }, 50);
-        }
-      });
+    
+      // set default search with query string
+      var search = $location.search;
+      $scope.search.storeLocator = search.search || search.q;
+      $scope.doSearch(true);  
     }
 
     $scope.openMarkerInfo = function (marker, zoom) {
@@ -7501,6 +7510,9 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
         if ($scope.canShow(data[i])) {
           tempMarkers.push($scope.createMarker(data[i]));
         }
+      }
+      if (i == 1){
+        $scope.currentMarker = tempMarkers[i];
       }
 
       if (gsn.isNull($scope.myMap, null) !== null && $scope.myMarkers.length > 0) {
