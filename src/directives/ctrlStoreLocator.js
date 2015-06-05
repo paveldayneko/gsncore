@@ -53,6 +53,9 @@
       if (store){
         $scope.storeList = [store];
       }
+      else if (storeNumber.length > 0){
+        gsnApi.goUrl('/404')
+      }
       else {
         $scope.storeList = rsp.response;
       }
