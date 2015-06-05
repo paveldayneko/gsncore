@@ -7,7 +7,7 @@
     var service = {
       forceRefresh: true,
       actionParam: null,
-      doRefresh: debounce(doRefresh, 1000)
+      doRefresh: doRefresh
     };
 
     $rootScope.$on('gsnevent:shoppinglistitem-updating', function (event, shoppingList, item) {
@@ -51,7 +51,6 @@
             loyaltyid: p.response.ExternalId
           });
         });
-        service.forceRefresh = true;
         service.doRefresh();
       }, 50);
     });
@@ -96,6 +95,9 @@
     function doRefresh() {
       ($rootScope.gvm || {}).adsCollapsed = false;
       updateNetworkId();
+      
+      // force refresh if there are any empty unit
+      service.forceRefresh = angular.element('.gsnunit::not([id])');
 
       // targetted campaign
       if (parseFloat(gsnApi.isNull($sessionStorage.GsnCampaign, 0)) <= 0) {
