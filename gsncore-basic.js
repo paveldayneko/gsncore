@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.21
  * gsncore repository
- * Build date: Thu Jun 04 2015 20:43:18 GMT-0500 (CDT)
+ * Build date: Thu Jun 04 2015 20:48:51 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -2169,7 +2169,7 @@
       updateNetworkId();
       
       // force refresh if there are any empty unit
-      service.forceRefresh = angular.element('.gsnunit::not([id])');
+      service.forceRefresh = angular.element('div.gsnunit:not([id])').length > 0;
 
       // targetted campaign
       if (parseFloat(gsnApi.isNull($sessionStorage.GsnCampaign, 0)) <= 0) {

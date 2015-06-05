@@ -97,7 +97,7 @@
       updateNetworkId();
       
       // force refresh if there are any empty unit
-      service.forceRefresh = angular.element('.gsnunit::not([id])');
+      service.forceRefresh = angular.element('div.gsnunit:not([id])').length > 0;
 
       // targetted campaign
       if (parseFloat(gsnApi.isNull($sessionStorage.GsnCampaign, 0)) <= 0) {

@@ -217,6 +217,9 @@
 
     $scope.showAllStores = function (distanceOrigin) {
       if (!$scope.mapOptions) {
+        $timeout(function() {
+          $scope.showAllStores(distanceOrigin);
+        }, 500);
         return;
       }
       
