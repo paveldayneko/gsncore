@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.21
  * gsncore repository
- * Build date: Thu Jun 04 2015 20:48:51 GMT-0500 (CDT)
+ * Build date: Thu Jun 04 2015 20:57:16 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -7326,7 +7326,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
   var myDirectiveName = 'ctrlStoreLocator';
 
   angular.module('gsn.core')
-    .controller(myDirectiveName, ['$scope', 'gsnApi', '$notification', '$timeout', '$rootScope', '$location', 'gsnStore', myController])
+    .controller(myDirectiveName, ['$scope', 'gsnApi', '$notification', '$timeout', '$rootScope', '$location', 'gsnStore', 'debounce', myController])
     .directive(myDirectiveName, myDirective);
 
   function myDirective() {
@@ -7339,7 +7339,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     return directive;
   }
 
-  function myController($scope, gsnApi, $notification, $timeout, $rootScope, $location, gsnStore) {
+  function myController($scope, gsnApi, $notification, $timeout, $rootScope, $location, gsnStore, debounce) {
     $scope.activate = activate;
 
     var defaultZoom = $scope.defaultZoom || 10;
@@ -7507,35 +7507,32 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     };
 
     // find the best zoom to fit all markers
-    $scope.fitAllMarkers = function () {
+    $scope.fitAllMarkers = debounce(function () {
       if (gsnApi.isNull($scope.myMap, null) === null) {
-        $timeout($scope.fitAllMarkers, 500);
         return;
       }
 
-      $timeout(function () {
-        if ($scope.myMarkers.length == 1) {
-          $scope.mapOptions.center = $scope.myMarkers[0].getPosition();
-          $scope.mapOptions.zoom = $scope.defaultZoom || 10;
-          $scope.myMap.setZoom($scope.mapOptions.zoom);
-          $scope.myMap.setCenter($scope.mapOptions.center);
-          return;
-        }
+      if ($scope.myMarkers.length == 1) {
+        $scope.mapOptions.center = $scope.myMarkers[0].getPosition();
+        $scope.mapOptions.zoom = $scope.defaultZoom || 10;
+        $scope.myMap.setZoom($scope.mapOptions.zoom);
+        $scope.myMap.setCenter($scope.mapOptions.center);
+        return;
+      }
 
-        // make sure this is on the UI thread
-        var markers = $scope.myMarkers;
-        var bounds = new google.maps.LatLngBounds();
-        for (var i = 0; i < markers.length; i++) {
-          bounds.extend(markers[i].getPosition());
-        }
+      // make sure this is on the UI thread
+      var markers = $scope.myMarkers;
+      var bounds = new google.maps.LatLngBounds();
+      for (var i = 0; i < markers.length; i++) {
+        bounds.extend(markers[i].getPosition());
+      }
 
-        if ($scope.searchMarker) {
-          bounds.extend($scope.searchMarker.getPosition());
-        }
+      if ($scope.searchMarker) {
+        bounds.extend($scope.searchMarker.getPosition());
+      }
 
-        $scope.myMap.fitBounds(bounds);
-      }, 20);
-    };
+      $scope.myMap.fitBounds(bounds);
+    }, 200);
 
     $scope.showAllStores = function (distanceOrigin) {
       if (!$scope.mapOptions) {
@@ -7577,6 +7574,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       }
 
       $scope.initializeMarker(result);
+      $scope.fitAllMarkers();
     };
 
     $scope.canShow = function (store) {
