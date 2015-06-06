@@ -29,7 +29,7 @@
 
     $scope.allItems = [];
     $scope.loadMore = loadMore;
-    $scope.vm = { cacheItems: [], digitalCirc: null, filterBy: $location.search().q };
+    $scope.vm = { cacheItems: [], digitalCirc: null, filterBy: $location.search().q, filter: {} };
 
     function activate() {
       
@@ -111,14 +111,22 @@
       // don't show circular until data and list are both loaded
       if (gsnApi.isNull(circularPage, null) === null || gsnApi.isNull(list, null) === null) return;
 
-      var result = $filter('orderBy')($filter('filter')(circularPage.items, $scope.vm.filterBy || ''), $scope.actualSortBy);
-      $scope.vm.page = circularPage;
+      var result1 = $filter('filter')(circularPage.items, $scope.vm.filter);
+      var result = $filter('orderBy')($filter('filter')(result1, $scope.vm.filterBy || ''), $scope.actualSortBy);
+      if (!$scope.vm.page) {
+        $scope.vm.page = circularPage;
+        $scope.vm.categories = gsnApi.groupBy(circularPage.items, 'CategoryName');
+        $scope.vm.brands = gsnApi.groupBy(circularPage.items, 'BrandName');
+      }
+      
       $scope.vm.cacheItems = result;
       $scope.allItems = [];
       loadMore();
     };
 
     $scope.$watch('vm.filterBy', $scope.doSearchInternal);
+    $scope.$watch('vm.filter.BrandName', $scope.doSearchInternal);
+    $scope.$watch('vm.filter.CategoryName', $scope.doSearchInternal);
 
     $scope.$on('gsnevent:circular-loaded', function (event, data) {
       if (data.success) {

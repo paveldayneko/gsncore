@@ -40,7 +40,7 @@ gulp.task('build', function() {
 
 
 gulp.task('build-basic', function() {
-  return gulp.src(['src/gsn.js', 'src/module.js', 'src/gsn-ui-map.js', 'src/angular-recaptcha.js', 'src/filters/*.js', 'src/services/!(gsnProLogicRewardCard).js'
+  return gulp.src(['src/gsn.js', 'src/module.js', 'src/gsn-ui-map.js', 'src/bindonce.js', 'src/angular-recaptcha.js', 'src/filters/*.js', 'src/services/!(gsnProLogicRewardCard).js'
     , 'src/directives/ctrlAccount.js'
     , 'src/directives/ctrlChangePassword.js'
     , 'src/directives/ctrlLogin.js'
