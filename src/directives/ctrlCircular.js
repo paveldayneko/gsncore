@@ -112,6 +112,7 @@
       if (gsnApi.isNull(circularPage, null) === null || gsnApi.isNull(list, null) === null) return;
 
       var result = $filter('orderBy')($filter('filter')(circularPage.items, $scope.vm.filterBy || ''), $scope.actualSortBy);
+      $scope.vm.page = circularPage;
       $scope.vm.cacheItems = result;
       $scope.allItems = [];
       loadMore();
