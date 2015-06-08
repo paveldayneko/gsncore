@@ -51,10 +51,10 @@
         if (rsp.success) {
           // check if tile is in response
           // rsp.response;
-          if (attrs.tile) {
+          if (attrs.gsnAdUnit) {
             for (var i = 0; i < rsp.response.length; i++) {
               var tile = rsp.response[i];
-              if (tile.Code == attrs.tile) {
+              if (tile.Code == attrs.gsnAdUnit) {
                 hasTile = true;
                 break;
               }
