@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.22
  * gsncore repository
- * Build date: Sun Jun 07 2015 20:45:19 GMT-0500 (CDT)
+ * Build date: Mon Jun 08 2015 07:14:40 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -344,7 +344,18 @@
         obj[list[attribute]] = list;
       } else {
         gsn.map(list, function (item, i) {
-          obj[item[attribute]] = item;
+          var k = item[attribute];
+          var e = obj[k];
+          if (e) {
+            if( Object.prototype.toString.call( e ) !== '[object Array]' ) {
+              e = [e]; 
+            }
+            e.push(item);
+          }
+          else {
+            e = item;
+          }
+          obj[k] = e;
         });
       }
     }

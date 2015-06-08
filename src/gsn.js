@@ -338,7 +338,18 @@
         obj[list[attribute]] = list;
       } else {
         gsn.map(list, function (item, i) {
-          obj[item[attribute]] = item;
+          var k = item[attribute];
+          var e = obj[k];
+          if (e) {
+            if( Object.prototype.toString.call( e ) !== '[object Array]' ) {
+              e = [e]; 
+            }
+            e.push(item);
+          }
+          else {
+            e = item;
+          }
+          obj[k] = e;
         });
       }
     }
