@@ -299,7 +299,9 @@
 
     returnObj.parseStoreSpecificContent = function(contentData) {
       var contentDataResult = {};
+      var possibleResult = [];
       var myContentData = contentData;
+      var allStoreCount = gsn.config.StoreList.length;
       var storeId = returnObj.isNull(returnObj.getSelectedStoreId(), 0);
 
       // determine if contentData is array
@@ -318,7 +320,7 @@
         i++;
 
         if (storeId <= 0) {
-          if (gsn.config.StoreList.length == v.StoreIds.length) {
+          if (allStoreCount == v.StoreIds.length) {
             contentDataResult = v;
           }
           
@@ -328,9 +330,21 @@
         angular.forEach(storeIds, function (v1, k1) {
           if (storeId == v1) {
             contentDataResult = v;
+            possibleResult.push(v);
           }
         });
       });
+
+      var maxStoreIdCount = allStoreCount;
+      if (possibleResult.length > 1){
+        // use result with least number of stores
+        angular.forEach(possibleResult, function(v, k){
+          if (v.StoreIds.length > 1 && v.StoreIds.length < maxStoreIdCount){
+            maxStoreIdCount = v.StoreIds.length;
+            contentDataResult = v;
+          }
+        });
+      }
 
       return contentDataResult;
     };
