@@ -39,6 +39,10 @@
             scope[modifierName] = currentModifier;
 
             var $element = angular.element(options.selector);
+            if ($element.length <= 0 && options.html){
+              $element = angular.element(html)
+              angular.element('head')[0].appendChild($element[0]);
+            }
 
             // Keep track of the original value, so that it
             // can be restored later.
@@ -135,6 +139,7 @@
   ngModifyElementDirective({
     name: 'gsnMetaGoogleSiteVerification',
     selector: 'meta[name="google-site-verification"]',
+    html: '<meta name="google-site-verification" content="" />',
     get: function (e) {
       return e.attr('content');
     },
@@ -148,6 +153,7 @@
   ngModifyElementDirective({
     name: 'gsnOgTitle',
     selector: 'meta[name="og:title"]',
+    html: '<meta name="og:title" content="" />',
     get: function (e) {
       return e.attr('content');
     },
@@ -160,6 +166,7 @@
   ngModifyElementDirective({
     name: 'gsnOgType',
     selector: 'meta[name="og:type"]',
+    html: '<meta name="og:type" content="" />',
     get: function (e) {
       return e.attr('content');
     },
@@ -172,6 +179,7 @@
   ngModifyElementDirective({
     name: 'gsnOgImage',
     selector: 'meta[name="og:image"]',
+    html: '<meta name="og:image" content="" />',
     get: function (e) {
       return e.attr('content');
     },
@@ -184,6 +192,20 @@
   ngModifyElementDirective({
     name: 'gsnOgUrl',
     selector: 'meta[name="og:url"]',
+    html: '<meta name="og:url" content="" />',
+    get: function (e) {
+      return e.attr('content');
+    },
+    set: function (e, v) {
+      return e.attr('content', v);
+    }
+  });
+
+  // og:description - the description.
+  ngModifyElementDirective({
+    name: 'gsnOgDescription',
+    selector: 'meta[name="og:description"]',
+    html: '<meta name="og:description" content="" />',
     get: function (e) {
       return e.attr('content');
     },
