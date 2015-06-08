@@ -2,7 +2,7 @@
   'use strict';
   var myModule = angular.module('gsn.core');
 
-  myModule.directive('gsnTwitterShare', ['$timeout', function ($timeout) {
+  myModule.directive('gsnTwitterShare', ['$timeout', 'gsnApi', function ($timeout, gsnApi) {
     // Usage:   display twitter share
     // 
     // Creates: 2014-01-06
