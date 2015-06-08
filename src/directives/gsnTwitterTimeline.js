@@ -14,18 +14,26 @@
     return directive;
 
     function link(scope, element, attrs) {
-
+      var loadingScript = false;
       element.html('<a class="twitter-timeline" href="' + attrs.href + '" data-widget-id="' + attrs.gsnTwitterTimeline + '">' + attrs.title + '</a>');
 
       function loadTimeline() {
-        if (typeof twttr !== "undefined" && twttr !== null) {
-          twttr.widgets.load();
-        } else {
+        if (typeof twttr === "undefined") {
           $timeout(loadTimeline, 500);
+          if (loadingScript) return;
+          loadingScript = true;
+
+          // dynamically load twitter
+          var src = '//platform.twitter.com/widgets.js';
+          gsnApi.loadScripts([src], loadTimeline);
+          return;
         }
+
+        twttr.widgets.load();
+        return;
       }
 
-      $timeout(loadTimeline, 500);
+      loadTimeline();
     }
   }]);
 
