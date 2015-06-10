@@ -53,7 +53,7 @@
     };
 
     $scope.clippedCount = 0;
-    $scope.clippedCoupons = [];
+    $scope.clippedCoupons = {};
     $scope.sortBy = 'EndDate';
     $scope.sortByName = 'About to Expire';
     $scope.filterByComplex = '';
@@ -258,9 +258,9 @@
     function printClippedCoupons() {
       $scope.printer.printed = null; 
       var clippedCouponsInArr = [];
-      angular.forEach($scope.clippedCoupons, function (v, k) {
-        clippedCouponsInArr.push(v);
-      });
+      for(var key in $scope.clippedCoupons){
+        clippedCouponsInArr.push($scope.clippedCoupons[key]);
+      }
       $scope.printer.total = clippedCouponsInArr.length;
       gsnCouponPrinter.print(clippedCouponsInArr);
       $scope.$emit('gsnevent:closemodal');

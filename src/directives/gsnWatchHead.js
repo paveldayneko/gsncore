@@ -39,8 +39,8 @@
             scope[modifierName] = currentModifier;
 
             var $element = angular.element(options.selector);
-            if ($element.length <= 0 && options.html){
-              $element = angular.element(html)
+            if ($element.length <= 0 && typeof(options.html) == 'string') {
+              $element = angular.element(options.html)
               angular.element('head')[0].appendChild($element[0]);
             }
 
