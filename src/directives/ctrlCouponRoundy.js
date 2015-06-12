@@ -244,6 +244,10 @@
     $scope.$on('gsnevent:gcprinter-not-found', function() {
       $scope.printer.notinstalled++;
     });
+    $scope.$on('gsnevent:gcprinter-initcomplete', function() {
+      $scope.gcprinter = gcprinter;
+      $scope.printer.gcprinter = gcprinter;
+    });
     $scope.$on('gsnevent:gcprinter-printed', function(evt, e, rsp) {
       $scope.printer.printed = e;
       if (rsp) {
