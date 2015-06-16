@@ -39,14 +39,17 @@
       targeted: []
     };
 
-    $scope.sortBy = 'EndDate';
-    $scope.sortByName = 'About to Expire';
-    $scope.filterBy = $location.search().q;
     $scope.coupons = {
       printable: { items: []},
       digital: { items: []},
       store: { items: []}
     };
+    $scope.vm = {
+      filterBy: $location.search().q,
+      sortBy: 'EndDate',
+      sortByName: 'About to Expire'
+    }
+
     $scope.couponType = 'store';
     if ($scope.currentPath.indexOf('/coupons/printable') == 0){
       $scope.couponType = 'printable';
@@ -122,9 +125,9 @@
       loadCoupons();
 
       // apply filter
-      $scope.preSelectedCoupons.items = $filter('filter')($filter('filter')($scope.preSelectedCoupons.items, $scope.filterBy), { IsTargeted: false });
-      $scope.preSelectedCoupons.items = $filter('orderBy')($filter('filter')($scope.preSelectedCoupons.items, $scope.filterBy), $scope.sortBy);
-      $scope.preSelectedCoupons.targeted = $filter('orderBy')($filter('filter')($scope.preSelectedCoupons.targeted, $scope.filterBy), $scope.sortBy);
+      $scope.preSelectedCoupons.items = $filter('filter')($filter('filter')($scope.preSelectedCoupons.items, $scope.vm.filterBy), { IsTargeted: false });
+      $scope.preSelectedCoupons.items = $filter('orderBy')($filter('filter')($scope.preSelectedCoupons.items, $scope.vm.filterBy), $scope.vm.sortBy);
+      $scope.preSelectedCoupons.targeted = $filter('orderBy')($filter('filter')($scope.preSelectedCoupons.targeted, $scope.vm.filterBy), $scope.vm.sortBy);
       $scope.selectedCoupons.items.length = 0;
       $scope.selectedCoupons.targeted = $scope.preSelectedCoupons.targeted;
       loadMore();
@@ -154,8 +157,8 @@
     });
 
     $scope.$on('gsnevent:youtech-cardcoupon-loaded', activate);
-    $scope.$watch('sortBy', activate);
-    $scope.$watch('filterBy', activate);
+    $scope.$watch('vm.sortBy', activate);
+    $scope.$watch('vm.filterBy', activate);
     $scope.$watch('selectedCoupons.cardCouponOnly', activate);
     
     // trigger modal
