@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.23
  * gsncore repository
- * Build date: Tue Jun 16 2015 14:34:47 GMT-0500 (CDT)
+ * Build date: Tue Jun 16 2015 14:40:15 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -4895,6 +4895,9 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         item.PageNumber = parseInt(page.PageNumber);
         var pos = item.AreaCoordinates.split(',');
         var temp = 0;
+        for(var i = 0; i < 4; i++){
+          pos[i] = parseInt(pos[i]) || 0;
+        }
         // swap if bad position
         if (pos[0] > pos[2]){
           temp = pos[0];
@@ -4906,6 +4909,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           pos[1] = pos[3];
           pos[3] = temp;
         }
+
         // calculate width height
         pos[4] = pos[2] - pos[0]; // width
         pos[5] = pos[3] - pos[1]; // height

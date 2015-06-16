@@ -602,6 +602,9 @@
         item.PageNumber = parseInt(page.PageNumber);
         var pos = item.AreaCoordinates.split(',');
         var temp = 0;
+        for(var i = 0; i < 4; i++){
+          pos[i] = parseInt(pos[i]) || 0;
+        }
         // swap if bad position
         if (pos[0] > pos[2]){
           temp = pos[0];
@@ -613,6 +616,7 @@
           pos[1] = pos[3];
           pos[3] = temp;
         }
+
         // calculate width height
         pos[4] = pos[2] - pos[0]; // width
         pos[5] = pos[3] - pos[1]; // height
