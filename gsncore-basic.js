@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.23
  * gsncore repository
- * Build date: Tue Jun 16 2015 14:30:08 GMT-0500 (CDT)
+ * Build date: Tue Jun 16 2015 14:31:54 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -4909,6 +4909,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         // calculate width height
         pos[4] = pos[2] - pos[0]; // width
         pos[5] = pos[3] - pos[1]; // height
+        item.rect = pos;
         
         circularMaster.items.push(item);
         items.push(item);
