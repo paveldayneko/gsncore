@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.23
  * gsncore repository
- * Build date: Tue Jun 16 2015 14:31:54 GMT-0500 (CDT)
+ * Build date: Tue Jun 16 2015 14:34:47 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -4787,7 +4787,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       // foreach Circular
       angular.forEach(circulars, function (circ) {
         circ.StoreIds = circ.StoreIds || [];
-        circ.CircularTypeName = (cirularTypes[circ.CircularTypeId] || {}).Name;
+        circ.CircularTypeName = (circularTypes[circ.CircularTypeId] || {}).Name;
         if (circ.StoreIds.length <= 0 || circ.StoreIds.indexOf(_lc.storeId) >= 0) {
           circularData.Circulars.push(circ);
           if (!circ.Pagez) {
