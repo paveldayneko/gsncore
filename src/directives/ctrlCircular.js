@@ -29,7 +29,7 @@
 
     $scope.allItems = [];
     $scope.loadMore = loadMore;
-    $scope.vm = { cacheItems: [], digitalCirc: null, filterBy: $location.search().q, filter: {} };
+    $scope.vm = { cacheItems: [], digitalCirc: null, filterBy: $location.search().q, filter: {}, pageIdx: $location.search().p, circIdx: $location.search().c };
 
     function activate() {
       

@@ -494,6 +494,7 @@
       // foreach Circular
       angular.forEach(circulars, function (circ) {
         circ.StoreIds = circ.StoreIds || [];
+        circ.CircularTypeName = (cirularTypes[circ.CircularTypeId] || {}).Name;
         if (circ.StoreIds.length <= 0 || circ.StoreIds.indexOf(_lc.storeId) >= 0) {
           circularData.Circulars.push(circ);
           if (!circ.Pagez) {
@@ -599,6 +600,23 @@
     function processCircularPage(items, circularMaster, page) {
       angular.forEach(page.Items, function (item) {
         item.PageNumber = parseInt(page.PageNumber);
+        var pos = item.AreaCoordinates.split(',');
+        var temp = 0;
+        // swap if bad position
+        if (pos[0] > pos[2]){
+          temp = pos[0];
+          pos[0] = pos[2];
+          pos[2] = temp;
+        }
+        if (pos[1] > pos[3]){
+          temp = pos[1];
+          pos[1] = pos[3];
+          pos[3] = temp;
+        }
+        // calculate width height
+        pos[4] = pos[2] - pos[0]; // width
+        pos[5] = pos[3] - pos[1]; // height
+        
         circularMaster.items.push(item);
         items.push(item);
       });
