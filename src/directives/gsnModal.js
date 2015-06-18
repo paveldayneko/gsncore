@@ -45,7 +45,8 @@
               hideOn: attrs.hideOn || 'click,esc,tap',
               cls: attrs.cls,
               timeout: attrs.timeout,
-              closeCls: attrs.closeCls || 'close modal'
+              closeCls: attrs.closeCls || 'close modal',
+              disableScrollTop: attrs.disableScrollTop
             }, scope.$eval(attrs.hideCb));
           }); 
         }

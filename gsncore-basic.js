@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.23
  * gsncore repository
- * Build date: Thu Jun 18 2015 07:01:09 GMT-0500 (CDT)
+ * Build date: Thu Jun 18 2015 07:14:33 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -6280,7 +6280,8 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
               hideOn: attrs.hideOn || 'click,esc,tap',
               cls: attrs.cls,
               timeout: attrs.timeout,
-              closeCls: attrs.closeCls || 'close modal'
+              closeCls: attrs.closeCls || 'close modal',
+              disableScrollTop: attrs.disableScrollTop
             }, scope.$eval(attrs.hideCb));
           }); 
         }
