@@ -57,7 +57,7 @@
           }
           else if (name == 'gsnFtConfig') {
             scope.item = gsnApi.parseStoreSpecificContent(gsnApi.getHomeData().ConfigData[attrs.gsnFtConfig]);
-            if (attrs.Overwrite && ((scope.item.Description || '').length > 0)) {
+            if (attrs.overwrite && ((scope.item.Description || '').length > 0)) {
               element.html(scope.item.Description);
             }
           }
