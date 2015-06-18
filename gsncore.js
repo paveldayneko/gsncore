@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.23
  * gsncore repository
- * Build date: Tue Jun 16 2015 17:48:47 GMT-0500 (CDT)
+ * Build date: Thu Jun 18 2015 06:30:59 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -3773,7 +3773,12 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 
     $scope.allItems = [];
     $scope.loadMore = loadMore;
-    $scope.vm = { cacheItems: [], digitalCirc: null, filterBy: $location.search().q, filter: {}, pageIdx: $location.search().p, circIdx: $location.search().c };
+    $scope.vm = { cacheItems: [], 
+      digitalCirc: null, 
+      filterBy: $location.search().q, 
+      filter: {}, 
+      pageIdx: $location.search().p, 
+      circIdx: $location.search().c };
 
     function activate() {
       
@@ -3794,6 +3799,13 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 
         if (data.Circulars.length <= 0) {
           return;
+        }
+        
+        if (data.Circulars.length == 1) {
+          if (gsnApi.isNull($scope.vm.circIdx, null) === null) {
+            $scope.vm.circIdx = 1;
+            $scope.vm.pageIdx = 1;
+          }
         }
 
         $scope.doSearchInternal();
@@ -3930,7 +3942,9 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     $scope.addCouponToCard = addCouponToCard;
     $scope.printManufacturerCoupon = printManufacturerCoupon;
     $scope.loadMore = loadMore;
-    $scope.printer = { blocked: 0, notsupported: 0, notinstalled: 0, printed: null, count: 0, total: 0, isChrome: /chrome/gi.test(gsnApi.userAgent) };
+    $scope.printer = { blocked: 0, 
+      notsupported: 0, notinstalled: 0, printed: null, 
+      count: 0, total: 0, isChrome: /chrome/gi.test(gsnApi.userAgent) };
 
 
     $scope.isValidProLogic = false;
@@ -3958,14 +3972,12 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       sortByName: 'About to Expire'
     }
 
-    $scope.couponType = 'store';
-    if ($scope.currentPath.indexOf('/coupons/printable') == 0){
-      $scope.couponType = 'printable';
-    } else if ($scope.currentPath.indexOf('/coupons/digital') == 0) {
-      $scope.couponType = 'digital';
-    }
-    
+    $scope.couponType = $scope.friendlyPath.replace('coupons-', '');
     $scope.itemsPerPage = $location.search().itemsperpage || $location.search().itemsPerPage || $scope.itemsPerPage || 20;
+
+    if ($scope.couponType.length < 4){
+      $scope.couponType = 'store';
+    }
 
     function loadMore() {
       var items = $scope.preSelectedCoupons.items || [];
@@ -4098,6 +4110,11 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     //#region Internal Methods             
     function printManufacturerCoupon(evt, item) {
       gsnCouponPrinter.print([item]);
+      $analytics.eventTrack('CouponPrintNow', 
+        { category: item.ExtCategory, 
+          label: item.Description1, 
+          value: item.ProductCode });
+
     }
       
     function addCouponToCard(evt, item) {
@@ -8274,6 +8291,9 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
           }
           else if (name == 'gsnFtConfig') {
             scope.item = gsnApi.parseStoreSpecificContent(gsnApi.getHomeData().ConfigData[attrs.gsnFtConfig]);
+            if (attrs.Overwrite && ((scope.item.Description || '').length > 0)) {
+              element.html(scope.item.Description);
+            }
           }
           else if (name == 'gsnFtContent') {
             // do nothing, content already being handled by content position
@@ -10934,6 +10954,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
         // store the new route location
         $scope.currentPath = angular.lowercase(gsnApi.isNull($location.path(), ''));
+        $scope.friendlyPath = /\/+/gi.replace($scope.currentPath.replace('/', ''), '-');
         $scope.gvm.menuInactive = false;
         $scope.gvm.shoppingListActive = false;
 

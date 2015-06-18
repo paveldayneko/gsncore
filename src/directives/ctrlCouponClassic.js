@@ -22,7 +22,9 @@
     $scope.addCouponToCard = addCouponToCard;
     $scope.printManufacturerCoupon = printManufacturerCoupon;
     $scope.loadMore = loadMore;
-    $scope.printer = { blocked: 0, notsupported: 0, notinstalled: 0, printed: null, count: 0, total: 0, isChrome: /chrome/gi.test(gsnApi.userAgent) };
+    $scope.printer = { blocked: 0, 
+      notsupported: 0, notinstalled: 0, printed: null, 
+      count: 0, total: 0, isChrome: /chrome/gi.test(gsnApi.userAgent) };
 
 
     $scope.isValidProLogic = false;
@@ -50,14 +52,12 @@
       sortByName: 'About to Expire'
     }
 
-    $scope.couponType = 'store';
-    if ($scope.currentPath.indexOf('/coupons/printable') == 0){
-      $scope.couponType = 'printable';
-    } else if ($scope.currentPath.indexOf('/coupons/digital') == 0) {
-      $scope.couponType = 'digital';
-    }
-    
+    $scope.couponType = $scope.friendlyPath.replace('coupons-', '');
     $scope.itemsPerPage = $location.search().itemsperpage || $location.search().itemsPerPage || $scope.itemsPerPage || 20;
+
+    if ($scope.couponType.length < 4){
+      $scope.couponType = 'store';
+    }
 
     function loadMore() {
       var items = $scope.preSelectedCoupons.items || [];
@@ -190,6 +190,11 @@
     //#region Internal Methods             
     function printManufacturerCoupon(evt, item) {
       gsnCouponPrinter.print([item]);
+      $analytics.eventTrack('CouponPrintNow', 
+        { category: item.ExtCategory, 
+          label: item.Description1, 
+          value: item.ProductCode });
+
     }
       
     function addCouponToCard(evt, item) {

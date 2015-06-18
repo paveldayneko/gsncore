@@ -29,7 +29,12 @@
 
     $scope.allItems = [];
     $scope.loadMore = loadMore;
-    $scope.vm = { cacheItems: [], digitalCirc: null, filterBy: $location.search().q, filter: {}, pageIdx: $location.search().p, circIdx: $location.search().c };
+    $scope.vm = { cacheItems: [], 
+      digitalCirc: null, 
+      filterBy: $location.search().q, 
+      filter: {}, 
+      pageIdx: $location.search().p, 
+      circIdx: $location.search().c };
 
     function activate() {
       
@@ -50,6 +55,13 @@
 
         if (data.Circulars.length <= 0) {
           return;
+        }
+        
+        if (data.Circulars.length == 1) {
+          if (gsnApi.isNull($scope.vm.circIdx, null) === null) {
+            $scope.vm.circIdx = 1;
+            $scope.vm.pageIdx = 1;
+          }
         }
 
         $scope.doSearchInternal();

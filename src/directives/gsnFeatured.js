@@ -57,6 +57,9 @@
           }
           else if (name == 'gsnFtConfig') {
             scope.item = gsnApi.parseStoreSpecificContent(gsnApi.getHomeData().ConfigData[attrs.gsnFtConfig]);
+            if (attrs.Overwrite && ((scope.item.Description || '').length > 0)) {
+              element.html(scope.item.Description);
+            }
           }
           else if (name == 'gsnFtContent') {
             // do nothing, content already being handled by content position

@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.23
  * gsncore repository
- * Build date: Tue Jun 16 2015 17:48:47 GMT-0500 (CDT)
+ * Build date: Thu Jun 18 2015 06:30:59 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -2408,6 +2408,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
         // store the new route location
         $scope.currentPath = angular.lowercase(gsnApi.isNull($location.path(), ''));
+        $scope.friendlyPath = /\/+/gi.replace($scope.currentPath.replace('/', ''), '-');
         $scope.gvm.menuInactive = false;
         $scope.gvm.shoppingListActive = false;
 
@@ -5969,6 +5970,9 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           }
           else if (name == 'gsnFtConfig') {
             scope.item = gsnApi.parseStoreSpecificContent(gsnApi.getHomeData().ConfigData[attrs.gsnFtConfig]);
+            if (attrs.Overwrite && ((scope.item.Description || '').length > 0)) {
+              element.html(scope.item.Description);
+            }
           }
           else if (name == 'gsnFtContent') {
             // do nothing, content already being handled by content position
