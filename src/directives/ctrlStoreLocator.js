@@ -59,6 +59,9 @@
       else {
         $scope.storeList = rsp.response;
       }
+      if ($scope.storeList.length <= 1 && $scope.singleStoreRedirect) {
+        gsnApi.goUrl($scope.singleStoreRedirect + '/' + $scope.storeList[0].StoreNumber)
+      }
       $scope.showAllStores();
     });
 

@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.23
  * gsncore repository
- * Build date: Thu Jun 18 2015 07:14:33 GMT-0500 (CDT)
+ * Build date: Thu Jun 18 2015 13:20:02 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -7446,6 +7446,9 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       }
       else {
         $scope.storeList = rsp.response;
+      }
+      if ($scope.storeList.length <= 1 && $scope.singleStoreRedirect) {
+        gsnApi.goUrl($scope.singleStoreRedirect + '/' + $scope.storeList[0].StoreNumber)
       }
       $scope.showAllStores();
     });
