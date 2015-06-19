@@ -169,6 +169,16 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           }
 
           gsnProfile.addItem(item);
+
+          if (item.ItemTypeId == 8) {
+            
+            if (gsnApi.isNull(item.Varieties, null) === null) {
+              item.Varieties = [];
+            }
+
+            $scope.gvm.selectedItem = item;
+          }
+
         }
 
         $rootScope.$broadcast('gsnevent:shoppinglist-toggle-item', item);

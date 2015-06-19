@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.23
  * gsncore repository
- * Build date: Fri Jun 19 2015 09:38:28 GMT-0500 (CDT)
+ * Build date: Fri Jun 19 2015 10:05:01 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -2393,6 +2393,16 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           }
 
           gsnProfile.addItem(item);
+
+          if (item.ItemTypeId == 8) {
+            
+            if (gsnApi.isNull(item.Varieties, null) === null) {
+              item.Varieties = [];
+            }
+
+            $scope.gvm.selectedItem = item;
+          }
+
         }
 
         $rootScope.$broadcast('gsnevent:shoppinglist-toggle-item', item);
