@@ -41,19 +41,12 @@
     "gulp-inject": "*",
     "gulp-concat": "~2.3.4",
     "gulp-util": "*",
-    "del": "~1.1.1",
     "gulp-git": "~1.1.0",
     "gulp-bump": "*",
     "run-sequence": "~1.0.2",
     "express": "4.12.3",
     "coffee-script": "1.9.2",
-    "component": "1.1.0",
-    "component-coffee": "0.1.4",
-    "uglify-js": "2.4.20",
-    "duo": "0.8",
-    "duo-test": "0.3",
-    "duo-coffee": "1.0.0"
-  
+    "uglify-js": "2.4.20"
   },
   "engines": {
     "node": ">= 0.12.0"

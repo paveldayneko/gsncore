@@ -8,8 +8,6 @@ var header =     require('gulp-header');
 var git =        require('gulp-git');
 var runSeq =     require('run-sequence');
 var inject =     require('gulp-inject');
-
-var del =        require('del');
 var fs =         require('fs');
 var bump =       require('gulp-bump');
 var exec =       require('child_process').exec;
