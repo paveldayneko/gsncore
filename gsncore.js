@@ -2,158 +2,690 @@
  * gsncore
  * version 1.4.23
  * gsncore repository
- * Build date: Mon Jun 22 2015 12:31:13 GMT-0500 (CDT)
+ * Build date: Mon Jun 22 2015 12:35:53 GMT-0500 (CDT)
  */
-(function (angular, undefined) {
+; (function () {
   'use strict';
 
-  var myDirectiveName = 'ctrlContactUs';
-  
-  angular.module('gsn.core')
-    .controller(myDirectiveName, ['$scope', 'gsnProfile', 'gsnApi', '$timeout', 'gsnStore', '$interpolate', '$http', myController])
-    .directive(myDirectiveName, myDirective);
+  // Baseline setup
+  // --------------
 
-  function myDirective() {
-    var directive = {
-      restrict: 'EA',
-      scope: true,
-      controller: myDirectiveName
-    };
+  // Establish the root object, `window` in the browser, or `exports` on the server.
+  var root = this;
 
-    return directive;
+  // Save the previous value of the `gsn` variable.
+  var previousGsn = root.gsn;
+
+  // Establish the object that gets returned to break out of a loop iteration.
+  var breaker = {};
+
+  // Save bytes in the minified (but not gzipped) version:
+  var ArrayProto = Array.prototype,
+      ObjProto = Object.prototype;
+
+  // Create quick reference variables for speed access to core prototypes.
+  var
+    slice = ArrayProto.slice,
+    hasOwnProperty = ObjProto.hasOwnProperty;
+
+  // All **ECMAScript 5** native function implementations that we hope to use
+  // are declared here.
+  var
+    nativeForEach = ArrayProto.forEach,
+    nativeMap = ArrayProto.map,
+    nativeSome = ArrayProto.some,
+    nativeIndexOf = ArrayProto.indexOf,
+    nativeKeys = Object.keys;
+
+  /* jshint -W055 */
+  // Create a safe reference to the gsn object for use below.
+  var gsn = function (obj) {
+    if (obj instanceof gsn) return obj;
+    if (!(this instanceof gsn)) return new gsn(obj);
+    this._wrapped = obj;
+    return this;
+  };
+
+  // Export the gsn object for **Node.js**, with
+  // backwards-compatibility for the old `require()` API.
+  if (typeof exports !== 'undefined') {
+    if (typeof module !== 'undefined' && module.exports) {
+      exports = module.exports = gsn;
+    }
+    exports.gsn = gsn;
+  } else {
+    root.gsn = gsn;
   }
-  
-  function myController($scope, gsnProfile, gsnApi, $timeout, gsnStore, $interpolate, $http) {
+  gsn.root = root;
 
-    $scope.activate = activate;
-    $scope.vm = { PrimaryStoreId: gsnApi.getSelectedStoreId(), ReceiveEmail: true };
-    $scope.masterVm = { PrimaryStoreId: gsnApi.getSelectedStoreId(), ReceiveEmail: true };
+  /**
+   * The semantic version number.
+   *
+   * @static
+   * @memberOf gsn
+   * @type string
+   */
+  gsn.VERSION = '1.0.4';
+  gsn.previousGsn = previousGsn;
 
-    $scope.hasSubmitted = false;    // true when user has click the submit button
-    $scope.isValidSubmit = true;    // true when result of submit is valid
-    $scope.isSubmitting = false;    // true if we're waiting for result from server
-    $scope.errorResponse = null;
-    $scope.contactSuccess = false;
-    $scope.topics = [];
-    $scope.topicsByValue = {};
-    $scope.storeList = [];
-    $scope.captcha = {};
-    $scope.storesById = {};
+  // internal config
+  gsn.config = {
+    // url config
+    AuthServiceUrl: '/proxy/auth',
+    StoreServiceUrl: '/proxy/store',
+    ProfileServiceUrl: '/proxy/profile',
+    ShoppingListServiceUrl: '/proxy/shoppinglist',
+    LoggingServiceUrl: '/proxy/logging',
+    YoutechCouponUrl: '/proxy/couponut',
+    RoundyProfileUrl: '/proxy/roundy',
+    MidaxServiceUrl: '/proxy/midax',
+    ApiUrl: '',
 
-    var template;
+    // global config
+    Version: new Date().getTime(),
+    EmailRegex: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+    ServiceUnavailableMessage: 'We are unable to process your request at this time.',
 
-    $http.get($scope.getThemeUrl('/views/email/contact-us.html'))
-      .success(function (response) {
-        template = response.replace(/data-ctrl-email-preview/gi, '');
-      });
+    // true to make use of localStorage for better caching of user info across session, useful in a phonegap or mobile site app
+    UseLocalStorage: false,
 
-    function activate() {
-      gsnStore.getStores().then(function (rsp) {
-        $scope.stores = rsp.response;
+    // chain specific config
+    ContentBaseUrl: '/asset',
 
-        // prebuild list base on roundy spec (ﾉωﾉ)
-        // make sure that it is order by state, then by name
-        $scope.storesById = gsnApi.mapObject($scope.stores, 'StoreId');
-      });
+    ChainId: 0,
+    ChainName: 'Grocery Shopping Network',
+    DfpNetworkId: '/6394/digitalstore.test',
+    GoogleTagId: null,
+    GoogleAnalyticAccountId1: null,
+    GoogleAnalyticAccountId2: null,
+    GoogleSiteVerificationId: null,
+    RegistrationFromEmailAddress: 'tech@grocerywebsites.com',
+    FacebookAppId: null,
+    FacebookPermission: null,
+    GoogleSiteSearchCode: null,
+    DisableLimitedTimeCoupons: false,
+    Theme: null,
+    HomePage: null,
+    StoreList: null,
+    AllContent: null,
+    hasDigitalCoupon: false,
+    hasStoreCoupon: false,
+    hasPrintableCoupon: false,
+    hasRoundyProfile: false,
+    hasInit: false
+  };
 
-      gsnProfile.getProfile().then(function (p) {
-        if (p.success) {
-          $scope.masterVm = angular.copy(p.response);
-          $scope.doReset();
+  gsn.identity = function (value) {
+    return value;
+  };
+
+  gsn.userAgent = root.navigator.userAgent;
+
+  function detectIe() {
+    var ua = gsn.userAgent;
+    var msie = ua.indexOf('MSIE ');
+    var trident = ua.indexOf('Trident/');
+
+    if (msie > 0) {
+      // IE 10 or older => return version number
+      return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+    }
+
+    if (trident > 0) {
+      // IE 11 (or newer) => return version number
+      var rv = ua.indexOf('rv:');
+      return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+    }
+
+    // other browser
+    return false;
+  };
+
+  gsn.browser = {
+    isIE: detectIe(),
+    userAgent: gsn.userAgent,
+    isMobile: /iP(hone|od|ad)|Android|BlackBerry|IEMobile|Kindle|NetFront|Silk-Accelerated|(hpw|web)OS|Fennec|Minimo|Opera M(obi|ini)|Blazer|Dolfin|Dolphin|Skyfire|Zune/gi.test(gsn.userAgent),
+    isAndroid: /(android)/gi.test(gsn.userAgent),
+    isIOS: /iP(hone|od|ad)/gi.test(gsn.userAgent)
+  };
+  //#region Collection Functions
+  // --------------------
+
+  // The cornerstone, an `each` implementation, aka `forEach`.
+  // Handles objects with the built-in `forEach`, arrays, and raw objects.
+  // Delegates to **ECMAScript 5**'s native `forEach` if available.
+  var each = gsn.each = gsn.forEach = function (obj, iterator, context) {
+    if (gsn.isNull(obj, null) === null) return;
+    if (nativeForEach && obj.forEach === nativeForEach) {
+      obj.forEach(iterator, context);
+    } else if (obj.length === +obj.length) {
+      for (var i = 0, length = obj.length; i < length; i++) {
+        if (iterator.call(context, obj[i], i, obj) === breaker) return;
+      }
+    } else {
+      var keys = gsn.keys(obj);
+      for (var j = 0, length2 = keys.length; j < length2; j++) {
+        if (iterator.call(context, obj[keys[j]], keys[j], obj) === breaker) return;
+      }
+    }
+  };
+
+  // Return the results of applying the iterator to each element.
+  // Delegates to **ECMAScript 5**'s native `map` if available.
+  gsn.map = gsn.collect = function (obj, iterator, context) {
+    var results = [];
+    if (gsn.isNull(obj, null) === null) return results;
+    if (nativeMap && obj.map === nativeMap) return obj.map(iterator, context);
+    each(obj, function (value, index, list) {
+      results.push(iterator.call(context, value, index, list));
+    });
+    return results;
+  };
+  //#endregion
+
+  //#region methods
+  // --------------------
+  // Extend a given object with all the properties in passed-in object(s).
+  // gsn.extend(destination, *source);
+  gsn.extend = function (obj) {
+    each(slice.call(arguments, 1), function (source) {
+      if (typeof (source) !== 'undefined') {
+        gsn.forEach(source, function (v, k) {
+          if (gsn.isNull(v, null) !== null) {
+            obj[k] = v;
+          }
+        });
+      }
+    });
+    return obj;
+  };
+
+  // Determine if at least one element in the object matches a truth test.
+  // Delegates to **ECMAScript 5**'s native `some` if available.
+  // Aliased as `any`.
+  var any = gsn.some = gsn.any = function (obj, predicate, context) {
+    predicate = predicate || gsn.identity;
+    var result = false;
+    if (gsn.isNull(obj, null) === null) return result;
+    if (nativeSome && obj.some === nativeSome) return obj.some(predicate, context);
+    each(obj, function (value, index, list) {
+      if (result || (result = predicate.call(context, value, index, list))) return breaker;
+      return null;
+    });
+    return !!result;
+  };
+
+  // Determine if the array or object contains a given value (using `===`).
+  // Aliased as `include`.
+  gsn.contains = gsn.include = function (obj, target) {
+    if (gsn.isNull(obj, null) === null) return false;
+    if (nativeIndexOf && obj.indexOf === nativeIndexOf) return obj.indexOf(target) != -1;
+    return any(obj, function (value) {
+      return value === target;
+    });
+  };
+
+  // extend the current config
+  gsn.applyConfig = function (config, dontUseProxy) {
+    if (!gsn.config.hasInit) {
+      gsn.config.hasInit = true;
+      gsn.extend(gsn.config, config);
+      gsn.config.HomePage = gsn.parsePartialContentData(gsn.config.HomePage);
+      var siteMenu = gsn.config.SiteMenu || '';
+      if (typeof(siteMenu) == 'string') {
+        gsn.config.SiteMenu = siteMenu.length > 10 ? JSON.parse(siteMenu) : [];
+      }
+    }
+
+    // determine if proxy should be replace with direct url to api
+    var useProxy = !gsn.isNull(dontUseProxy, gsn.config.dontUseProxy);
+
+    // use proxy and older android, then it must use proxy
+    if (useProxy && gsn.browser.isAndroid) {
+      var ua = gsn.browser.userAgent;
+      var androidversion = parseFloat(ua.slice(ua.indexOf("Android") + 8));
+
+      if (androidversion > 4) {
+        return;
+      }
+
+      useProxy = false;
+    }
+
+    // if not useProxy, replace proxy with valid api url
+    if (!useProxy) {
+      gsn.forEach(gsn.config, function (v, k) {
+        if (typeof (v) !== 'string' || v == 'ApiUrl') return;
+        if (v.indexOf('/proxy/') >= 0) {
+          gsn.config[k] = v.replace('/proxy/', gsn.config.ApiUrl + '/');
         }
       });
+    }
+  };
 
-      $scope.topics = gsnApi.groupBy(getData(), 'ParentOption');
-      $scope.topicsByValue = gsnApi.mapObject($scope.topics, 'key');
-      $scope.parentTopics = $scope.topicsByValue[''];
+  // return defaultValue if null
+  gsn.isNull = function (obj, defaultValue) {
+    return (typeof (obj) === 'undefined' || obj === null) ? defaultValue : obj;
+  };
 
-      delete $scope.topicsByValue[''];
+  // return defaultValue if NaN
+  gsn.isNaN = function (obj, defaultValue) {
+    return (isNaN(obj)) ? defaultValue : obj;
+  };
+
+  // sort a collection base on a field name
+  gsn.sortOn = function (collection, name) {
+    if (gsn.isNull(collection, null) === null) return null;
+    if (collection.length <= 0) return [];
+
+    // detect attribute type, problem is if your first object is null or not string then this breaks
+    if (typeof (collection[0][name]) == 'string') {
+      collection.sort(function (a, b) {
+        if ((a[name] && a[name].toLowerCase()) < (b[name] && b[name].toLowerCase())) return -1;
+        if ((a[name] && a[name].toLowerCase()) > (b[name] && b[name].toLowerCase())) return 1;
+        return 0;
+      });
+    } else {
+      collection.sort(function (a, b) {
+        if (a[name] < b[name]) return -1;
+        if (a[name] > b[name]) return 1;
+        return 0;
+      });
     }
 
-    $scope.getSubTopics = function () {
-      return $scope.topicsByValue[$scope.vm.Topic];
-    };
+    return collection;
+  };
 
-    $scope.getFullStateName = function (store) {
-      return '=========' + store.LinkState.FullName + '=========';
-    };
+  // clean keyword - for support of sending keyword to google dfp
+  gsn.cleanKeyword = function (keyword) {
+    var result = keyword.replace(/[^a-zA-Z0-9]+/gi, '_').replace(/^[_]+/gi, '');
+    if (gsn.isNull(result.toLowerCase, null) !== null) {
+      result = result.toLowerCase();
+    }
+    return result;
+  };
 
-    $scope.getStoreDisplayName = function (store) {
-      return store.StoreName + ' - ' + store.PrimaryAddress + '(#' + store.StoreNumber + ')';
-    };
+  // group a list by a field name/attribute and execute post process function
+  gsn.groupBy = function (list, attribute, postProcessFunction) {
+    if (gsn.isNull(list, null) === null) return [];
 
-    $scope.doSubmit = function () {
-      var payload = $scope.vm;
-      if ($scope.myContactUsForm.$valid) {
-        payload.CaptchaChallenge = $scope.captcha.challenge;
-        payload.CaptchaResponse = $scope.captcha.response;
-        payload.Store = $scope.getStoreDisplayName($scope.storesById[payload.PrimaryStoreId]);
-        $scope.email = payload;
-        payload.EmailMessage = $interpolate(template)($scope);
-        // prevent double submit
-        if ($scope.isSubmitting) return;
+    // First, reset declare result.
+    var groups = [];
+    var grouper = {};
 
-        $scope.hasSubmitted = true;
-        $scope.isSubmitting = true;
-        $scope.errorResponse = null;
-        gsnProfile.sendContactUs(payload)
-            .then(function (result) {
-              $scope.isSubmitting = false;
-              $scope.isValidSubmit = result.success;
-              if (result.success) {
-                $scope.contactSuccess = true;
-              } else if (typeof (result.response) == 'string') {
-                $scope.errorResponse = result.response;
-              } else {
-                $scope.errorResponse = gsnApi.getServiceUnavailableMessage();
-              }
-            });
+    // this make sure all elements are correctly sorted
+    gsn.forEach(list, function (item) {
+      var groupKey = item[attribute];
+      var group = grouper[groupKey];
+      if (gsn.isNull(group, null) === null) {
+        group = { key: groupKey, items: [] };
+        grouper[groupKey] = group;
       }
-    };
+      group.items.push(item);
+    });
 
-    $scope.doReset = function () {
-      $scope.vm = angular.copy($scope.masterVm);
-      $scope.vm.ConfirmEmail = $scope.vm.Email;
-    };
+    // finally, sort on group
+    var i = 0;
+    gsn.forEach(grouper, function (myGroup) {
+      myGroup.$idx = i++;
+      groups.push(myGroup);
 
-    $scope.activate();
+      if (postProcessFunction) postProcessFunction(myGroup);
+    });
 
-    function getData() {
-      return [
-          {
-            "Value": "Company",
-            "Text": "Company",
-            "ParentOption": ""
-          },
-          {
-            "Value": "Store",
-            "Text": "Store (specify store below)",
-            "ParentOption": ""
-          },
-          {
-            "Value": "Other",
-            "Text": "Other (specify below)",
-            "ParentOption": ""
-          },
-          {
-            "Value": "Employment",
-            "Text": "Employment",
-            "ParentOption": ""
-          },
-          {
-            "Value": "Website",
-            "Text": "Website",
-            "ParentOption": ""
-          },
-          {
-            "Value": "Pharmacy",
-            "Text": "Pharmacy (specify store below)",
-            "ParentOption": ""
+    return gsn.sortOn(groups, 'key');
+  };
+
+  // map a list to object, todo: there is this better array map some where
+  gsn.mapObject = function (list, attribute) {
+    var obj = {};
+    if (list) {
+      if (gsn.isNull(list.length, -1) < 0) {
+        obj[list[attribute]] = list;
+      } else {
+        gsn.map(list, function (item, i) {
+          var k = item[attribute];
+          var e = obj[k];
+          if (e) {
+            if( Object.prototype.toString.call( e ) !== '[object Array]' ) {
+              e = [e]; 
+            }
+            e.push(item);
           }
-      ];
+          else {
+            e = item;
+          }
+          obj[k] = e;
+        });
+      }
     }
+    return obj;
+  };
+
+  // Retrieve the names of an object's properties.
+  // Delegates to **ECMAScript 5**'s native `Object.keys`
+  gsn.keys = nativeKeys || function (obj) {
+    if (obj !== Object(obj)) throw new TypeError('Invalid object');
+    var keys = [];
+    for (var key in obj) if (gsn.has(obj, key)) keys.push(key);
+    return keys;
+  };
+
+  // Shortcut function for checking if an object has a given property directly
+  // on itself (in other words, not on a prototype).
+  gsn.has = function (obj, key) {
+    return hasOwnProperty.call(obj, key);
+  };
+
+  gsn.getUrl = function (baseUrl, url) {
+    url = gsn.isNull(url, '');
+    var data = ((url.indexOf('?') > 0) ? '&' : '?') + 'nocache=' + gsn.config.Version;
+    return (baseUrl + url + data).replace(/(\\\\)+/gi, '\\');
+  };
+
+  // get the content url
+  gsn.getContentUrl = function (url) {
+    return gsn.getUrl(gsn.config.ContentBaseUrl, url);
+  };
+
+  gsn.getThemeUrl = function (url) {
+    var baseUrl = gsn.config.ContentBaseUrl;
+
+    if (gsn.isNull(gsn.config.SiteTheme, '').length > 0) {
+      baseUrl = baseUrl.replace('/' + gsn.config.ChainId, '/' + gsn.config.SiteTheme);
+    }
+
+    return gsn.getUrl(baseUrl, url);
+  };
+
+  gsn.setTheme = function (theme) {
+    gsn.config.SiteTheme = theme;
+  };
+
+  gsn.goUrl = function (url, target) {
+    // do nothing, dummy function to be polyfill later
+  };
+
+  gsn.initAnalytics = function($analyticsProvider) {
+    // provide backward compatibility if not googletag
+    if (gsn.config.GoogleTagId) {
+      return;
+    }
+
+    // GA already supports buffered invocations so we don't need
+    // to wrap these inside angulartics.waitForVendorApi
+    if ($analyticsProvider.settings) {
+      $analyticsProvider.settings.trackRelativePath = true;
+    }
+
+    var firstTracker = (gsn.isNull(gsn.config.GoogleAnalyticAccountId1, '').length > 0);
+    var secondTracker = (gsn.isNull(gsn.config.GoogleAnalyticAccountId2, '').length > 0);
+
+    if (root.ga) {
+      // creating google analytic object
+      if (firstTracker) {
+        ga('create', gsn.config.GoogleAnalyticAccountId1, 'auto');
+
+        if (secondTracker) {
+          ga('create', gsn.config.GoogleAnalyticAccountId2, 'auto', { 'name': 'trackerTwo' });
+        }
+      } else if (secondTracker) {
+        secondTracker = false;
+        ga('create', gsn.config.GoogleAnalyticAccountId2, 'auto');
+      }
+
+      // enable demographic
+      ga('require', 'displayfeatures');
+    }
+
+    // GA already supports buffered invocations so we don't need
+    // to wrap these inside angulartics.waitForVendorApi
+
+    $analyticsProvider.registerPageTrack(function (path) {
+      // begin tracking
+      if (root.ga) {
+        ga('send', 'pageview', path);
+
+        if (secondTracker) {
+          ga('trackerTwo.send', 'pageview', path);
+        }
+      }
+
+      // piwik tracking
+      if (root._tk) {
+        _tk.pageview()
+      }
+
+      // quantcast tracking
+      if (root._qevents) {
+        _qevents.push({
+          qacct: "p-1bL6rByav5EUo"
+        });
+      }
+    });
+
+    /**
+    * Track Event in GA
+    * @name eventTrack
+    *
+    * @param {string} action Required 'action' (string) associated with the event
+    * @param {object} properties Comprised of the mandatory field 'category' (string) and optional  fields 'label' (string), 'value' (integer) and 'noninteraction' (boolean)
+    *
+    * @link https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide#SettingUpEventTracking
+    *
+    * @link https://developers.google.com/analytics/devguides/collection/analyticsjs/events
+    */
+    $analyticsProvider.registerEventTrack(function (action, properties) {
+      // GA requires that eventValue be an integer, see:
+      // https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#eventValue
+      // https://github.com/luisfarzati/angulartics/issues/81
+      if (properties.value) {
+        var parsed = parseInt(properties.value, 10);
+        properties.value = isNaN(parsed) ? 0 : parsed;
+      }
+
+      if (root.ga) {
+        if (properties.noninteraction) {
+          ga('send', 'event', properties.category, action, properties.label, properties.value, { nonInteraction: 1 });
+          if (secondTracker) {
+            ga('trackerTwo.send', 'event', properties.category, action, properties.label, properties.value, { nonInteraction: 1 });
+          }
+        } else {
+          ga('send', 'event', properties.category, action, properties.label, properties.value);
+          if (secondTracker) {
+            ga('trackerTwo.send', 'event', properties.category, action, properties.label, properties.value);
+          }
+        }
+      }
+
+      if (root._tk) {
+        _tk.event(properties.category, action, properties.label, properties.value);
+      }
+    });
+  };
+
+  gsn.init = function($locationProvider, $sceDelegateProvider, $sceProvider, $httpProvider, FacebookProvider, $analyticsProvider) {
+    gsn.initAngular($sceProvider, $sceDelegateProvider, $locationProvider, $httpProvider, FacebookProvider);
+    gsn.initAnalytics($analyticsProvider);
+  };
+  
+  // support angular initialization
+  gsn.initAngular = function ($sceProvider, $sceDelegateProvider, $locationProvider, $httpProvider, FacebookProvider) {
+    gsn.applyConfig(root.globalConfig.data || {});
+    gsn.config.ContentBaseUrl = root.location.port > 1000 && root.location.port < 5000 ? "/asset/" + gsn.config.ChainId : gsn.config.ContentBaseUrl;
+    gsn.config.hasRoundyProfile = [215, 216, 217, 218].indexOf(gsn.config.ChainId) > -1;
+    gsn.config.DisableLimitedTimeCoupons = (215 === gsn.config.ChainId);
+    if (gsn.config.Theme) {
+      gsn.setTheme(gsn.config.Theme);
+    }
+
+    //#region security config
+    // For security reason, please do not disable $sce
+    // instead, please use trustHtml filter with data-ng-bind-html for specific trust
+    $sceProvider.enabled(!gsn.browser.isIE && root.location.protocol.indexOf('http') >= 0);
+
+    $sceDelegateProvider.resourceUrlWhitelist(gsn.config.SceWhiteList || [
+      'self',
+      'http://*.gsn.io/**',
+      'http://*.*.gsn.io/**',
+      'http://*.*.*.gsn.io/**',
+      'http://*.gsn2.com/**',
+      'https://*.gsn2.com/**',
+      'http://*.gsngrocers.com/**',
+      'https://*.gsngrocers.com/**',
+      'http://localhost:*/**',
+      'file:///**']);
+
+
+    //gets rid of the /#/ in the url and allows things like 'bootstrap collapse' to function
+    if (typeof ($locationProvider) !== "undefined") {
+      $locationProvider.html5Mode(true).hashPrefix('!');
+    }
+
+    if (typeof($httpProvider) !== "undefined") {
+      $httpProvider.interceptors.push('gsnAuthenticationHandler');
+
+      //Enable cross domain calls
+      $httpProvider.defaults.useXDomain = true;
+
+      //Remove the header used to identify ajax call  that would prevent CORS from working
+      $httpProvider.defaults.headers.common['X-Requested-With'] = null;
+    }
+
+    if (typeof(FastClick) !== "undefined") {
+      FastClick.attach(document.body);
+    }
+
+    if (typeof(FacebookProvider) !== "undefined") {
+      FacebookProvider.init(gsn.config.FacebookAppId);
+    }
+  };
+  //#endregion
+
+  if (root.globalConfig) {
+    gsn.config.ApiUrl = gsn.isNull(root.globalConfig.apiUrl, '').replace(/\/+$/g, '');
   }
-})(angular);
+
+  //#region dynamic script loader
+  function loadSingleScript(uri, callbackFunc) {
+    if (uri.indexOf('//') === 0) {
+      uri = 'http:' + uri;
+    }
+
+    // Prefix protocol
+    if ((root.location || {}).protocol === 'file') {
+      uri = uri.replace('https://', 'http://')
+    }
+
+    var tag = document.createElement('script');
+    tag.type = 'text/javascript';
+    tag.src = uri;
+    if (callbackFunc) {
+      tag.onload = maybeDone;
+      tag.onreadystatechange = maybeDone; // For IE8-
+    }
+
+    document.body.appendChild(tag);
+
+    /* jshint -W040 */
+    function maybeDone() {
+      if (this.readyState === undefined || this.readyState === 'complete') {
+        // Pull the tags out based on the actual element in case IE ever
+        // intermingles the onload and onreadystatechange handlers for the same
+        // script block before notifying for another one.
+        if (typeof (callbackFunc) === 'function') callbackFunc();
+      }
+    }
+    /* jshint +W040 */
+  }
+
+  gsn.loadScripts = function (uris, callbackFunc) {
+    if (gsn.isNull(uris.length, 0) <= 0) {
+      if (typeof (callbackFunc) === 'function') {
+        callbackFunc();
+      }
+    }
+    else {
+      if (typeof(uris) == 'string'){
+        uris = [uris];
+      }
+      
+      var toProcess = [].concat(uris);
+      processNext();
+    }
+
+    function processNext() {
+      if (toProcess.length <= 0) {
+        if (typeof (callbackFunc) === 'function') {
+          callbackFunc();
+        }
+      }
+      else {
+        var item = toProcess[0];
+        toProcess.splice(0, 1);
+        loadSingleScript(item, processNext);
+      }
+    }
+  };
+
+  gsn.loadIframe = function (parentEl, html) {
+    var iframe = document.createElement('iframe');
+    parentEl[0].appendChild(iframe);
+
+    /* jshint -W107 */
+    if (iframe.contentWindow) {
+      iframe.contentWindow.contents = html;
+      iframe.src = 'javascript:window["contents"]';
+    } else {
+      var doc = iframe.document;
+      if (iframe.contentDocument) doc = iframe.contentDocument;
+      doc.open();
+      doc.write(html);
+      doc.close();
+    }
+    /* jshint +W107 */
+
+    return iframe;
+  };
+  //#endregion
+
+  gsn.parsePartialContentData = function(data) {
+    if (gsn.isNull(data, null) === null) {
+      data = { ConfigData: {}, ContentData: {}, ContentList: [] };
+    }
+
+    var result = data;
+    if (result.ConfigData) {
+      return result;
+    }
+
+    var configData = [];
+    var contentData = [];
+
+    // parse home config
+    if (result.Contents) {
+      gsn.forEach(result.Contents, function (v, k) {
+        if (v.IsMetaData) configData.push(v);
+        else contentData.push(v);
+      });
+
+      result.Contents = null;
+      result.ConfigData = gsn.mapObject(configData, 'Headline');
+      result.ContentData = gsn.mapObject(contentData, 'SortBy');
+      var contentList = [];
+      for (var i = 0; i < contentData.length; i++) {
+        contentList.push(contentData[i]);
+      }
+
+      if (contentList.length > 0) {
+        result.ContentList = gsn.sortOn(contentList, "SortBy");
+      }
+    }
+
+    return result;
+  };
+}).call(this);
+
 (function (gsn, angular, undefined) {
   'use strict';
   
@@ -3013,6 +3545,168 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 "use strict";angular.module("ui.alias",[]).config(["$compileProvider","uiAliasConfig",function(a,b){b=b||{},angular.forEach(b,function(b,c){angular.isString(b)&&(b={replace:!0,template:b}),a.directive(c,function(){return b})})}]),angular.module("ui.event",[]).directive("uiEvent",["$parse",function(a){return function(b,c,d){var e=b.$eval(d.uiEvent);angular.forEach(e,function(d,e){var f=a(d);c.bind(e,function(a){var c=Array.prototype.slice.call(arguments);c=c.splice(1),f(b,{$event:a,$params:c}),b.$$phase||b.$apply()})})}}]),angular.module("ui.format",[]).filter("format",function(){return function(a,b){var c=a;if(angular.isString(c)&&void 0!==b)if(angular.isArray(b)||angular.isObject(b)||(b=[b]),angular.isArray(b)){var d=b.length,e=function(a,c){return c=parseInt(c,10),c>=0&&d>c?b[c]:a};c=c.replace(/\$([0-9]+)/g,e)}else angular.forEach(b,function(a,b){c=c.split(":"+b).join(a)});return c}}),angular.module("ui.highlight",[]).filter("highlight",function(){return function(a,b,c){return b||angular.isNumber(b)?(a=a.toString(),b=b.toString(),c?a.split(b).join('<span class="ui-match">'+b+"</span>"):a.replace(new RegExp(b,"gi"),'<span class="ui-match">$&</span>')):a}}),angular.module("ui.include",[]).directive("uiInclude",["$http","$templateCache","$anchorScroll","$compile",function(a,b,c,d){return{restrict:"ECA",terminal:!0,compile:function(e,f){var g=f.uiInclude||f.src,h=f.fragment||"",i=f.onload||"",j=f.autoscroll;return function(e,f){function k(){var k=++m,o=e.$eval(g),p=e.$eval(h);o?a.get(o,{cache:b}).success(function(a){if(k===m){l&&l.$destroy(),l=e.$new();var b;b=p?angular.element("<div/>").html(a).find(p):angular.element("<div/>").html(a).contents(),f.html(b),d(b)(l),!angular.isDefined(j)||j&&!e.$eval(j)||c(),l.$emit("$includeContentLoaded"),e.$eval(i)}}).error(function(){k===m&&n()}):n()}var l,m=0,n=function(){l&&(l.$destroy(),l=null),f.html("")};e.$watch(h,k),e.$watch(g,k)}}}}]),angular.module("ui.indeterminate",[]).directive("uiIndeterminate",[function(){return{compile:function(a,b){return b.type&&"checkbox"===b.type.toLowerCase()?function(a,b,c){a.$watch(c.uiIndeterminate,function(a){b[0].indeterminate=!!a})}:angular.noop}}}]),angular.module("ui.inflector",[]).filter("inflector",function(){function a(a){return a.replace(/^([a-z])|\s+([a-z])/g,function(a){return a.toUpperCase()})}function b(a,b){return a.replace(/[A-Z]/g,function(a){return b+a})}var c={humanize:function(c){return a(b(c," ").split("_").join(" "))},underscore:function(a){return a.substr(0,1).toLowerCase()+b(a.substr(1),"_").toLowerCase().split(" ").join("_")},variable:function(b){return b=b.substr(0,1).toLowerCase()+a(b.split("_").join(" ")).substr(1).split(" ").join("")}};return function(a,b){return b!==!1&&angular.isString(a)?(b=b||"humanize",c[b](a)):a}}),angular.module("ui.jq",[]).value("uiJqConfig",{}).directive("uiJq",["uiJqConfig","$timeout",function(a,b){return{restrict:"A",compile:function(c,d){if(!angular.isFunction(c[d.uiJq]))throw new Error('ui-jq: The "'+d.uiJq+'" function does not exist');var e=a&&a[d.uiJq];return function(a,c,d){function f(){b(function(){c[d.uiJq].apply(c,g)},0,!1)}var g=[];d.uiOptions?(g=a.$eval("["+d.uiOptions+"]"),angular.isObject(e)&&angular.isObject(g[0])&&(g[0]=angular.extend({},e,g[0]))):e&&(g=[e]),d.ngModel&&c.is("select,input,textarea")&&c.bind("change",function(){c.trigger("input")}),d.uiRefresh&&a.$watch(d.uiRefresh,function(){f()}),f()}}}}]),angular.module("ui.keypress",[]).factory("keypressHelper",["$parse",function(a){var b={8:"backspace",9:"tab",13:"enter",27:"esc",32:"space",33:"pageup",34:"pagedown",35:"end",36:"home",37:"left",38:"up",39:"right",40:"down",45:"insert",46:"delete"},c=function(a){return a.charAt(0).toUpperCase()+a.slice(1)};return function(d,e,f,g){var h,i=[];h=e.$eval(g["ui"+c(d)]),angular.forEach(h,function(b,c){var d,e;e=a(b),angular.forEach(c.split(" "),function(a){d={expression:e,keys:{}},angular.forEach(a.split("-"),function(a){d.keys[a]=!0}),i.push(d)})}),f.bind(d,function(a){var c=!(!a.metaKey||a.ctrlKey),f=!!a.altKey,g=!!a.ctrlKey,h=!!a.shiftKey,j=a.keyCode;"keypress"===d&&!h&&j>=97&&122>=j&&(j-=32),angular.forEach(i,function(d){var i=d.keys[b[j]]||d.keys[j.toString()],k=!!d.keys.meta,l=!!d.keys.alt,m=!!d.keys.ctrl,n=!!d.keys.shift;i&&k===c&&l===f&&m===g&&n===h&&e.$apply(function(){d.expression(e,{$event:a})})})})}}]),angular.module("ui.keypress").directive("uiKeydown",["keypressHelper",function(a){return{link:function(b,c,d){a("keydown",b,c,d)}}}]),angular.module("ui.keypress").directive("uiKeypress",["keypressHelper",function(a){return{link:function(b,c,d){a("keypress",b,c,d)}}}]),angular.module("ui.keypress").directive("uiKeyup",["keypressHelper",function(a){return{link:function(b,c,d){a("keyup",b,c,d)}}}]),angular.module("ui.mask",[]).value("uiMaskConfig",{maskDefinitions:{9:/\d/,A:/[a-zA-Z]/,"*":/[a-zA-Z0-9]/}}).directive("uiMask",["uiMaskConfig",function(a){return{priority:100,require:"ngModel",restrict:"A",compile:function(){var b=a;return function(a,c,d,e){function f(a){return angular.isDefined(a)?(s(a),N?(k(),l(),!0):j()):j()}function g(a){angular.isDefined(a)&&(D=a,N&&w())}function h(a){return N?(G=o(a||""),I=n(G),e.$setValidity("mask",I),I&&G.length?p(G):void 0):a}function i(a){return N?(G=o(a||""),I=n(G),e.$viewValue=G.length?p(G):"",e.$setValidity("mask",I),""===G&&void 0!==e.$error.required&&e.$setValidity("required",!1),I?G:void 0):a}function j(){return N=!1,m(),angular.isDefined(P)?c.attr("placeholder",P):c.removeAttr("placeholder"),angular.isDefined(Q)?c.attr("maxlength",Q):c.removeAttr("maxlength"),c.val(e.$modelValue),e.$viewValue=e.$modelValue,!1}function k(){G=K=o(e.$modelValue||""),H=J=p(G),I=n(G);var a=I&&G.length?H:"";d.maxlength&&c.attr("maxlength",2*B[B.length-1]),c.attr("placeholder",D),c.val(a),e.$viewValue=a}function l(){O||(c.bind("blur",t),c.bind("mousedown mouseup",u),c.bind("input keyup click focus",w),O=!0)}function m(){O&&(c.unbind("blur",t),c.unbind("mousedown",u),c.unbind("mouseup",u),c.unbind("input",w),c.unbind("keyup",w),c.unbind("click",w),c.unbind("focus",w),O=!1)}function n(a){return a.length?a.length>=F:!0}function o(a){var b="",c=C.slice();return a=a.toString(),angular.forEach(E,function(b){a=a.replace(b,"")}),angular.forEach(a.split(""),function(a){c.length&&c[0].test(a)&&(b+=a,c.shift())}),b}function p(a){var b="",c=B.slice();return angular.forEach(D.split(""),function(d,e){a.length&&e===c[0]?(b+=a.charAt(0)||"_",a=a.substr(1),c.shift()):b+=d}),b}function q(a){var b=d.placeholder;return"undefined"!=typeof b&&b[a]?b[a]:"_"}function r(){return D.replace(/[_]+/g,"_").replace(/([^_]+)([a-zA-Z0-9])([^_])/g,"$1$2_$3").split("_")}function s(a){var b=0;if(B=[],C=[],D="","string"==typeof a){F=0;var c=!1,d=a.split("");angular.forEach(d,function(a,d){R.maskDefinitions[a]?(B.push(b),D+=q(d),C.push(R.maskDefinitions[a]),b++,c||F++):"?"===a?c=!0:(D+=a,b++)})}B.push(B.slice().pop()+1),E=r(),N=B.length>1?!0:!1}function t(){L=0,M=0,I&&0!==G.length||(H="",c.val(""),a.$apply(function(){e.$setViewValue("")}))}function u(a){"mousedown"===a.type?c.bind("mouseout",v):c.unbind("mouseout",v)}function v(){M=A(this),c.unbind("mouseout",v)}function w(b){b=b||{};var d=b.which,f=b.type;if(16!==d&&91!==d){var g,h=c.val(),i=J,j=o(h),k=K,l=!1,m=y(this)||0,n=L||0,q=m-n,r=B[0],s=B[j.length]||B.slice().shift(),t=M||0,u=A(this)>0,v=t>0,w=h.length>i.length||t&&h.length>i.length-t,C=h.length<i.length||t&&h.length===i.length-t,D=d>=37&&40>=d&&b.shiftKey,E=37===d,F=8===d||"keyup"!==f&&C&&-1===q,G=46===d||"keyup"!==f&&C&&0===q&&!v,H=(E||F||"click"===f)&&m>r;if(M=A(this),!D&&(!u||"click"!==f&&"keyup"!==f)){if("input"===f&&C&&!v&&j===k){for(;F&&m>r&&!x(m);)m--;for(;G&&s>m&&-1===B.indexOf(m);)m++;var I=B.indexOf(m);j=j.substring(0,I)+j.substring(I+1),l=!0}for(g=p(j),J=g,K=j,c.val(g),l&&a.$apply(function(){e.$setViewValue(j)}),w&&r>=m&&(m=r+1),H&&m--,m=m>s?s:r>m?r:m;!x(m)&&m>r&&s>m;)m+=H?-1:1;(H&&s>m||w&&!x(n))&&m++,L=m,z(this,m)}}}function x(a){return B.indexOf(a)>-1}function y(a){if(!a)return 0;if(void 0!==a.selectionStart)return a.selectionStart;if(document.selection){a.focus();var b=document.selection.createRange();return b.moveStart("character",-a.value.length),b.text.length}return 0}function z(a,b){if(!a)return 0;if(0!==a.offsetWidth&&0!==a.offsetHeight)if(a.setSelectionRange)a.focus(),a.setSelectionRange(b,b);else if(a.createTextRange){var c=a.createTextRange();c.collapse(!0),c.moveEnd("character",b),c.moveStart("character",b),c.select()}}function A(a){return a?void 0!==a.selectionStart?a.selectionEnd-a.selectionStart:document.selection?document.selection.createRange().text.length:0:0}var B,C,D,E,F,G,H,I,J,K,L,M,N=!1,O=!1,P=d.placeholder,Q=d.maxlength,R={};d.uiOptions?(R=a.$eval("["+d.uiOptions+"]"),angular.isObject(R[0])&&(R=function(a,b){for(var c in a)Object.prototype.hasOwnProperty.call(a,c)&&(b[c]?angular.extend(b[c],a[c]):b[c]=angular.copy(a[c]));return b}(b,R[0]))):R=b,d.$observe("uiMask",f),d.$observe("placeholder",g),e.$formatters.push(h),e.$parsers.push(i),c.bind("mousedown mouseup",u),Array.prototype.indexOf||(Array.prototype.indexOf=function(a){if(null===this)throw new TypeError;var b=Object(this),c=b.length>>>0;if(0===c)return-1;var d=0;if(arguments.length>1&&(d=Number(arguments[1]),d!==d?d=0:0!==d&&1/0!==d&&d!==-1/0&&(d=(d>0||-1)*Math.floor(Math.abs(d)))),d>=c)return-1;for(var e=d>=0?d:Math.max(c-Math.abs(d),0);c>e;e++)if(e in b&&b[e]===a)return e;return-1})}}}}]),angular.module("ui.reset",[]).value("uiResetConfig",null).directive("uiReset",["uiResetConfig",function(a){var b=null;return void 0!==a&&(b=a),{require:"ngModel",link:function(a,c,d,e){var f;f=angular.element('<a class="ui-reset" />'),c.wrap('<span class="ui-resetwrap" />').after(f),f.bind("click",function(c){c.preventDefault(),a.$apply(function(){d.uiReset?e.$setViewValue(a.$eval(d.uiReset)):e.$setViewValue(b),e.$render()})})}}}]),angular.module("ui.route",[]).directive("uiRoute",["$location","$parse",function(a,b){return{restrict:"AC",scope:!0,compile:function(c,d){var e;if(d.uiRoute)e="uiRoute";else if(d.ngHref)e="ngHref";else{if(!d.href)throw new Error("uiRoute missing a route or href property on "+c[0]);e="href"}return function(c,d,f){function g(b){var d=b.indexOf("#");d>-1&&(b=b.substr(d+1)),(j=function(){i(c,a.path().indexOf(b)>-1)})()}function h(b){var d=b.indexOf("#");d>-1&&(b=b.substr(d+1)),(j=function(){var d=new RegExp("^"+b+"$",["i"]);i(c,d.test(a.path()))})()}var i=b(f.ngModel||f.routeModel||"$uiRoute").assign,j=angular.noop;switch(e){case"uiRoute":f.uiRoute?h(f.uiRoute):f.$observe("uiRoute",h);break;case"ngHref":f.ngHref?g(f.ngHref):f.$observe("ngHref",g);break;case"href":g(f.href)}c.$on("$routeChangeSuccess",function(){j()}),c.$on("$stateChangeSuccess",function(){j()})}}}}]),angular.module("ui.scroll.jqlite",["ui.scroll"]).service("jqLiteExtras",["$log","$window",function(a,b){return{registerFor:function(a){var c,d,e,f,g,h,i;return d=angular.element.prototype.css,a.prototype.css=function(a,b){var c,e;return e=this,c=e[0],c&&3!==c.nodeType&&8!==c.nodeType&&c.style?d.call(e,a,b):void 0},h=function(a){return a&&a.document&&a.location&&a.alert&&a.setInterval},i=function(a,b,c){var d,e,f,g,i;return d=a[0],i={top:["scrollTop","pageYOffset","scrollLeft"],left:["scrollLeft","pageXOffset","scrollTop"]}[b],e=i[0],g=i[1],f=i[2],h(d)?angular.isDefined(c)?d.scrollTo(a[f].call(a),c):g in d?d[g]:d.document.documentElement[e]:angular.isDefined(c)?d[e]=c:d[e]},b.getComputedStyle?(f=function(a){return b.getComputedStyle(a,null)},c=function(a,b){return parseFloat(b)}):(f=function(a){return a.currentStyle},c=function(a,b){var c,d,e,f,g,h,i;return c=/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source,f=new RegExp("^("+c+")(?!px)[a-z%]+$","i"),f.test(b)?(i=a.style,d=i.left,g=a.runtimeStyle,h=g&&g.left,g&&(g.left=i.left),i.left=b,e=i.pixelLeft,i.left=d,h&&(g.left=h),e):parseFloat(b)}),e=function(a,b){var d,e,g,i,j,k,l,m,n,o,p,q,r;return h(a)?(d=document.documentElement[{height:"clientHeight",width:"clientWidth"}[b]],{base:d,padding:0,border:0,margin:0}):(r={width:[a.offsetWidth,"Left","Right"],height:[a.offsetHeight,"Top","Bottom"]}[b],d=r[0],l=r[1],m=r[2],k=f(a),p=c(a,k["padding"+l])||0,q=c(a,k["padding"+m])||0,e=c(a,k["border"+l+"Width"])||0,g=c(a,k["border"+m+"Width"])||0,i=k["margin"+l],j=k["margin"+m],n=c(a,i)||0,o=c(a,j)||0,{base:d,padding:p+q,border:e+g,margin:n+o})},g=function(a,b,c){var d,g,h;return g=e(a,b),g.base>0?{base:g.base-g.padding-g.border,outer:g.base,outerfull:g.base+g.margin}[c]:(d=f(a),h=d[b],(0>h||null===h)&&(h=a.style[b]||0),h=parseFloat(h)||0,{base:h-g.padding-g.border,outer:h,outerfull:h+g.padding+g.border+g.margin}[c])},angular.forEach({before:function(a){var b,c,d,e,f,g,h;if(f=this,c=f[0],e=f.parent(),b=e.contents(),b[0]===c)return e.prepend(a);for(d=g=1,h=b.length-1;h>=1?h>=g:g>=h;d=h>=1?++g:--g)if(b[d]===c)return angular.element(b[d-1]).after(a),void 0;throw new Error("invalid DOM structure "+c.outerHTML)},height:function(a){var b;return b=this,angular.isDefined(a)?(angular.isNumber(a)&&(a+="px"),d.call(b,"height",a)):g(this[0],"height","base")},outerHeight:function(a){return g(this[0],"height",a?"outerfull":"outer")},offset:function(a){var b,c,d,e,f,g;return f=this,arguments.length?void 0===a?f:a:(b={top:0,left:0},e=f[0],(c=e&&e.ownerDocument)?(d=c.documentElement,e.getBoundingClientRect&&(b=e.getBoundingClientRect()),g=c.defaultView||c.parentWindow,{top:b.top+(g.pageYOffset||d.scrollTop)-(d.clientTop||0),left:b.left+(g.pageXOffset||d.scrollLeft)-(d.clientLeft||0)}):void 0)},scrollTop:function(a){return i(this,"top",a)},scrollLeft:function(a){return i(this,"left",a)}},function(b,c){return a.prototype[c]?void 0:a.prototype[c]=b})}}}]).run(["$log","$window","jqLiteExtras",function(a,b,c){return b.jQuery?void 0:c.registerFor(angular.element)}]),angular.module("ui.scroll",[]).directive("ngScrollViewport",["$log",function(){return{controller:["$scope","$element",function(a,b){return b}]}}]).directive("ngScroll",["$log","$injector","$rootScope","$timeout",function(a,b,c,d){return{require:["?^ngScrollViewport"],transclude:"element",priority:1e3,terminal:!0,compile:function(e,f,g){return function(f,h,i,j){var k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T;if(H=i.ngScroll.match(/^\s*(\w+)\s+in\s+(\w+)\s*$/),!H)throw new Error('Expected ngScroll in form of "item_ in _datasource_" but got "'+i.ngScroll+'"');if(F=H[1],v=H[2],D=function(a){return angular.isObject(a)&&a.get&&angular.isFunction(a.get)},u=f[v],!D(u)&&(u=b.get(v),!D(u)))throw new Error(v+" is not a valid datasource");return r=Math.max(3,+i.bufferSize||10),q=function(){return T.height()*Math.max(.1,+i.padding||.1)},O=function(a){return a[0].scrollHeight||a[0].document.documentElement.scrollHeight},k=null,g(R=f.$new(),function(a){var b,c,d,f,g,h;if(f=a[0].localName,"dl"===f)throw new Error("ng-scroll directive does not support <"+a[0].localName+"> as a repeating tag: "+a[0].outerHTML);return"li"!==f&&"tr"!==f&&(f="div"),h=j[0]||angular.element(window),h.css({"overflow-y":"auto",display:"block"}),d=function(a){var b,c,d;switch(a){case"tr":return d=angular.element("<table><tr><td><div></div></td></tr></table>"),b=d.find("div"),c=d.find("tr"),c.paddingHeight=function(){return b.height.apply(b,arguments)},c;default:return c=angular.element("<"+a+"></"+a+">"),c.paddingHeight=c.height,c}},c=function(a,b,c){return b[{top:"before",bottom:"after"}[c]](a),{paddingHeight:function(){return a.paddingHeight.apply(a,arguments)},insert:function(b){return a[{top:"after",bottom:"before"}[c]](b)}}},g=c(d(f),e,"top"),b=c(d(f),e,"bottom"),R.$destroy(),k={viewport:h,topPadding:g.paddingHeight,bottomPadding:b.paddingHeight,append:b.insert,prepend:g.insert,bottomDataPos:function(){return O(h)-b.paddingHeight()},topDataPos:function(){return g.paddingHeight()}}}),T=k.viewport,B=1,I=1,p=[],J=[],x=!1,n=!1,G=u.loading||function(){},E=!1,L=function(a,b){var c,d;for(c=d=a;b>=a?b>d:d>b;c=b>=a?++d:--d)p[c].scope.$destroy(),p[c].element.remove();return p.splice(a,b-a)},K=function(){return B=1,I=1,L(0,p.length),k.topPadding(0),k.bottomPadding(0),J=[],x=!1,n=!1,l(!1)},o=function(){return T.scrollTop()+T.height()},S=function(){return T.scrollTop()},P=function(){return!x&&k.bottomDataPos()<o()+q()},s=function(){var b,c,d,e,f,g;for(b=0,e=0,c=f=g=p.length-1;(0>=g?0>=f:f>=0)&&(d=p[c].element.outerHeight(!0),k.bottomDataPos()-b-d>o()+q());c=0>=g?++f:--f)b+=d,e++,x=!1;return e>0?(k.bottomPadding(k.bottomPadding()+b),L(p.length-e,p.length),I-=e,a.log("clipped off bottom "+e+" bottom padding "+k.bottomPadding())):void 0},Q=function(){return!n&&k.topDataPos()>S()-q()},t=function(){var b,c,d,e,f,g;for(e=0,d=0,f=0,g=p.length;g>f&&(b=p[f],c=b.element.outerHeight(!0),k.topDataPos()+e+c<S()-q());f++)e+=c,d++,n=!1;return d>0?(k.topPadding(k.topPadding()+e),L(0,d),B+=d,a.log("clipped off top "+d+" top padding "+k.topPadding())):void 0},w=function(a,b){return E||(E=!0,G(!0)),1===J.push(a)?z(b):void 0},C=function(a,b){var c,d,e;return c=f.$new(),c[F]=b,d=a>B,c.$index=a,d&&c.$index--,e={scope:c},g(c,function(b){return e.element=b,d?a===I?(k.append(b),p.push(e)):(p[a-B].element.after(b),p.splice(a-B+1,0,e)):(k.prepend(b),p.unshift(e))}),{appended:d,wrapper:e}},m=function(a,b){var c;return a?k.bottomPadding(Math.max(0,k.bottomPadding()-b.element.outerHeight(!0))):(c=k.topPadding()-b.element.outerHeight(!0),c>=0?k.topPadding(c):T.scrollTop(T.scrollTop()+b.element.outerHeight(!0)))},l=function(b,c,e){var f;return f=function(){return a.log("top {actual="+k.topDataPos()+" visible from="+S()+" bottom {visible through="+o()+" actual="+k.bottomDataPos()+"}"),P()?w(!0,b):Q()&&w(!1,b),e?e():void 0},c?d(function(){var a,b,d;for(b=0,d=c.length;d>b;b++)a=c[b],m(a.appended,a.wrapper);return f()}):f()},A=function(a,b){return l(a,b,function(){return J.shift(),0===J.length?(E=!1,G(!1)):z(a)})},z=function(b){var c;return c=J[0],c?p.length&&!P()?A(b):u.get(I,r,function(c){var d,e,f,g;if(e=[],0===c.length)x=!0,k.bottomPadding(0),a.log("appended: requested "+r+" records starting from "+I+" recieved: eof");else{for(t(),f=0,g=c.length;g>f;f++)d=c[f],e.push(C(++I,d));a.log("appended: requested "+r+" received "+c.length+" buffer size "+p.length+" first "+B+" next "+I)}return A(b,e)}):p.length&&!Q()?A(b):u.get(B-r,r,function(c){var d,e,f,g;if(e=[],0===c.length)n=!0,k.topPadding(0),a.log("prepended: requested "+r+" records starting from "+(B-r)+" recieved: bof");else{for(s(),d=f=g=c.length-1;0>=g?0>=f:f>=0;d=0>=g?++f:--f)e.unshift(C(--B,c[d]));a.log("prepended: requested "+r+" received "+c.length+" buffer size "+p.length+" first "+B+" next "+I)}return A(b,e)})},M=function(){return c.$$phase||E?void 0:(l(!1),f.$apply())},T.bind("resize",M),N=function(){return c.$$phase||E?void 0:(l(!0),f.$apply())},T.bind("scroll",N),f.$watch(u.revision,function(){return K()}),y=u.scope?u.scope.$new():f.$new(),f.$on("$destroy",function(){return y.$destroy(),T.unbind("resize",M),T.unbind("scroll",N)}),y.$on("update.items",function(a,b,c){var d,e,f,g,h;if(angular.isFunction(b))for(e=function(a){return b(a.scope)},f=0,g=p.length;g>f;f++)d=p[f],e(d);else 0<=(h=b-B-1)&&h<p.length&&(p[b-B-1].scope[F]=c);return null}),y.$on("delete.items",function(a,b){var c,d,e,f,g,h,i,j,k,m,n,o;if(angular.isFunction(b)){for(e=[],h=0,k=p.length;k>h;h++)d=p[h],e.unshift(d);for(g=function(a){return b(a.scope)?(L(e.length-1-c,e.length-c),I--):void 0},c=i=0,m=e.length;m>i;c=++i)f=e[c],g(f)}else 0<=(o=b-B-1)&&o<p.length&&(L(b-B-1,b-B),I--);for(c=j=0,n=p.length;n>j;c=++j)d=p[c],d.scope.$index=B+c;return l(!1)}),y.$on("insert.item",function(a,b,c){var d,e,f,g,h,i,j,k,m,n,o,q;if(e=[],angular.isFunction(b)){for(f=[],i=0,m=p.length;m>i;i++)c=p[i],f.unshift(c);for(h=function(a){var f,g,h,i,j;if(g=b(a.scope)){if(C=function(a,b){return C(a,b),I++},angular.isArray(g)){for(j=[],f=h=0,i=g.length;i>h;f=++h)c=g[f],j.push(e.push(C(d+f,c)));return j}return e.push(C(d,g))}},d=j=0,n=f.length;n>j;d=++j)g=f[d],h(g)}else 0<=(q=b-B-1)&&q<p.length&&(e.push(C(b,c)),I++);for(d=k=0,o=p.length;o>k;d=++k)c=p[d],c.scope.$index=B+d;return l(!1,e)})}}}}]),angular.module("ui.scrollfix",[]).directive("uiScrollfix",["$window",function(a){return{require:"^?uiScrollfixTarget",link:function(b,c,d,e){function f(){var b;if(angular.isDefined(a.pageYOffset))b=a.pageYOffset;else{var e=document.compatMode&&"BackCompat"!==document.compatMode?document.documentElement:document.body;b=e.scrollTop}!c.hasClass("ui-scrollfix")&&b>d.uiScrollfix?c.addClass("ui-scrollfix"):c.hasClass("ui-scrollfix")&&b<d.uiScrollfix&&c.removeClass("ui-scrollfix")}var g=c[0].offsetTop,h=e&&e.$element||angular.element(a);d.uiScrollfix?"string"==typeof d.uiScrollfix&&("-"===d.uiScrollfix.charAt(0)?d.uiScrollfix=g-parseFloat(d.uiScrollfix.substr(1)):"+"===d.uiScrollfix.charAt(0)&&(d.uiScrollfix=g+parseFloat(d.uiScrollfix.substr(1)))):d.uiScrollfix=g,h.on("scroll",f),b.$on("$destroy",function(){h.off("scroll",f)})}}}]).directive("uiScrollfixTarget",[function(){return{controller:["$element",function(a){this.$element=a}]}}]),angular.module("ui.showhide",[]).directive("uiShow",[function(){return function(a,b,c){a.$watch(c.uiShow,function(a){a?b.addClass("ui-show"):b.removeClass("ui-show")})}}]).directive("uiHide",[function(){return function(a,b,c){a.$watch(c.uiHide,function(a){a?b.addClass("ui-hide"):b.removeClass("ui-hide")})}}]).directive("uiToggle",[function(){return function(a,b,c){a.$watch(c.uiToggle,function(a){a?b.removeClass("ui-hide").addClass("ui-show"):b.removeClass("ui-show").addClass("ui-hide")})}}]),angular.module("ui.unique",[]).filter("unique",["$parse",function(a){return function(b,c){if(c===!1)return b;if((c||angular.isUndefined(c))&&angular.isArray(b)){var d=[],e=angular.isString(c)?a(c):function(a){return a},f=function(a){return angular.isObject(a)?e(a):a};angular.forEach(b,function(a){for(var b=!1,c=0;c<d.length;c++)if(angular.equals(f(d[c]),f(a))){b=!0;break}b||d.push(a)}),b=d}return b}}]),angular.module("ui.validate",[]).directive("uiValidate",function(){return{restrict:"A",require:"ngModel",link:function(a,b,c,d){function e(b){return angular.isString(b)?(a.$watch(b,function(){angular.forEach(g,function(a){a(d.$modelValue)})}),void 0):angular.isArray(b)?(angular.forEach(b,function(b){a.$watch(b,function(){angular.forEach(g,function(a){a(d.$modelValue)})})}),void 0):(angular.isObject(b)&&angular.forEach(b,function(b,c){angular.isString(b)&&a.$watch(b,function(){g[c](d.$modelValue)}),angular.isArray(b)&&angular.forEach(b,function(b){a.$watch(b,function(){g[c](d.$modelValue)})})}),void 0)}var f,g={},h=a.$eval(c.uiValidate);h&&(angular.isString(h)&&(h={validator:h}),angular.forEach(h,function(b,c){f=function(e){var f=a.$eval(b,{$value:e});return angular.isObject(f)&&angular.isFunction(f.then)?(f.then(function(){d.$setValidity(c,!0)},function(){d.$setValidity(c,!1)}),e):f?(d.$setValidity(c,!0),e):(d.$setValidity(c,!1),void 0)},g[c]=f,d.$formatters.push(f),d.$parsers.push(f)}),c.uiValidateWatch&&e(a.$eval(c.uiValidateWatch)))}}}),angular.module("ui.utils",["ui.event","ui.format","ui.highlight","ui.include","ui.indeterminate","ui.inflector","ui.jq","ui.keypress","ui.mask","ui.reset","ui.route","ui.scrollfix","ui.scroll","ui.scroll.jqlite","ui.showhide","ui.unique","ui.validate"]);
 (function (angular, undefined) {
   'use strict';
+  var myModule = angular.module('gsn.core');
+
+  myModule.filter('defaultIf', ['gsnApi', function (gsnApi) {
+    // Usage: testValue | defaultIf:testValue == 'test' 
+    //    or: testValue | defaultIf:someTest():defaultValue
+    //
+
+    return function (input, conditional, defaultOrFalseValue) {
+      var localCondition = conditional;
+      if (typeof(conditional) == "function") {
+        localCondition = conditional();
+      }
+      return localCondition ? defaultOrFalseValue : input;
+    };
+  }]);
+
+})(angular);
+(function (angular, undefined) {
+  'use strict';
+  var myModule = angular.module('gsn.core');
+
+  myModule.filter('groupBy', ['gsnApi', function (gsnApi) {
+    // Usage: for doing grouping
+    // 
+
+    return function (input, attribute) {
+      return gsnApi.groupBy(input, attribute);
+    };
+  }]);
+
+})(angular);
+(function (angular, undefined) {
+  'use strict';
+  var myModule = angular.module('gsn.core');
+
+  myModule.filter('pagingFilter', function () {
+    // Usage: for doing paging, item in list | pagingFilter:2:1
+    // 
+
+    return function (input, pageSize, currentPage) {
+      return input ? input.slice(currentPage * pageSize, (currentPage + 1) * pageSize) : [];
+    };
+  });
+
+})(angular);
+(function (angular, undefined) {
+  'use strict';
+  var myModule = angular.module('gsn.core');
+
+  myModule.filter('tel', function () {
+    // Usage: phone number formating phoneNumber | tel
+    // 
+    return function (tel, format, regex) {
+      if (!tel) return '';
+
+      regex = regex ? new RegEx(regex) : /(\d{3})(\d{3})(\d{4})/;
+      var value = (""+tel).replace(/\D/g, '');  
+      
+      return  value.replace(regex, format || "$1-$2-$3");
+    };
+  });
+
+})(angular);
+(function (angular, undefined) {
+  'use strict';
+  var myModule = angular.module('gsn.core');
+
+  /**
+  * This directive help dynamically create a list of numbers.
+  * usage: data-ng-repeat="n in [] | range:1:5"
+  * @directive range
+  */
+  myModule.filter('range', [function () {
+    return function (input, min, max) {
+      min = parseInt(min); //Make string input int
+      max = parseInt(max);
+      for (var i = min; i < max; i++) {
+        input.push(i);
+      }
+
+      return input;
+    };
+  }]);
+
+})(angular);
+(function (angular, undefined) {
+  'use strict';
+  var myModule = angular.module('gsn.core');
+
+  myModule.filter('removeAspx', ['gsnApi', function (gsnApi) {
+    // Usage: for removing aspx
+    // 
+
+    return function (text) {
+      return gsnApi.isNull(text, '').replace(/(.aspx\"|.gsn\")+/gi, '"');
+    };
+  }]);
+
+})(angular);
+(function (angular, undefined) {
+  'use strict';
+  var myModule = angular.module('gsn.core');
+
+  myModule.filter('replaceWith', function() {
+    // Usage: testValue | replaceWith:'\\s+':'gi':' ' 
+    // 
+    return function(input, regex, flag, replaceWith) {
+     var patt = new RegExp(regex, flag);      
+     
+     return input.replace(patt, replaceWith);
+   };
+ });
+})(angular);
+(function (angular, undefined) {
+  'use strict';
+  var myModule = angular.module('gsn.core');
+
+  myModule.filter('truncate', [function () {
+    /**
+     * {{some_text | truncate:true:100:' ...'}}
+     * @param  {string}  value    the original text
+     * @param  {boolean} wordwise true to split by word
+     * @param  {integer} max      max character or word
+     * @param  {string}  tail     ending characters
+     * @return {string}          
+     */
+    return function (value, wordwise, max, tail) {
+      if (!value) return '';
+
+      max = parseInt(max, 10);
+      if (!max) return value;
+      if (value.length <= max) return value;
+
+      value = value.substr(0, max);
+      if (wordwise) {
+        var lastspace = value.lastIndexOf(' ');
+        if (lastspace != -1) {
+          value = value.substr(0, lastspace);
+        }
+      }
+
+      return value + (tail || ' …');
+    };
+  }]);
+
+})(angular);
+
+(function (angular, undefined) {
+  'use strict';
+  var myModule = angular.module('gsn.core');
+
+  myModule.filter('trustedHtml', ['gsnApi', '$sce', function (gsnApi, $sce) {
+    // Usage: allow for binding html
+    // 
+    return function (text) {
+      return $sce.trustAsHtml(text);
+    };
+  }]);
+
+})(angular);
+(function (angular, undefined) {
+  'use strict';
 
   var myDirectiveName = 'ctrlAccount';
   
@@ -3390,131 +4084,156 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
   }
 })(angular);
 
-// ContactUsCtrl
-storeApp.controller('ContactUsCtrl', ['$scope', 'gsnProfile', 'gsnApi', '$timeout', 'gsnStore', '$interpolate', '$http', function ($scope, gsnProfile, gsnApi, $timeout, gsnStore, $interpolate, $http) {
-  $scope.activate = activate;
-  $scope.vm = { PrimaryStoreId: gsnApi.getSelectedStoreId(), ReceiveEmail: true };
-  $scope.masterVm = { PrimaryStoreId: gsnApi.getSelectedStoreId(), ReceiveEmail: true };
+(function (angular, undefined) {
+  'use strict';
 
-  $scope.hasSubmitted = false;    // true when user has click the submit button
-  $scope.isValidSubmit = true;    // true when result of submit is valid
-  $scope.isSubmitting = false;    // true if we're waiting for result from server
-  $scope.errorResponse = null;
-  $scope.contactSuccess = false;
-  $scope.topics = [];
-  $scope.topicsByValue = {};
-  $scope.storeList = [];
-  $scope.captcha = {};
-  $scope.storesById = {};
+  var myDirectiveName = 'ctrlContactUs';
+  
+  angular.module('gsn.core')
+    .controller(myDirectiveName, ['$scope', 'gsnProfile', 'gsnApi', '$timeout', 'gsnStore', '$interpolate', '$http', myController])
+    .directive(myDirectiveName, myDirective);
 
-   var template;
+  function myDirective() {
+    var directive = {
+      restrict: 'EA',
+      scope: true,
+      controller: myDirectiveName
+    };
 
-  $http.get($scope.getThemeUrl('/views/email/contact-us.html'))
-    .success(function (response) {
-      template = response.replace(/data-ctrl-email-preview/gi, '');
-    });
-
-  function activate() {
-    gsnStore.getStores().then(function (rsp) {
-      $scope.stores = rsp.response;
-
-      // prebuild list base on roundy spec (ﾉωﾉ)
-      // make sure that it is order by state, then by name
-      $scope.storesById = gsnApi.mapObject($scope.stores, 'StoreId');
-    });
-
-    gsnProfile.getProfile().then(function (p) {
-      if (p.success) {
-        $scope.masterVm = angular.copy(p.response);
-        $scope.doReset();
-      }
-    });
-
-    $scope.topics = gsnApi.groupBy(getData(), 'ParentOption');
-    $scope.topicsByValue = gsnApi.mapObject($scope.topics, 'key');
-    $scope.parentTopics = $scope.topicsByValue[''];
-
-    delete $scope.topicsByValue[''];
+    return directive;
   }
+  
+  function myController($scope, gsnProfile, gsnApi, $timeout, gsnStore, $interpolate, $http) {
 
-  $scope.getSubTopics = function () {
-    return $scope.topicsByValue[$scope.vm.Topic];
-  };
+    $scope.activate = activate;
+    $scope.vm = { PrimaryStoreId: gsnApi.getSelectedStoreId(), ReceiveEmail: true };
+    $scope.masterVm = { PrimaryStoreId: gsnApi.getSelectedStoreId(), ReceiveEmail: true };
 
-  $scope.getFullStateName = function (store) {
-    return '=========' + store.LinkState.FullName + '=========';
-  };
+    $scope.hasSubmitted = false;    // true when user has click the submit button
+    $scope.isValidSubmit = true;    // true when result of submit is valid
+    $scope.isSubmitting = false;    // true if we're waiting for result from server
+    $scope.errorResponse = null;
+    $scope.contactSuccess = false;
+    $scope.topics = [];
+    $scope.topicsByValue = {};
+    $scope.storeList = [];
+    $scope.captcha = {};
+    $scope.storesById = {};
 
-  $scope.getStoreDisplayName = function (store) {
-    return store.StoreName + ' - ' + store.PrimaryAddress + '(#' + store.StoreNumber + ')';
-  };
+    var template;
 
-  $scope.doSubmit = function () {
-    var payload = $scope.vm;
-    if ($scope.myContactUsForm.$valid) {
-      payload.CaptchaChallenge = $scope.captcha.challenge;
-      payload.CaptchaResponse = $scope.captcha.response;
-      payload.Store = $scope.getStoreDisplayName($scope.storesById[payload.PrimaryStoreId]);
-      $scope.email = payload;
-      payload.EmailMessage = $interpolate(template)($scope);
-      // prevent double submit
-      if ($scope.isSubmitting) return;
+    $http.get($scope.getThemeUrl('/views/email/contact-us.html'))
+      .success(function (response) {
+        template = response.replace(/data-ctrl-email-preview/gi, '');
+      });
 
-      $scope.hasSubmitted = true;
-      $scope.isSubmitting = true;
-      $scope.errorResponse = null;
-      gsnProfile.sendContactUs(payload)
-          .then(function (result) {
-            $scope.isSubmitting = false;
-            $scope.isValidSubmit = result.success;
-            if (result.success) {
-              $scope.contactSuccess = true;
-            } else if (typeof (result.response) == 'string') {
-              $scope.errorResponse = result.response;
-            } else {
-              $scope.errorResponse = gsnApi.getServiceUnavailableMessage();
-            }
-          });
-    }
-  };
+    function activate() {
+      gsnStore.getStores().then(function (rsp) {
+        $scope.stores = rsp.response;
 
-  $scope.doReset = function () {
-    $scope.vm = angular.copy($scope.masterVm);
-    $scope.vm.ConfirmEmail = $scope.vm.Email;
-  };
+        // prebuild list base on roundy spec (ﾉωﾉ)
+        // make sure that it is order by state, then by name
+        $scope.storesById = gsnApi.mapObject($scope.stores, 'StoreId');
+      });
 
-  $scope.activate();
-  //#region Internal Methods        
-  function getData() {
-    return [
-        {
-          "Value": "Company",
-          "Text": "Company",
-          "ParentOption": ""
-        },
-        {
-          "Value": "Store",
-          "Text": "Store (specify store below)",
-          "ParentOption": ""
-        },
-        {
-          "Value": "Other",
-          "Text": "Other (specify below)",
-          "ParentOption": ""
-        },
-        {
-          "Value": "Employment",
-          "Text": "Employment",
-          "ParentOption": ""
-        },
-        {
-          "Value": "Website",
-          "Text": "Website",
-          "ParentOption": ""
+      gsnProfile.getProfile().then(function (p) {
+        if (p.success) {
+          $scope.masterVm = angular.copy(p.response);
+          $scope.doReset();
         }
-    ];
+      });
+
+      $scope.topics = gsnApi.groupBy(getData(), 'ParentOption');
+      $scope.topicsByValue = gsnApi.mapObject($scope.topics, 'key');
+      $scope.parentTopics = $scope.topicsByValue[''];
+
+      delete $scope.topicsByValue[''];
+    }
+
+    $scope.getSubTopics = function () {
+      return $scope.topicsByValue[$scope.vm.Topic];
+    };
+
+    $scope.getFullStateName = function (store) {
+      return '=========' + store.LinkState.FullName + '=========';
+    };
+
+    $scope.getStoreDisplayName = function (store) {
+      return store.StoreName + ' - ' + store.PrimaryAddress + '(#' + store.StoreNumber + ')';
+    };
+
+    $scope.doSubmit = function () {
+      var payload = $scope.vm;
+      if ($scope.myContactUsForm.$valid) {
+        payload.CaptchaChallenge = $scope.captcha.challenge;
+        payload.CaptchaResponse = $scope.captcha.response;
+        payload.Store = $scope.getStoreDisplayName($scope.storesById[payload.PrimaryStoreId]);
+        $scope.email = payload;
+        payload.EmailMessage = $interpolate(template)($scope);
+        // prevent double submit
+        if ($scope.isSubmitting) return;
+
+        $scope.hasSubmitted = true;
+        $scope.isSubmitting = true;
+        $scope.errorResponse = null;
+        gsnProfile.sendContactUs(payload)
+            .then(function (result) {
+              $scope.isSubmitting = false;
+              $scope.isValidSubmit = result.success;
+              if (result.success) {
+                $scope.contactSuccess = true;
+              } else if (typeof (result.response) == 'string') {
+                $scope.errorResponse = result.response;
+              } else {
+                $scope.errorResponse = gsnApi.getServiceUnavailableMessage();
+              }
+            });
+      }
+    };
+
+    $scope.doReset = function () {
+      $scope.vm = angular.copy($scope.masterVm);
+      $scope.vm.ConfirmEmail = $scope.vm.Email;
+    };
+
+    $scope.activate();
+
+    function getData() {
+      return [
+          {
+            "Value": "Company",
+            "Text": "Company",
+            "ParentOption": ""
+          },
+          {
+            "Value": "Store",
+            "Text": "Store (specify store below)",
+            "ParentOption": ""
+          },
+          {
+            "Value": "Other",
+            "Text": "Other (specify below)",
+            "ParentOption": ""
+          },
+          {
+            "Value": "Employment",
+            "Text": "Employment",
+            "ParentOption": ""
+          },
+          {
+            "Value": "Website",
+            "Text": "Website",
+            "ParentOption": ""
+          },
+          {
+            "Value": "Pharmacy",
+            "Text": "Pharmacy (specify store below)",
+            "ParentOption": ""
+          }
+      ];
+    }
   }
-}]);
+})(angular);
 (function (angular, undefined) {
   'use strict';
 
@@ -9988,168 +10707,6 @@ storeApp.controller('ContactUsCtrl', ['$scope', 'gsnProfile', 'gsnApi', '$timeou
 
     };
   }]);
-})(angular);
-(function (angular, undefined) {
-  'use strict';
-  var myModule = angular.module('gsn.core');
-
-  myModule.filter('defaultIf', ['gsnApi', function (gsnApi) {
-    // Usage: testValue | defaultIf:testValue == 'test' 
-    //    or: testValue | defaultIf:someTest():defaultValue
-    //
-
-    return function (input, conditional, defaultOrFalseValue) {
-      var localCondition = conditional;
-      if (typeof(conditional) == "function") {
-        localCondition = conditional();
-      }
-      return localCondition ? defaultOrFalseValue : input;
-    };
-  }]);
-
-})(angular);
-(function (angular, undefined) {
-  'use strict';
-  var myModule = angular.module('gsn.core');
-
-  myModule.filter('groupBy', ['gsnApi', function (gsnApi) {
-    // Usage: for doing grouping
-    // 
-
-    return function (input, attribute) {
-      return gsnApi.groupBy(input, attribute);
-    };
-  }]);
-
-})(angular);
-(function (angular, undefined) {
-  'use strict';
-  var myModule = angular.module('gsn.core');
-
-  myModule.filter('pagingFilter', function () {
-    // Usage: for doing paging, item in list | pagingFilter:2:1
-    // 
-
-    return function (input, pageSize, currentPage) {
-      return input ? input.slice(currentPage * pageSize, (currentPage + 1) * pageSize) : [];
-    };
-  });
-
-})(angular);
-(function (angular, undefined) {
-  'use strict';
-  var myModule = angular.module('gsn.core');
-
-  myModule.filter('tel', function () {
-    // Usage: phone number formating phoneNumber | tel
-    // 
-    return function (tel, format, regex) {
-      if (!tel) return '';
-
-      regex = regex ? new RegEx(regex) : /(\d{3})(\d{3})(\d{4})/;
-      var value = (""+tel).replace(/\D/g, '');  
-      
-      return  value.replace(regex, format || "$1-$2-$3");
-    };
-  });
-
-})(angular);
-(function (angular, undefined) {
-  'use strict';
-  var myModule = angular.module('gsn.core');
-
-  /**
-  * This directive help dynamically create a list of numbers.
-  * usage: data-ng-repeat="n in [] | range:1:5"
-  * @directive range
-  */
-  myModule.filter('range', [function () {
-    return function (input, min, max) {
-      min = parseInt(min); //Make string input int
-      max = parseInt(max);
-      for (var i = min; i < max; i++) {
-        input.push(i);
-      }
-
-      return input;
-    };
-  }]);
-
-})(angular);
-(function (angular, undefined) {
-  'use strict';
-  var myModule = angular.module('gsn.core');
-
-  myModule.filter('removeAspx', ['gsnApi', function (gsnApi) {
-    // Usage: for removing aspx
-    // 
-
-    return function (text) {
-      return gsnApi.isNull(text, '').replace(/(.aspx\"|.gsn\")+/gi, '"');
-    };
-  }]);
-
-})(angular);
-(function (angular, undefined) {
-  'use strict';
-  var myModule = angular.module('gsn.core');
-
-  myModule.filter('replaceWith', function() {
-    // Usage: testValue | replaceWith:'\\s+':'gi':' ' 
-    // 
-    return function(input, regex, flag, replaceWith) {
-     var patt = new RegExp(regex, flag);      
-     
-     return input.replace(patt, replaceWith);
-   };
- });
-})(angular);
-(function (angular, undefined) {
-  'use strict';
-  var myModule = angular.module('gsn.core');
-
-  myModule.filter('truncate', [function () {
-    /**
-     * {{some_text | truncate:true:100:' ...'}}
-     * @param  {string}  value    the original text
-     * @param  {boolean} wordwise true to split by word
-     * @param  {integer} max      max character or word
-     * @param  {string}  tail     ending characters
-     * @return {string}          
-     */
-    return function (value, wordwise, max, tail) {
-      if (!value) return '';
-
-      max = parseInt(max, 10);
-      if (!max) return value;
-      if (value.length <= max) return value;
-
-      value = value.substr(0, max);
-      if (wordwise) {
-        var lastspace = value.lastIndexOf(' ');
-        if (lastspace != -1) {
-          value = value.substr(0, lastspace);
-        }
-      }
-
-      return value + (tail || ' …');
-    };
-  }]);
-
-})(angular);
-
-(function (angular, undefined) {
-  'use strict';
-  var myModule = angular.module('gsn.core');
-
-  myModule.filter('trustedHtml', ['gsnApi', '$sce', function (gsnApi, $sce) {
-    // Usage: allow for binding html
-    // 
-    return function (text) {
-      return $sce.trustAsHtml(text);
-    };
-  }]);
-
 })(angular);
 // bridging between Digital Store, ExpressLane, and Advertisment
 (function (angular, undefined) {
