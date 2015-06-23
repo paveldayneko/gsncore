@@ -55,7 +55,7 @@
     $scope.couponType = $scope.friendlyPath.replace('coupons-', '');
     $scope.itemsPerPage = $location.search().itemsperpage || $location.search().itemsPerPage || $scope.itemsPerPage || 20;
 
-    if ($scope.couponType.length < 1){
+    if ($scope.couponType.length < 1 || $scope.couponType == $scope.friendlyPath){
       $scope.couponType = 'printable';
     }
 
