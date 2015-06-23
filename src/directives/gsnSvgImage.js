@@ -42,7 +42,7 @@
             img = angular.element(attrs.gsnSvgImage);
             svg = img.parent('svg');
             // append Image
-            svg[0].setAttributeNS("", "viewBox", "0 0 " + width + " " + height + ""); 
+            svg[0].setAttributeNS("", "viewBox", "0 0 " + width + " " + height + "");
             img.attr("width", width).attr("height", height).attr("xlink:href", attrs.src);
             img.show();
             var isIE = /Trident.*rv:11\.0/.test(navigator.userAgent) || /msie/gi.test(navigator.userAgent);
@@ -65,7 +65,7 @@
             // re-adjust
             var reAdjust = debounce(function() {
               // click activate to re-arrange item
-              angular.element('rect').click();
+              angular.element('.onlist').click();
 
               // remove active item
               $timeout(function() {
