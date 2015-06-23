@@ -56,7 +56,7 @@
     $scope.itemsPerPage = $location.search().itemsperpage || $location.search().itemsPerPage || $scope.itemsPerPage || 20;
 
     if ($scope.couponType.length < 4){
-      $scope.couponType = 'store';
+      $scope.couponType = 'printable';
     }
 
     function loadMore() {
@@ -109,15 +109,16 @@
         });
           
         $scope.selectedCoupons.totalSavings = totalSavings.toFixed(2);
-      } else if ($scope.couponType == 'printable') {
+      } else if ($scope.couponType == 'store') {
+        list.items = instoreCoupons.items;
+      }
+      else {
         gsnCouponPrinter.init();
         gsnStore.getManufacturerCouponTotalSavings().then(function (rst) {
           $scope.selectedCoupons.totalSavings = parseFloat(rst.response).toFixed(2);
         });
 
         list.items = manuCoupons.items;
-      } else {
-        list.items = instoreCoupons.items;
       }
     }
 

@@ -42,7 +42,7 @@
       if ($scope.currentPath == '/circular' && (gsnApi.isNull(config.defaultMobileListView, null) === null)) {
         config.defaultMobileListView = true;
         if (gsnApi.browser.isMobile && gsnApi.getThemeConfig('default-mobile-listview')) {
-          gsnApi.goUrl('/circular/list');
+          gsnApi.goUrl(gsnApi.getThemeConfig('default-mobile-listview'));
           return;
         }
       }
