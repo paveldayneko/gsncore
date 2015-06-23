@@ -64,7 +64,13 @@
 
             // re-adjust
             var reAdjust = debounce(function() {
+              // click activate to re-arrange item
               angular.element('rect').click();
+
+              // remove active item
+              $timeout(function() {
+                vm.activeItem = null;
+              }, 200);
             }, 200);
             reAdjust();
 
