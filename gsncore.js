@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.23
  * gsncore repository
- * Build date: Mon Jun 22 2015 22:41:05 GMT-0500 (CDT)
+ * Build date: Mon Jun 22 2015 22:43:19 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -10763,11 +10763,6 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
         var linkData = data.detail;
         if (linkData) {
           var url = gsnApi.isNull(linkData.Url, '');
-          var lowerUrl = angular.lowercase(url);
-          if (lowerUrl.indexOf('recipecenter') > 0) {
-            url = '/recipecenter';
-          }
-
           var target = gsnApi.isNull(linkData.Target, '');
           if (target == '_blank') {
             // this is a link out to open in new window
