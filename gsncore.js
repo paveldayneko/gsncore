@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.23
  * gsncore repository
- * Build date: Mon Jun 22 2015 20:25:06 GMT-0500 (CDT)
+ * Build date: Mon Jun 22 2015 20:58:58 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -4129,7 +4129,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     $scope.couponType = $scope.friendlyPath.replace('coupons-', '');
     $scope.itemsPerPage = $location.search().itemsperpage || $location.search().itemsPerPage || $scope.itemsPerPage || 20;
 
-    if ($scope.couponType.length < 4){
+    if ($scope.couponType.length < 1){
       $scope.couponType = 'printable';
     }
 
