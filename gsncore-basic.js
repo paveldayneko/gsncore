@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.23
  * gsncore repository
- * Build date: Mon Jun 22 2015 21:11:38 GMT-0500 (CDT)
+ * Build date: Mon Jun 22 2015 22:10:06 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -7523,7 +7523,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
             element.css( { bottom: bottom, top: 'auto' } );
           }
         } else if (!isNaN(top)) {
-          isStuck = scrollTop > anchorTop + top;
+          isStuck = scrollTop > anchorTop + top + elementHeight;
           if (isStuck) {
             element.css( { bottom: 'auto', top: top } );
           }

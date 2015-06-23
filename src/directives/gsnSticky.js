@@ -32,7 +32,7 @@
             element.css( { bottom: bottom, top: 'auto' } );
           }
         } else if (!isNaN(top)) {
-          isStuck = scrollTop > anchorTop + top;
+          isStuck = scrollTop > anchorTop + top + elementHeight;
           if (isStuck) {
             element.css( { bottom: 'auto', top: top } );
           }
