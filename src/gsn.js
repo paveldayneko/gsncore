@@ -501,6 +501,9 @@
   gsn.init = function($locationProvider, $sceDelegateProvider, $sceProvider, $httpProvider, FacebookProvider, $analyticsProvider) {
     gsn.initAngular($sceProvider, $sceDelegateProvider, $locationProvider, $httpProvider, FacebookProvider);
     gsn.initAnalytics($analyticsProvider);
+    if (typeof(root._tk) !== 'undefined'){
+      root._tk.util.Emitter(gsn.prototype);
+    }
   };
   
   // support angular initialization

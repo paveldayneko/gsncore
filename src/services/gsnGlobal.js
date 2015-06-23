@@ -178,7 +178,6 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
             $scope.gvm.selectedItem = item;
           }
-
         }
 
         $rootScope.$broadcast('gsnevent:shoppinglist-toggle-item', item);

@@ -8,6 +8,10 @@
     var returnObj = {};
     var myGsn = $window.Gsn.Advertising;
 
+    myGsn.onAllEvents = function(evt){
+      gsn.emit(evt.en, evt.detail);
+    };
+
     myGsn.on('clickRecipe', function (data) {
       $timeout(function () {
         $location.url('/recipe/' + data.detail.RecipeId);
@@ -37,11 +41,6 @@
         var linkData = data.detail;
         if (linkData) {
           var url = gsnApi.isNull(linkData.Url, '');
-          var lowerUrl = angular.lowercase(url);
-          if (lowerUrl.indexOf('recipecenter') > 0) {
-            url = '/recipecenter';
-          }
-
           var target = gsnApi.isNull(linkData.Target, '');
           if (target == '_blank') {
             // this is a link out to open in new window

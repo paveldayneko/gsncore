@@ -96,6 +96,7 @@
         }
 
         shoppingList.addItem(item);
+        gsn.emit('AddItem', item);
       }
     };
 
@@ -122,6 +123,8 @@
       var shoppingList = returnObj.getShoppingList();
       if (shoppingList) {
         shoppingList.removeItem(item);
+
+        gsn.emit('RemoveItem', item);
       }
     };
 
