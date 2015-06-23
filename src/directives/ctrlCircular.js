@@ -83,7 +83,7 @@
       }
     };
 
-    $scope.doToggleCartItem = function (evt, tempItem) {
+    $scope.doToggleCircularItem = function (evt, tempItem) {
       if ($scope.isOnList(tempItem)) {
         gsnProfile.removeItem(tempItem);
       } else {

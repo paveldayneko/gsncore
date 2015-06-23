@@ -69,7 +69,7 @@
 
               // remove active item
               $timeout(function() {
-                vm.activeItem = null;
+                scope.vm.activeItem = null;
               }, 200);
             }, 200);
             reAdjust();
