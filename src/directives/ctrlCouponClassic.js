@@ -191,11 +191,13 @@
     //#region Internal Methods             
     function printManufacturerCoupon(evt, item) {
       gsnCouponPrinter.print([item]);
+
       $analytics.eventTrack('CouponPrintNow', 
         { category: item.ExtCategory, 
           label: item.Description1, 
           value: item.ProductCode });
 
+      gsn.emit('PrintNow', item);
     }
       
     function addCouponToCard(evt, item) {
@@ -207,6 +209,7 @@
             $analytics.eventTrack('CouponAddToCard', { category: item.ExtCategory, label: item.Description1, value: item.ProductCode });
 
             $scope.doToggleCartItem(evt, item);
+
             // apply
             $timeout(function () {
               item.AddCount++;
@@ -219,6 +222,7 @@
         $analytics.eventTrack('CouponRemoveFromCard', { category: item.ExtCategory, label: item.Description1, value: item.ProductCode });
 
         $scope.doToggleCartItem(evt, item);
+
         // apply
         $timeout(function () {
           item.AddCount--;

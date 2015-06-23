@@ -214,6 +214,8 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         if (gsnApi.isNull(next.layout, '').length > 0) {
           $scope.currentLayout = next.layout;
         }
+        
+        $scope.gvm.selectedItem = null;
       });
 
       $scope.$on('gsnevent:profile-load-success', function (event, result) {
