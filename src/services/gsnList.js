@@ -65,6 +65,7 @@
           itemToPost['TotalDownloadsAllowed'] = undefined;
           itemToPost['Varieties'] = undefined;
           itemToPost['Page'] = undefined;
+          itemToPost['rect'] = null;
 
           $rootScope.$broadcast('gsnevent:shoppinglistitem-updating', returnObj, existingItem, $mySavedData);
 

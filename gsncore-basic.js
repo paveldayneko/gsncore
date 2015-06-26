@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.4.23
+ * version 1.4.24
  * gsncore repository
- * Build date: Tue Jun 23 2015 00:27:45 GMT-0500 (CDT)
+ * Build date: Fri Jun 26 2015 10:23:42 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -1850,6 +1850,26 @@
   'use strict';
   var myModule = angular.module('gsn.core');
 
+  /**
+  * This directive help dynamically create a list of numbers.
+  * usage: data-ng-repeat="n in [] | range:1:5"
+  * @directive range
+  */
+  myModule.filter('sortCoordinate', [function () {
+    return function (input, rect, x, y) {
+      function sortMe(a, b){
+        return a[rect][x] - b[rect][x] || a[rect][y] - b[rect][y]; 
+      }
+      
+      return input.sort(sortMe);
+    };
+  }]);
+
+})(angular);
+(function (angular, undefined) {
+  'use strict';
+  var myModule = angular.module('gsn.core');
+
   myModule.filter('truncate', [function () {
     /**
      * {{some_text | truncate:true:100:' ...'}}
@@ -2681,6 +2701,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           itemToPost['TotalDownloadsAllowed'] = undefined;
           itemToPost['Varieties'] = undefined;
           itemToPost['Page'] = undefined;
+          itemToPost['rect'] = null;
 
           $rootScope.$broadcast('gsnevent:shoppinglistitem-updating', returnObj, existingItem, $mySavedData);
 
@@ -4913,32 +4934,33 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     function processCircularPage(items, circularMaster, page) {
       angular.forEach(page.Items, function (item) {
         item.PageNumber = parseInt(page.PageNumber);
-        var pos = item.AreaCoordinates.split(',');
-        var temp = 0;
-        for(var i = 0; i < 4; i++){
-          pos[i] = parseInt(pos[i]) || 0;
-        }
-        // swap if bad position
-        if (pos[0] > pos[2]){
-          temp = pos[0];
-          pos[0] = pos[2];
-          pos[2] = temp;
-        }
-        if (pos[1] > pos[3]){
-          temp = pos[1];
-          pos[1] = pos[3];
-          pos[3] = temp;
-        }
+        var pos = (item.AreaCoordinates + '').split(',');
+        if (pos.length > 2) {
+          var temp = 0;
+          for(var i = 0; i < 4; i++){
+            pos[i] = parseInt(pos[i]) || 0;
+          }
+          // swap if bad position
+          if (pos[0] > pos[2]){
+            temp = pos[0];
+            pos[0] = pos[2];
+            pos[2] = temp;
+          }
+          if (pos[1] > pos[3]){
+            temp = pos[1];
+            pos[1] = pos[3];
+            pos[3] = temp;
+          }
 
-        // calculate width height
-        pos[4] = pos[2] - pos[0]; // width
-        pos[5] = pos[3] - pos[1]; // height
-
-        // get center
-        pos[6] = pos[4] / 2;
-        pos[7] = pos[5] / 2;
-        
-        item.rect = pos;
+          item.rect.x = pos[0];
+          item.rect.y = pos[1];
+          item.rect.xx = pos[2];
+          item.rect.yy = pos[3];
+          item.rect.width = pos[2] - pos[0]; // width
+          item.rect.height = pos[3] - pos[1]; // height
+          item.rect.cx = item.rect.width / 2; // center
+          item.rect.cy = item.rect.height / 2;
+        }
         
         circularMaster.items.push(item);
         items.push(item);

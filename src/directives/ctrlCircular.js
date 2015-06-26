@@ -24,7 +24,7 @@
     $scope.loadAll = $scope.loadAll || false;
     $scope.itemsPerPage = $scope.itemsPerPage || 10;
     $scope.sortBy = $scope.sortBy || 'CategoryName';
-    $scope.sortByName = $scope.sortByName || 'department';
+    $scope.sortByName = $scope.sortByName || 'Department';
     $scope.actualSortBy = $scope.sortBy;
 
     $scope.allItems = [];
@@ -66,6 +66,7 @@
 
         $scope.doSearchInternal();
         $scope.vm.digitalCirc = data;
+        setPage();
       }
     }
 
@@ -118,18 +119,18 @@
     });
 
     $scope.doSearchInternal = function () {
-      var circularPage = gsnStore.getCircular($scope.pageId);
+      var circularType = gsnStore.getCircular($scope.pageId);
       var list = gsnProfile.getShoppingList();
 
       // don't show circular until data and list are both loaded
-      if (gsnApi.isNull(circularPage, null) === null || gsnApi.isNull(list, null) === null) return;
+      if (gsnApi.isNull(circularType, null) === null || gsnApi.isNull(list, null) === null) return;
 
-      var result1 = $filter('filter')(circularPage.items, $scope.vm.filter);
+      var result1 = $filter('filter')(circularType.items, $scope.vm.filter);
       var result = $filter('orderBy')($filter('filter')(result1, $scope.vm.filterBy || ''), $scope.actualSortBy);
-      if (!$scope.vm.page) {
-        $scope.vm.page = circularPage;
-        $scope.vm.categories = gsnApi.groupBy(circularPage.items, 'CategoryName');
-        $scope.vm.brands = gsnApi.groupBy(circularPage.items, 'BrandName');
+      if (!$scope.vm.circularType) {
+        $scope.vm.circularType = circularType;
+        $scope.vm.categories = gsnApi.groupBy(circularType.items, 'CategoryName');
+        $scope.vm.brands = gsnApi.groupBy(circularType.items, 'BrandName');
       }
       
       $scope.vm.cacheItems = result;
@@ -140,6 +141,8 @@
     $scope.$watch('vm.filterBy', $scope.doSearchInternal);
     $scope.$watch('vm.filter.BrandName', $scope.doSearchInternal);
     $scope.$watch('vm.filter.CategoryName', $scope.doSearchInternal);
+    $scope.$watch('vm.pageIdx', setPage);
+    $scope.$watch('vm.circIdx', setPage);
 
     $scope.$on('gsnevent:circular-loaded', function (event, data) {
       if (data.success) {
@@ -151,7 +154,19 @@
     });
     
     $timeout(activate, 50);
-    //#region Internal Methods        
+    //#region Internal Methods   
+    function sortMe(a, b){
+      return a.rect.x - b.rect.x || a.rect.y - b.rect.y; 
+    } 
+
+    function setPage() {
+      $scope.vm.circular = $scope.vm.digitalCirc.Circulars[$scope.vm.circIdx - 1]
+      $scope.vm.page = $scope.vm.circular.Pages[$scope.vm.pageIdx - 1];
+      if (!$scope.vm.page.sorted) {
+        $scope.vm.page.Items.sort(sortMe);
+        $scope.vm.page.sorted = true;
+      }
+    }    
 
     function loadMore() {
       var items = $scope.vm.cacheItems || [];

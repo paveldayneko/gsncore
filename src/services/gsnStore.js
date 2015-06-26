@@ -600,32 +600,33 @@
     function processCircularPage(items, circularMaster, page) {
       angular.forEach(page.Items, function (item) {
         item.PageNumber = parseInt(page.PageNumber);
-        var pos = item.AreaCoordinates.split(',');
-        var temp = 0;
-        for(var i = 0; i < 4; i++){
-          pos[i] = parseInt(pos[i]) || 0;
-        }
-        // swap if bad position
-        if (pos[0] > pos[2]){
-          temp = pos[0];
-          pos[0] = pos[2];
-          pos[2] = temp;
-        }
-        if (pos[1] > pos[3]){
-          temp = pos[1];
-          pos[1] = pos[3];
-          pos[3] = temp;
-        }
+        var pos = (item.AreaCoordinates + '').split(',');
+        if (pos.length > 2) {
+          var temp = 0;
+          for(var i = 0; i < 4; i++){
+            pos[i] = parseInt(pos[i]) || 0;
+          }
+          // swap if bad position
+          if (pos[0] > pos[2]){
+            temp = pos[0];
+            pos[0] = pos[2];
+            pos[2] = temp;
+          }
+          if (pos[1] > pos[3]){
+            temp = pos[1];
+            pos[1] = pos[3];
+            pos[3] = temp;
+          }
 
-        // calculate width height
-        pos[4] = pos[2] - pos[0]; // width
-        pos[5] = pos[3] - pos[1]; // height
-
-        // get center
-        pos[6] = pos[4] / 2;
-        pos[7] = pos[5] / 2;
-        
-        item.rect = pos;
+          item.rect.x = pos[0];
+          item.rect.y = pos[1];
+          item.rect.xx = pos[2];
+          item.rect.yy = pos[3];
+          item.rect.width = pos[2] - pos[0]; // width
+          item.rect.height = pos[3] - pos[1]; // height
+          item.rect.cx = item.rect.width / 2; // center
+          item.rect.cy = item.rect.height / 2;
+        }
         
         circularMaster.items.push(item);
         items.push(item);
