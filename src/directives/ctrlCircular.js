@@ -156,8 +156,9 @@
     $timeout(activate, 50);
     //#region Internal Methods   
     function sortMe(a, b){
-      return a.rect.x - b.rect.x || a.rect.y - b.rect.y; 
-    } 
+      if (a.rect.x <= b.rect.x) return a.rect.y - b.rect.y;
+      return a.rect.x - b.rect.x;
+    }
 
     function setPage() {
       if (!$scope.vm.digitalCirc) return;

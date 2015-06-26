@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.24
  * gsncore repository
- * Build date: Fri Jun 26 2015 10:34:41 GMT-0500 (CDT)
+ * Build date: Fri Jun 26 2015 10:47:58 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -1845,26 +1845,6 @@
      return input.replace(patt, replaceWith);
    };
  });
-})(angular);
-(function (angular, undefined) {
-  'use strict';
-  var myModule = angular.module('gsn.core');
-
-  /**
-  * This directive help dynamically create a list of numbers.
-  * usage: data-ng-repeat="n in [] | range:1:5"
-  * @directive range
-  */
-  myModule.filter('sortCoordinate', [function () {
-    return function (input, rect, x, y) {
-      function sortMe(a, b){
-        return a[rect][x] - b[rect][x] || a[rect][y] - b[rect][y]; 
-      }
-      
-      return input.sort(sortMe);
-    };
-  }]);
-
 })(angular);
 (function (angular, undefined) {
   'use strict';
