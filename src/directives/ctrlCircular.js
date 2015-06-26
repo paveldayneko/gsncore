@@ -160,6 +160,10 @@
     } 
 
     function setPage() {
+      if (!$scope.vm.digitalCirc) return;
+      if (!$scope.vm.digitalCirc.Circulars) return;
+      if ($scope.vm.digitalCirc.Circulars.length <= 0) return;
+      
       $scope.vm.circular = $scope.vm.digitalCirc.Circulars[$scope.vm.circIdx - 1]
       $scope.vm.page = $scope.vm.circular.Pages[$scope.vm.pageIdx - 1];
       if (!$scope.vm.page.sorted) {
