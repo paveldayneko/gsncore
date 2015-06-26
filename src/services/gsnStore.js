@@ -600,6 +600,7 @@
     function processCircularPage(items, circularMaster, page) {
       angular.forEach(page.Items, function (item) {
         item.PageNumber = parseInt(page.PageNumber);
+        item.rect = {x: 0, y: 0};
         var pos = (item.AreaCoordinates + '').split(',');
         if (pos.length > 2) {
           var temp = 0;

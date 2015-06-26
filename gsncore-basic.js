@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.24
  * gsncore repository
- * Build date: Fri Jun 26 2015 10:30:14 GMT-0500 (CDT)
+ * Build date: Fri Jun 26 2015 10:34:41 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -2700,7 +2700,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           itemToPost['TotalDownloads'] = undefined;
           itemToPost['TotalDownloadsAllowed'] = undefined;
           itemToPost['Varieties'] = undefined;
-          itemToPost['Page'] = undefined;
+          itemToPost['PageNumber'] = undefined;
           itemToPost['rect'] = null;
 
           $rootScope.$broadcast('gsnevent:shoppinglistitem-updating', returnObj, existingItem, $mySavedData);
@@ -4934,6 +4934,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     function processCircularPage(items, circularMaster, page) {
       angular.forEach(page.Items, function (item) {
         item.PageNumber = parseInt(page.PageNumber);
+        item.rect = {x: 0, y: 0};
         var pos = (item.AreaCoordinates + '').split(',');
         if (pos.length > 2) {
           var temp = 0;
