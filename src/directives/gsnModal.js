@@ -34,7 +34,12 @@
             e.preventDefault();
           }
         }
-        if (!gmodal.isVisible) {
+        var forceShow = false;
+        if (attr.forceShow) {
+          forceShow = true;
+        }
+
+        if (!gmodal.isVisible || forceShow) {
           if (attrs.item) {
             scope.item = scope.$eval(attrs.item);
           } 
@@ -54,10 +59,6 @@
       };
       scope.hideModal = scope.closeModal;
       scope.showModal = scope.openModal;
-      scope.toggleModal = function() {
-        $scope.closeModal();
-        $timeout($scope.showModal, 50);
-      };
 
       scope.goUrl = function (url, target) {
         if (gsnApi.isNull(target, '') == '_blank') {

@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.24
  * gsncore repository
- * Build date: Mon Jun 29 2015 11:09:04 GMT-0500 (CDT)
+ * Build date: Mon Jun 29 2015 11:20:02 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -6479,7 +6479,12 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
             e.preventDefault();
           }
         }
-        if (!gmodal.isVisible) {
+        var forceShow = false;
+        if (attr.forceShow) {
+          forceShow = true;
+        }
+
+        if (!gmodal.isVisible || forceShow) {
           if (attrs.item) {
             scope.item = scope.$eval(attrs.item);
           } 
@@ -6499,10 +6504,6 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       };
       scope.hideModal = scope.closeModal;
       scope.showModal = scope.openModal;
-      scope.toggleModal = function() {
-        $scope.closeModal();
-        $timeout($scope.showModal, 50);
-      };
 
       scope.goUrl = function (url, target) {
         if (gsnApi.isNull(target, '') == '_blank') {
