@@ -35,7 +35,7 @@
           }
         }
         var forceShow = false;
-        if (attr.forceShow) {
+        if (attrs.forceShow) {
           forceShow = true;
         }
 

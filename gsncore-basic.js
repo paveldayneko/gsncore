@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.24
  * gsncore repository
- * Build date: Mon Jun 29 2015 11:20:02 GMT-0500 (CDT)
+ * Build date: Mon Jun 29 2015 11:23:40 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -6480,7 +6480,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           }
         }
         var forceShow = false;
-        if (attr.forceShow) {
+        if (attrs.forceShow) {
           forceShow = true;
         }
 
