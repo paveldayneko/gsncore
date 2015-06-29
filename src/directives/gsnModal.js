@@ -54,6 +54,10 @@
       };
       scope.hideModal = scope.closeModal;
       scope.showModal = scope.openModal;
+      scope.toggleModal = function() {
+        $scope.closeModal();
+        $timeout($scope.showModal, 50);
+      };
 
       scope.goUrl = function (url, target) {
         if (gsnApi.isNull(target, '') == '_blank') {
