@@ -23,6 +23,7 @@
     $scope.addCouponToCard = addCouponToCard;
     $scope.printManufacturerCoupon = printManufacturerCoupon;
     $scope.printClippedCoupons = printClippedCoupons;
+	$scope.showPrint = showPrint;
     $scope.loadMore = loadMore;
     $scope.clipCoupon = clipCoupon;
     $scope.isOnClippedList = isOnClippedList;
@@ -256,16 +257,24 @@
         if (count > 0) {
           $scope.printer.count = count;
         }
+		$scope.printer.total = 0;
       }
     });
+		
+	function showPrint() {
+	  $scope.printer.printed = null; 
+	  var clippedCouponsInArr = [];
+	  for(var key in $scope.clippedCoupons){
+	    clippedCouponsInArr.push($scope.clippedCoupons[key]);
+	  }
+	  $scope.printer.total = clippedCouponsInArr.length;
+	}
 
-    function printClippedCoupons() {
-      $scope.printer.printed = null; 
-      var clippedCouponsInArr = [];
+    function printClippedCoupons() {     
+	  var clippedCouponsInArr = [];
       for(var key in $scope.clippedCoupons){
         clippedCouponsInArr.push($scope.clippedCoupons[key]);
-      }
-      $scope.printer.total = clippedCouponsInArr.length;
+      } 
       gsnCouponPrinter.print(clippedCouponsInArr);
       $scope.$emit('gsnevent:closemodal');
     }
@@ -314,6 +323,7 @@
     function unclipCoupon(item) {
       if ($scope.clippedCoupons[item.ProductCode]) {
         $scope.clippedCoupons[item.ProductCode] = null;
+		delete $scope.clippedCoupons[item.ProductCode];
         gsnProfile.unclipCoupon(item.ProductCode);
       }
       countClippedCoupons();
@@ -342,7 +352,8 @@
       for (var key in $scope.clippedCoupons) {
         if (!isNaN(parseInt(key))) {
           var coupon = $scope.clippedCoupons[key];
-          saved += parseFloat(coupon.SavingsAmount);
+		  if(coupon != null)
+            saved += parseFloat(coupon.SavingsAmount);
         }
       }
       return saved.toFixed(2);
