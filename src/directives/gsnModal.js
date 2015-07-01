@@ -87,6 +87,12 @@
           }
         });
       }
+			
+	  if (attrs.eventToClose) {
+        scope.$on(attrs.eventToClose, function() {
+		  scope.closeModal();
+		});
+      }
     };
   }]);
 })(angular);

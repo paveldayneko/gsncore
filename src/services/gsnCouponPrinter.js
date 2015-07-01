@@ -9,7 +9,8 @@
       init: init,
       loadingScript: false,
       isScriptReady: false,
-      activated: false
+      activated: false,
+	  pluginInstalled: false
     };
     var couponClasses = [];
     var coupons = [];
@@ -19,6 +20,7 @@
     return service;
 
     function activate() {
+	  detectPluginWithWebSocket();
       if (typeof(gcprinter) == 'undefined') {
         $log.log('waiting for gcprinter...');
         $timeout(activate, 500);
@@ -130,7 +132,7 @@
     };
 
     function printInternal() {
-      if (!gcprinter.hasPlugin()) {
+      if (!gcprinter.hasPlugin() && !service.pluginInstalled) {
         $rootScope.$broadcast('gsnevent:gcprinter-not-found');
       }
       else if (gcprinter.isPluginBlocked()) {
@@ -147,5 +149,18 @@
         gcprinter.print(siteId, coupons);
       }
     };
+		
+	function detectPluginWithWebSocket() {
+	  var socket = new WebSocket("ws://localhost:26876");
+      socket.onopen = function () {
+	    $rootScope.$broadcast('gsnevent:gcprinter-ready');
+        service.pluginInstalled = true;
+      };
+
+      socket.onerror = function (error) {
+        service.pluginInstalled = false;
+		setTimeout(detectPluginWithWebSocket, 1000);
+      };
+	};
   }
 })(angular);
