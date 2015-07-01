@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.24
  * gsncore repository
- * Build date: Mon Jun 29 2015 11:23:40 GMT-0500 (CDT)
+ * Build date: Wed Jul 01 2015 11:05:04 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -1942,6 +1942,10 @@
             // $window.open(url, '');
           } else {
             // assume this is an internal redirect
+            if (url.indexOf('/') < 0) {
+              url = "/" + url;
+            }
+            
             $location.url(url);
           }
         }

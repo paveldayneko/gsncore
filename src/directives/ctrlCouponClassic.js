@@ -107,7 +107,7 @@
             }
           }
         });
-          
+
         $scope.selectedCoupons.totalSavings = totalSavings.toFixed(2);
       } else if ($scope.couponType == 'store') {
         list.items = instoreCoupons.items;
