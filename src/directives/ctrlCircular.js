@@ -165,11 +165,13 @@
       if (!$scope.vm.digitalCirc.Circulars) return;
       if ($scope.vm.digitalCirc.Circulars.length <= 0) return;
       
-      $scope.vm.circular = $scope.vm.digitalCirc.Circulars[$scope.vm.circIdx - 1]
-      $scope.vm.page = $scope.vm.circular.Pages[$scope.vm.pageIdx - 1];
-      if (!$scope.vm.page.sorted) {
-        $scope.vm.page.Items.sort(sortMe);
-        $scope.vm.page.sorted = true;
+      $scope.vm.circular = $scope.vm.digitalCirc.Circulars[$scope.vm.circIdx - 1];
+      if ($scope.vm.circular){
+        $scope.vm.page = $scope.vm.circular.Pages[$scope.vm.pageIdx - 1];
+        if (!$scope.vm.page.sorted) {
+          $scope.vm.page.Items.sort(sortMe);
+          $scope.vm.page.sorted = true;
+        }
       }
     }    
 
