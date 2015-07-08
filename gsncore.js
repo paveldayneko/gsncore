@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.0
  * gsncore repository
- * Build date: Wed Jul 08 2015 17:16:59 GMT-0500 (CDT)
+ * Build date: Wed Jul 08 2015 17:19:25 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -11008,11 +11008,13 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     // continously checks plugin to detect when it's installed
     function continousDetect() {	
       if (gcprinter.hasPlugin()) {
+        // force init
+        gcprinter.init(true);
+        
         $timeout(function() {
-          // force init
-          gcprinter.init(true);
           $rootScope.$broadcast('gsnevent:gcprinter-ready');
         }, 5);
+        
         return;
       }
 
