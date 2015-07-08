@@ -86,6 +86,8 @@
     returnObj.browser = gsn.browser;
 
     returnObj.parsePartialContentData = gsn.parsePartialContentData;
+    
+    returnObj.delete = gsn.delete;
     //#endregion
 
     //#region gsn.config pass-through

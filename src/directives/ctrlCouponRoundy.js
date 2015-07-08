@@ -322,8 +322,7 @@
 
     function unclipCoupon(item) {
       if ($scope.clippedCoupons[item.ProductCode]) {
-        $scope.clippedCoupons[item.ProductCode] = null;
-		delete $scope.clippedCoupons[item.ProductCode];
+        $scope.clippedCoupons = gsnApi.delete($scope.clippedCoupons, item.ProductCode);
         gsnProfile.unclipCoupon(item.ProductCode);
       }
       countClippedCoupons();
