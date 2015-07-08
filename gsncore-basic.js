@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.24
  * gsncore repository
- * Build date: Wed Jul 08 2015 08:54:07 GMT-0500 (CDT)
+ * Build date: Wed Jul 08 2015 08:56:52 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -1987,7 +1987,6 @@
       loadingScript: false,
       isScriptReady: false,
       activated: false,
-	    pluginInstalled: false,
       retries: 0
     };
     var couponClasses = [];
@@ -2126,7 +2125,7 @@
     };
 
     function printInternal() {
-      if (!gcprinter.hasPlugin() && !service.pluginInstalled) {
+      if (!gcprinter.hasPlugin()) {
         $rootScope.$broadcast('gsnevent:gcprinter-not-found');
       }
       else if (gcprinter.isPluginBlocked()) {

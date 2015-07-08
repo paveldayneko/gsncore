@@ -10,7 +10,6 @@
       loadingScript: false,
       isScriptReady: false,
       activated: false,
-	    pluginInstalled: false,
       retries: 0
     };
     var couponClasses = [];
@@ -149,7 +148,7 @@
     };
 
     function printInternal() {
-      if (!gcprinter.hasPlugin() && !service.pluginInstalled) {
+      if (!gcprinter.hasPlugin()) {
         $rootScope.$broadcast('gsnevent:gcprinter-not-found');
       }
       else if (gcprinter.isPluginBlocked()) {
