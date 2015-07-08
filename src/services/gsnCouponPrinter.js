@@ -10,7 +10,8 @@
       loadingScript: false,
       isScriptReady: false,
       activated: false,
-	  pluginInstalled: false
+	    pluginInstalled: false,
+      retries: 0
     };
     var couponClasses = [];
     var coupons = [];
@@ -20,7 +21,6 @@
     return service;
 
     function activate() {
-	  detectPluginWithWebSocket();
       if (typeof(gcprinter) == 'undefined') {
         $log.log('waiting for gcprinter...');
         $timeout(activate, 500);
@@ -93,7 +93,14 @@
         return;
       }
 
-      $timeout(printInternal, 5);
+      if (!gcprinter.hasPlugin()){
+        detectPluginWithWebSocket(function() {
+          printInternal();
+        });
+      }
+      else {
+        $timeout(printInternal, 5);
+      }
     }
 
     function print(items) {
@@ -121,8 +128,16 @@
       if (!gcprinter.isReady) {
         // keep trying to init until ready
         gcprinter.on('initcomplete', function() {
-          $timeout(printInternal, 5);
-          $rootScope.$broadcast('gsnevent:gcprinter-initcomplete');
+          if (!gcprinter.hasPlugin()){
+            detectPluginWithWebSocket(function() {
+              printInternal();
+              $rootScope.$broadcast('gsnevent:gcprinter-initcomplete');
+            });
+          }
+          else {
+            $timeout(printInternal, 5);
+            $rootScope.$broadcast('gsnevent:gcprinter-initcomplete');
+          }
         });
         gcprinter.init();
         return;
@@ -150,17 +165,15 @@
       }
     };
 		
-	function detectPluginWithWebSocket() {
+	function detectPluginWithWebSocket(cb) {
 	  var socket = new WebSocket("ws://localhost:26876");
-      socket.onopen = function () {
-	    $rootScope.$broadcast('gsnevent:gcprinter-ready');
-        service.pluginInstalled = true;
-      };
-
+      socket.onopen = cb;
       socket.onerror = function (error) {
-        service.pluginInstalled = false;
-		setTimeout(detectPluginWithWebSocket, 1000);
+        service.retries++;
+        if (service.retries > 4) return;
+
+		    setTimeout(detectPluginWithWebSocket, 1000);
       };
-	};
+	  };
   }
 })(angular);
