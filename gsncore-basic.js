@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.24
  * gsncore repository
- * Build date: Wed Jul 01 2015 14:16:57 GMT-0500 (CDT)
+ * Build date: Wed Jul 08 2015 08:29:18 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -375,6 +375,24 @@
   // on itself (in other words, not on a prototype).
   gsn.has = function (obj, key) {
     return hasOwnProperty.call(obj, key);
+  };
+
+  // allow for IE compatible delete
+  gsn.delete = function(obj, key) {
+    obj[key] = undefined;
+    try {
+      delete obj[k];
+    }
+    catch (e) {
+      var items = {};
+      gsn.each(obj, function(v, k) {
+        if (k != key)
+          items[k] = v;
+      });
+
+      return items;
+    }
+    return obj;
   };
 
   gsn.getUrl = function (baseUrl, url) {
@@ -777,6 +795,8 @@
     returnObj.browser = gsn.browser;
 
     returnObj.parsePartialContentData = gsn.parsePartialContentData;
+    
+    returnObj.delete = gsn.delete;
     //#endregion
 
     //#region gsn.config pass-through
