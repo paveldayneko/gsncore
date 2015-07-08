@@ -10,8 +10,9 @@
       loadingScript: false,
       isScriptReady: false,
       activated: false,
-      retries: 0
+      isChromePluginAvailable: false
     };
+	var lastIEPluginDetect = false;
     var couponClasses = [];
     var coupons = [];
 
@@ -20,6 +21,7 @@
     return service;
 
     function activate() {
+	  detectPluginWithWebSocket();
       if (typeof(gcprinter) == 'undefined') {
         $log.log('waiting for gcprinter...');
         $timeout(activate, 500);
@@ -92,14 +94,7 @@
         return;
       }
 
-      if (!gcprinter.hasPlugin()){
-        detectPluginWithWebSocket(function() {
-          $timeout(printInternal, 5);
-        });
-      }
-      else {
-        $timeout(printInternal, 5);
-      }
+      $timeout(printInternal, 5);
     }
 
     function print(items) {
@@ -111,15 +106,13 @@
       couponClasses.length = 0;
       angular.forEach(items, function (v, k) {
         var item = v;
-        if (item) {
-          if (gsnApi.isNull(v.ProductCode, null) == null)
-          {
-            item = gsnStore.getCoupon(v.ItemId, v.ItemTypeId);
-          }
-          
-          couponClasses.push('.coupon-message-' + item.ProductCode);
-          coupons.push(item.ProductCode);
+        if (gsnApi.isNull(v.ProductCode, null) == null)
+        {
+          item = gsnStore.getCoupon(v.ItemId, v.ItemTypeId);
         }
+        
+        couponClasses.push('.coupon-message-' + v.ProductCode);
+        coupons.push(v.ProductCode);
       });
 
       $timeout(function () {
@@ -129,16 +122,8 @@
       if (!gcprinter.isReady) {
         // keep trying to init until ready
         gcprinter.on('initcomplete', function() {
-          if (!gcprinter.hasPlugin()){
-            detectPluginWithWebSocket(function() {
-              $timeout(printInternal, 5);
-              $rootScope.$broadcast('gsnevent:gcprinter-initcomplete');
-            });
-          }
-          else {
-            $timeout(printInternal, 5);
-            $rootScope.$broadcast('gsnevent:gcprinter-initcomplete');
-          }
+          $timeout(printInternal, 5);
+          $rootScope.$broadcast('gsnevent:gcprinter-initcomplete');
         });
         gcprinter.init();
         return;
@@ -148,7 +133,7 @@
     };
 
     function printInternal() {
-      if (!gcprinter.hasPlugin()) {
+      if (!gcprinter.hasPlugin() && !(isChrome() && service.isChromePluginAvailable)) {
         $rootScope.$broadcast('gsnevent:gcprinter-not-found');
       }
       else if (gcprinter.isPluginBlocked()) {
@@ -166,15 +151,50 @@
       }
     };
 		
-	function detectPluginWithWebSocket(cb) {
+	//Infinitely checks plugin to detect moment, when it's installed
+	function detectPluginWithWebSocket() {	
+      if (isChrome()) {
+        detectChrome();
+	  } else {
+		detectNotChrome();
+	  }
+	};
+	
+	function detectChrome() {
 	  var socket = new WebSocket("ws://localhost:26876");
-      socket.onopen = cb;
-      socket.onerror = function (error) {
-        service.retries++;
-        if (service.retries > 4) return;
-
-		    setTimeout(detectPluginWithWebSocket, 1000);
-      };
+	  socket.onopen = function () {
+	    $timeout(checkPluginReady, 5);
+	    $rootScope.$broadcast('gsnevent:gcprinter-ready');
+	    service.isChromePluginAvailable = true;
 	  };
+
+	  socket.onerror = function (error) {
+	    service.isChromePluginAvailable = false;
+	    setTimeout(detectChrome, 2000);
+	  };
+	};
+	
+	function detectNotChrome() {
+	  if(!gcprinter.hasPlugin())
+		setTimeout(detectNotChrome, 2000);
+	  else if (gcprinter.hasPlugin() && !lastIEPluginDetect) {
+	    lastIEPluginDetect = true;		
+		$timeout(checkPluginReady, 5);
+		$rootScope.$broadcast('gsnevent:gcprinter-ready');
+	  }
+	};
+	
+	function checkPluginReady() {
+	  try {
+	    gcprinter.isPrinterSupported();
+	  } catch (e) {
+	    //Restore plugin
+		gcprinter.restartPlugin();
+	  }
+	};
+	
+	function isChrome(){
+		return navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+	};
   }
 })(angular);
