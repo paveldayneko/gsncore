@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.4.24
+ * version 1.6.0
  * gsncore repository
- * Build date: Wed Jul 08 2015 15:59:29 GMT-0500 (CDT)
+ * Build date: Wed Jul 08 2015 16:10:50 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -11049,20 +11049,23 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     });
 
     $rootScope.$on('gsnevent:shoppinglist-loaded', function (event, shoppingList, item) {
-      // load all the ad depts
-      var items = gsnProfile.getShoppingList().allItems();
-      var categories = gsnStore.getCategories();
+      var list = gsnProfile.getShoppingList();
+      if (list) {
+        // load all the ad depts
+        var items = gsnProfile.getShoppingList().allItems();
+        var categories = gsnStore.getCategories();
 
-      angular.forEach(items, function (item, idx) {
-        if (gsnApi.isNull(item.CategoryId, null) === null) return;
+        angular.forEach(items, function (item, idx) {
+          if (gsnApi.isNull(item.CategoryId, null) === null) return;
 
-        if (categories[item.CategoryId]) {
-          var newKw = categories[item.CategoryId].CategoryName;
-          Gsn.Advertising.addDept(newKw);
-        }
-      });
+          if (categories[item.CategoryId]) {
+            var newKw = categories[item.CategoryId].CategoryName;
+            Gsn.Advertising.addDept(newKw);
+          }
+        });
 
-      service.actionParam = {evtname: event.name, evtcategory: gsnProfile.getShoppingListId() };
+        service.actionParam = {evtname: event.name, evtcategory: gsnProfile.getShoppingListId() };
+      }
     });
 
     $rootScope.$on('$locationChangeSuccess', function (event, next) {

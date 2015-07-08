@@ -21,20 +21,23 @@
     });
 
     $rootScope.$on('gsnevent:shoppinglist-loaded', function (event, shoppingList, item) {
-      // load all the ad depts
-      var items = gsnProfile.getShoppingList().allItems();
-      var categories = gsnStore.getCategories();
+      var list = gsnProfile.getShoppingList();
+      if (list) {
+        // load all the ad depts
+        var items = gsnProfile.getShoppingList().allItems();
+        var categories = gsnStore.getCategories();
 
-      angular.forEach(items, function (item, idx) {
-        if (gsnApi.isNull(item.CategoryId, null) === null) return;
+        angular.forEach(items, function (item, idx) {
+          if (gsnApi.isNull(item.CategoryId, null) === null) return;
 
-        if (categories[item.CategoryId]) {
-          var newKw = categories[item.CategoryId].CategoryName;
-          Gsn.Advertising.addDept(newKw);
-        }
-      });
+          if (categories[item.CategoryId]) {
+            var newKw = categories[item.CategoryId].CategoryName;
+            Gsn.Advertising.addDept(newKw);
+          }
+        });
 
-      service.actionParam = {evtname: event.name, evtcategory: gsnProfile.getShoppingListId() };
+        service.actionParam = {evtname: event.name, evtcategory: gsnProfile.getShoppingListId() };
+      }
     });
 
     $rootScope.$on('$locationChangeSuccess', function (event, next) {
