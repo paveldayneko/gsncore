@@ -2,7 +2,7 @@
  * gsncore
  * version 1.4.24
  * gsncore repository
- * Build date: Wed Jul 08 2015 08:56:52 GMT-0500 (CDT)
+ * Build date: Wed Jul 08 2015 15:59:29 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -1987,8 +1987,9 @@
       loadingScript: false,
       isScriptReady: false,
       activated: false,
-      retries: 0
+      isChromePluginAvailable: false
     };
+    var lastIEPluginDetect = false;
     var couponClasses = [];
     var coupons = [];
 
@@ -2054,6 +2055,9 @@
         service.isScriptReady = true;
         init();
         $rootScope.$broadcast('gsnevent:gcprinter-initcomplete');
+        if (!gcprinter.hasPlugin()) {
+          continousDetect();
+        }
       });
       return;
     }
@@ -2069,14 +2073,7 @@
         return;
       }
 
-      if (!gcprinter.hasPlugin()){
-        detectPluginWithWebSocket(function() {
-          $timeout(printInternal, 5);
-        });
-      }
-      else {
-        $timeout(printInternal, 5);
-      }
+      $timeout(printInternal, 5);
     }
 
     function print(items) {
@@ -2087,16 +2084,18 @@
       coupons.length = 0;
       couponClasses.length = 0;
       angular.forEach(items, function (v, k) {
-        var item = v;
-        if (item) {
-          if (gsnApi.isNull(v.ProductCode, null) == null)
-          {
-            item = gsnStore.getCoupon(v.ItemId, v.ItemTypeId);
-          }
-          
-          couponClasses.push('.coupon-message-' + item.ProductCode);
-          coupons.push(item.ProductCode);
+        if (gsnApi.isNull(v, null) === null) {
+          return;
         }
+
+        var item = v;
+        if (gsnApi.isNull(v.ProductCode, null) === null)
+        {
+          item = gsnStore.getCoupon(v.ItemId, v.ItemTypeId);
+        }
+        
+        couponClasses.push('.coupon-message-' + item.ProductCode);
+        coupons.push(item.ProductCode);
       });
 
       $timeout(function () {
@@ -2104,20 +2103,8 @@
       }, 5);
 
       if (!gcprinter.isReady) {
-        // keep trying to init until ready
-        gcprinter.on('initcomplete', function() {
-          if (!gcprinter.hasPlugin()){
-            detectPluginWithWebSocket(function() {
-              $timeout(printInternal, 5);
-              $rootScope.$broadcast('gsnevent:gcprinter-initcomplete');
-            });
-          }
-          else {
-            $timeout(printInternal, 5);
-            $rootScope.$broadcast('gsnevent:gcprinter-initcomplete');
-          }
-        });
-        gcprinter.init();
+        // call to trigger printer init
+        init();
         return;
       }
 
@@ -2143,19 +2130,27 @@
       }
     };
 		
-	function detectPluginWithWebSocket(cb) {
-	  var socket = new WebSocket("ws://localhost:26876");
-      socket.onopen = cb;
-      socket.onerror = function (error) {
-        service.retries++;
-        if (service.retries > 4) return;
+    // continously checks plugin to detect when it's installed
+    function continousDetect() {	
+      if (gcprinter.hasPlugin()) {
+        // force init
+        gcprinter.init(true);
+        $rootScope.$broadcast('gsnevent:gcprinter-ready');
+        return;
+      }
 
-		    setTimeout(detectPluginWithWebSocket, 1000);
-      };
-	  };
-  }
+      if (gsnApi.browser.isIE) {
+        // use slower checkInstall method for IE
+        setTimeout(function() {
+          gcprinter.checkInstall(continousDetect, continousDetect);
+        }, 2000);
+      }
+      else {
+        gcprinter.detectWithSocket(2000, continousDetect, continousDetect, 1);
+      }
+    };
+  } // end service function
 })(angular);
-
 (function (angular, Gsn, undefined) {
   'use strict';
   var serviceId = 'gsnDfp';
