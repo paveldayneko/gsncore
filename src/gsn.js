@@ -371,6 +371,24 @@
     return hasOwnProperty.call(obj, key);
   };
 
+  // allow for IE compatible delete
+  gsn.delete = function(obj, key) {
+    obj[key] = undefined;
+    try {
+      delete obj[k];
+    }
+    catch (e) {
+      var items = {};
+      gsn.each(obj, function(v, k) {
+        if (k != key)
+          items[k] = v;
+      });
+
+      return items;
+    }
+    return obj;
+  };
+
   gsn.getUrl = function (baseUrl, url) {
     url = gsn.isNull(url, '');
     var data = ((url.indexOf('?') > 0) ? '&' : '?') + 'nocache=' + gsn.config.Version;
