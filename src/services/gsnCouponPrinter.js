@@ -95,7 +95,7 @@
 
       if (!gcprinter.hasPlugin()){
         detectPluginWithWebSocket(function() {
-          printInternal();
+          $timeout(printInternal, 5);
         });
       }
       else {
@@ -112,13 +112,15 @@
       couponClasses.length = 0;
       angular.forEach(items, function (v, k) {
         var item = v;
-        if (gsnApi.isNull(v.ProductCode, null) == null)
-        {
-          item = gsnStore.getCoupon(v.ItemId, v.ItemTypeId);
+        if (item) {
+          if (gsnApi.isNull(v.ProductCode, null) == null)
+          {
+            item = gsnStore.getCoupon(v.ItemId, v.ItemTypeId);
+          }
+          
+          couponClasses.push('.coupon-message-' + item.ProductCode);
+          coupons.push(item.ProductCode);
         }
-        
-        couponClasses.push('.coupon-message-' + v.ProductCode);
-        coupons.push(v.ProductCode);
       });
 
       $timeout(function () {
@@ -130,7 +132,7 @@
         gcprinter.on('initcomplete', function() {
           if (!gcprinter.hasPlugin()){
             detectPluginWithWebSocket(function() {
-              printInternal();
+              $timeout(printInternal, 5);
               $rootScope.$broadcast('gsnevent:gcprinter-initcomplete');
             });
           }
