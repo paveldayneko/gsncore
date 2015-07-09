@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.0
  * gsncore repository
- * Build date: Wed Jul 08 2015 17:19:25 GMT-0500 (CDT)
+ * Build date: Wed Jul 08 2015 21:49:42 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -9051,7 +9051,8 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       scope.pcvm = {
         hasScript: false,
         notFound: false,
-        isLoading: true
+        isLoading: true,
+        layout: 'default'
       }
       scope.partialContents = [];
       scope.contentDetail = {
@@ -9130,6 +9131,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       function processData(data) {
         partialData = gsnApi.parsePartialContentData(data);
         scope.partialContents = scope.getContentList();
+        scope.layout = scope.getConfig('layout').Description || 'default';
       }
       //#endregion
     }

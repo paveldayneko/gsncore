@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.0
  * gsncore repository
- * Build date: Wed Jul 08 2015 17:19:25 GMT-0500 (CDT)
+ * Build date: Wed Jul 08 2015 21:49:42 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -6739,7 +6739,8 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       scope.pcvm = {
         hasScript: false,
         notFound: false,
-        isLoading: true
+        isLoading: true,
+        layout: 'default'
       }
       scope.partialContents = [];
       scope.contentDetail = {
@@ -6818,6 +6819,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       function processData(data) {
         partialData = gsnApi.parsePartialContentData(data);
         scope.partialContents = scope.getContentList();
+        scope.layout = scope.getConfig('layout').Description || 'default';
       }
       //#endregion
     }

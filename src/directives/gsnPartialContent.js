@@ -21,7 +21,8 @@
       scope.pcvm = {
         hasScript: false,
         notFound: false,
-        isLoading: true
+        isLoading: true,
+        layout: 'default'
       }
       scope.partialContents = [];
       scope.contentDetail = {
@@ -100,6 +101,7 @@
       function processData(data) {
         partialData = gsnApi.parsePartialContentData(data);
         scope.partialContents = scope.getContentList();
+        scope.layout = scope.getConfig('layout').Description || 'default';
       }
       //#endregion
     }
