@@ -23,7 +23,7 @@
     $scope.addCouponToCard = addCouponToCard;
     $scope.printManufacturerCoupon = printManufacturerCoupon;
     $scope.printClippedCoupons = printClippedCoupons;
-	$scope.showPrint = showPrint;
+	  $scope.showPrint = showPrint;
     $scope.loadMore = loadMore;
     $scope.clipCoupon = clipCoupon;
     $scope.isOnClippedList = isOnClippedList;
@@ -351,8 +351,13 @@
       for (var key in $scope.clippedCoupons) {
         if (!isNaN(parseInt(key))) {
           var coupon = $scope.clippedCoupons[key];
-		  if(coupon != null)
-            saved += parseFloat(coupon.SavingsAmount);
+
+  		    if(coupon != null) {
+            var saving = parseFloat(coupon.SavingsAmount);
+            if (saving < 11) {
+              saved += saving;
+            }
+          }
         }
       }
       return saved.toFixed(2);
