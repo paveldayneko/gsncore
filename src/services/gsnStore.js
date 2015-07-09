@@ -406,6 +406,10 @@
         var storeByNumber = gsnApi.mapObject(storeList, 'StoreNumber');
         gsnApi.setSelectedStoreId(storeByNumber[search.storenbr].StoreId);
       }
+      else if (search.store) {
+        var storeByUrl = gsnApi.mapObject(storeList, 'StoreUrl');
+        gsnApi.setSelectedStoreId(storeByNumber[search.store].StoreId);
+      }
     }
 
     function processManufacturerCoupon() {

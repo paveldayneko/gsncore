@@ -46,14 +46,25 @@
 
     gsnStore.getStores().then(function(rsp){
       var storeList = rsp.response;
-      var storeNumber =  angular.lowercase($location.path()).replace(/\D*/, '');
-      $scope.storeByNumber = gsnApi.mapObject(storeList, "StoreNumber");
+      var storeNumber = $scope.currentPath.replace(/\D*/, '');
+      var storeUrl = '';
+      if ($scope.currentPath.indexOf('/store/') >= 0) {
+        storeUrl = $scope.currentPath.replace('/store/', '').replace(/[^a-z-]*/g, '');
+      }
 
+      $scope.storeByNumber = gsnApi.mapObject(storeList, "StoreNumber");
       var store = $scope.storeByNumber[storeNumber];
+
+      if (storeUrl.length > 0) {
+        $scope.storeByUrl = gsnApi.mapObject(storeList, 'StoreUrl');
+        store = $scope.storeByUrl[storeUrl];
+      }
+
       if (store){
         $scope.storeList = [store];
       }
-      else if (storeNumber.length > 0){
+      else if (storeNumber.length > 0 || storeUrl.length > 0) {
+        // store not found when either storeNumber or storeUrl is valid
         gsnApi.goUrl('/404')
       }
       else {
