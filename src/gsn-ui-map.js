@@ -35,7 +35,9 @@
           function activate() {
 
             var gmap = (window.google || {}).maps || {};
-            if (typeof( gmap.Map ) === 'undefined')
+            if ((typeof( gmap.Geocoder ) === 'undefined') 
+              || (typeof( gmap.InfoWindow ) === 'undefined')
+              || (typeof( gmap.Map ) === 'undefined'))
             {
               // wait until it is defined
               $timeout(activate, 100);
@@ -74,7 +76,9 @@
         link: function (scope, elm, attrs) {
           function activate() {
             var gmap = (window.google || {}).maps || {};
-            if (typeof( gmap.InfoWindow ) === 'undefined')
+            if ((typeof( gmap.Geocoder ) === 'undefined') 
+              || (typeof( gmap.InfoWindow ) === 'undefined')
+              || (typeof( gmap.Map ) === 'undefined'))
             {
               // wait until it is defined
               $timeout(activate, 100);
