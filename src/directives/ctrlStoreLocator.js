@@ -92,10 +92,10 @@
         || (typeof( gmap.InfoWindow ) === 'undefined')
         || (typeof( gmap.Map ) === 'undefined'))
       {
-        $timeout(activate, 100);
-        if ($scope.loadingScript) return;
+        $timeout(activate, 1000);
+        if ($scope.gvm.googleMapLoaded) return;
 
-        $scope.loadingScript = true;
+        $scope.gvm.googleMapLoaded = true;
         var myCallback = 'dynamic' + new Date().getTime();
         window[myCallback] = activate;
 
