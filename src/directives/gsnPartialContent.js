@@ -22,7 +22,8 @@
         hasScript: false,
         notFound: false,
         isLoading: true,
-        layout: 'default'
+        layout: 'default',
+        tab: $location.search().tab || 0
       }
       scope.partialContents = [];
       scope.contentDetail = {

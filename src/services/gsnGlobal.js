@@ -194,6 +194,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         // store the new route location
         $scope.currentPath = angular.lowercase(gsnApi.isNull($location.path(), ''));
         $scope.friendlyPath = $scope.currentPath.replace('/', '').replace(/\/+/gi, '-');
+        $scope.gvm.search = $location.search();
         $scope.gvm.menuInactive = false;
         $scope.gvm.shoppingListActive = false;
 
