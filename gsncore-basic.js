@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.0
  * gsncore repository
- * Build date: Thu Jul 09 2015 16:48:14 GMT-0500 (CDT)
+ * Build date: Thu Jul 09 2015 16:50:55 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -234,9 +234,9 @@
       var siteMenu = gsn.config.SiteMenu || '';
       if (typeof(siteMenu) == 'string') {
         gsn.config.SiteMenu = siteMenu.length > 10 ? JSON.parse(siteMenu) : [];
-        gsn.forEach(gsn.config.SiteMenu, function (k, v) {
+        gsn.forEach(gsn.config.SiteMenu, function (v, k) {
           v.Position = parseInt(v.Position);
-          gsn.forEach(v.SubMenu, function (k2, v2) {
+          gsn.forEach(v.SubMenu, function (v2, k2) {
             v2.Position = parseInt(v2.Position);
           });
         });
