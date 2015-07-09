@@ -228,6 +228,12 @@
       var siteMenu = gsn.config.SiteMenu || '';
       if (typeof(siteMenu) == 'string') {
         gsn.config.SiteMenu = siteMenu.length > 10 ? JSON.parse(siteMenu) : [];
+        gsn.forEach(gsn.config.SiteMenu, function (k, v) {
+          v.Position = parseInt(v.Position);
+          gsn.forEach(v.SubMenu, function (k2, v2) {
+            v2.Position = parseInt(v2.Position);
+          });
+        });
       }
     }
 
