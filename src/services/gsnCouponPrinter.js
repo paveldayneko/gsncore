@@ -78,7 +78,7 @@
         service.isScriptReady = true;
         init();
         $rootScope.$broadcast('gsnevent:gcprinter-initcomplete');
-        if (!gcprinter.hasPlugin()) {
+        if (isPluginNotInstalled()) {
           continousDetect();
         }
       });
@@ -135,13 +135,13 @@
     };
 
     function printInternal() {
-      if (!gcprinter.hasPlugin() && !(!gsnApi.browser.isIE && service.isChromePluginAvailable)) {
+      if (isPluginNotInstalled()) {
         $rootScope.$broadcast('gsnevent:gcprinter-not-found');
       }
       else if (gcprinter.isPluginBlocked()) {
         $rootScope.$broadcast('gsnevent:gcprinter-blocked');
       }
-      else if (!gcprinter.isPrinterSupported()) {
+      else if (!isPrinterSupported()) {
         $rootScope.$broadcast('gsnevent:gcprinter-not-supported');
       }
       else if (coupons.length > 0){
@@ -155,7 +155,7 @@
 		
     // continously checks plugin to detect when it's installed
     function continousDetect() {	
-      if (gcprinter.hasPlugin()) {
+      if (!isPluginNotInstalled()) {
         pluginSuccess();        
         return;
       }
@@ -180,6 +180,20 @@
           service.isChromePluginAvailable = true;
         $rootScope.$broadcast('gsnevent:gcprinter-ready');
       }, 5);
+	};
+	
+	function isPluginNotInstalled() {
+		return !gcprinter.hasPlugin() && !(!gsnApi.browser.isIE && service.isChromePluginAvailable);
+	};
+	
+	function isPrinterSupported() {
+		var result = false;
+		try {
+			result = gcprinter.isPrinterSupported();
+		} catch (e) {
+			result = true;
+		}
+		return result;
 	};
   } // end service function
 })(angular);
