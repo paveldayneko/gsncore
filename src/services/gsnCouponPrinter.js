@@ -183,17 +183,17 @@
 	};
 	
 	function isPluginNotInstalled() {
-		return !gcprinter.hasPlugin() && !(!gsnApi.browser.isIE && service.isChromePluginAvailable);
+      return !gcprinter.hasPlugin() && !(!gsnApi.browser.isIE && service.isChromePluginAvailable);
 	};
 	
 	function isPrinterSupported() {
-		var result = false;
-		try {
-			result = gcprinter.isPrinterSupported();
-		} catch (e) {
-			result = true;
-		}
-		return result;
+      var result = false;
+      try {
+        result = gcprinter.isPrinterSupported();
+      } catch (e) {
+        result = true;
+      }
+      return result;
 	};
   } // end service function
 })(angular);
