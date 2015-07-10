@@ -21,7 +21,8 @@ var banner = [
   ' * Build date: <%= new Date() %>',
   ' */\n'
 ].join('\n');
-var allSources = ['src/gsn.js', 'src/module.js', 'src/gsn-ui-map.js', 'src/angular-recaptcha.js', 'vendor/**.js', 'src/**/*.js'];
+var allSources = ['src/gsn.js', 'src/module.js', 'src/gsn-ui-map.js', 'src/angular-recaptcha.js', 'vendor/**.js', 'src/services/*.js', '/src/filters/*.js', 
+  'src/directives/!(ctrlCouponRoundy|ctrlRoundyProfile).js'];
 
 gulp.task('bump', function(){
     return gulp.src(['./package.json'])
