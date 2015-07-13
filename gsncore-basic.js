@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.1
  * gsncore repository
- * Build date: Mon Jul 13 2015 09:21:50 GMT-0500 (CDT)
+ * Build date: Mon Jul 13 2015 09:56:16 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -422,6 +422,10 @@
     return gsn.getUrl(baseUrl, url);
   };
 
+  gsn.getContentServiceUrl = function (url) {
+    return returnObj.getApiUrl() + '/Content'
+  };
+
   gsn.setTheme = function (theme) {
     gsn.config.SiteTheme = theme;
   };
@@ -819,7 +823,7 @@
     };
 
     returnObj.getContentServiceUrl = function (method) {
-      return returnObj.getApiUrl() + '/Content/' + method + '/' + returnObj.getChainId() + '/' + returnObj.isNull(returnObj.getSelectedStoreId(), '0') + '/';
+      return gsn.getContentServiceUrl('/' + method + '/' + returnObj.getChainId() + '/' + returnObj.isNull(returnObj.getSelectedStoreId(), '0') + '/');
     };
 
     returnObj.getYoutechCouponUrl = function () {

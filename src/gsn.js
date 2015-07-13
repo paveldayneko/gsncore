@@ -416,6 +416,10 @@
     return gsn.getUrl(baseUrl, url);
   };
 
+  gsn.getContentServiceUrl = function (url) {
+    return returnObj.getApiUrl() + '/Content'
+  };
+
   gsn.setTheme = function (theme) {
     gsn.config.SiteTheme = theme;
   };

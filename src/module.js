@@ -104,7 +104,7 @@
     };
 
     returnObj.getContentServiceUrl = function (method) {
-      return returnObj.getApiUrl() + '/Content/' + method + '/' + returnObj.getChainId() + '/' + returnObj.isNull(returnObj.getSelectedStoreId(), '0') + '/';
+      return gsn.getContentServiceUrl('/' + method + '/' + returnObj.getChainId() + '/' + returnObj.isNull(returnObj.getSelectedStoreId(), '0') + '/');
     };
 
     returnObj.getYoutechCouponUrl = function () {
