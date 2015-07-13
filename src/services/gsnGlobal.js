@@ -26,7 +26,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
       gsnApi.gsn.$rootScope = $rootScope
       $scope = $scope || $rootScope;
-      $scope.defaultLayout = $scope.defaultLayout || gsnApi.getThemeUrl('/views/layout.html');
+      $scope.defaultLayout = gsnApi.getConfig().DefaultLayout || gsnApi.getThemeUrl('/views/layout.html');
       $scope.currentLayout = $scope.defaultLayout;
       $scope.currentPath = '/';
       $scope.gvm = { 

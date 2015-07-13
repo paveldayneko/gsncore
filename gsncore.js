@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.1
  * gsncore repository
- * Build date: Fri Jul 10 2015 13:39:12 GMT-0500 (CDT)
+ * Build date: Mon Jul 13 2015 09:21:50 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -3992,7 +3992,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
       gsnApi.gsn.$rootScope = $rootScope
       $scope = $scope || $rootScope;
-      $scope.defaultLayout = $scope.defaultLayout || gsnApi.getThemeUrl('/views/layout.html');
+      $scope.defaultLayout = gsnApi.getConfig().DefaultLayout || gsnApi.getThemeUrl('/views/layout.html');
       $scope.currentLayout = $scope.defaultLayout;
       $scope.currentPath = '/';
       $scope.gvm = { 
