@@ -589,6 +589,9 @@
 
   if (root.globalConfig) {
     gsn.config.ApiUrl = gsn.isNull(root.globalConfig.apiUrl, '').replace(/\/+$/g, '');
+    if (gsn.config.ApiUrl == ''){
+      gsn.config.ApiUrl = '/proxy'
+    }
   }
 
   //#region dynamic script loader

@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.1
  * gsncore repository
- * Build date: Mon Jul 13 2015 10:08:13 GMT-0500 (CDT)
+ * Build date: Mon Jul 13 2015 10:13:11 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -595,6 +595,9 @@
 
   if (root.globalConfig) {
     gsn.config.ApiUrl = gsn.isNull(root.globalConfig.apiUrl, '').replace(/\/+$/g, '');
+    if (gsn.config.ApiUrl == ''){
+      gsn.config.ApiUrl = '/proxy'
+    }
   }
 
   //#region dynamic script loader
