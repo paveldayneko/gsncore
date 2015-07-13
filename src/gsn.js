@@ -417,7 +417,11 @@
   };
 
   gsn.getContentServiceUrl = function (url) {
-    return gsn.config.ApiUrl + '/Content' + gsn.isNull(url, '')
+    return gsn.getApiUrl() + '/Content' + gsn.isNull(url, '')
+  };
+
+  gsn.getApiUrl = function() {
+    return gsn.config.ApiUrl !== '' ? gsn.config.ApiUrl : '/proxy';
   };
 
   gsn.setTheme = function (theme) {

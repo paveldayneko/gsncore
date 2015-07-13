@@ -95,9 +95,7 @@
       return gsn.config;
     };
 
-    returnObj.getApiUrl = function () {
-      return gsn.config.ApiUrl;
-    };
+    returnObj.getApiUrl = gsn.getApiUrl;
 
     returnObj.getStoreUrl = function () {
       return gsn.config.StoreServiceUrl;
