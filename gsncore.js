@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.1
  * gsncore repository
- * Build date: Mon Jul 13 2015 10:19:56 GMT-0500 (CDT)
+ * Build date: Mon Jul 13 2015 14:06:49 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -12846,7 +12846,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
           // dynamically load twitter
           var src = '//platform.twitter.com/widgets.js';
-          gsnApi.loadScripts([src], loadTimeline);
+          gsnApi.loadScripts([src], loadShare);
           return;
         }
 

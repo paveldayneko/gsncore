@@ -27,7 +27,7 @@
 
           // dynamically load twitter
           var src = '//platform.twitter.com/widgets.js';
-          gsnApi.loadScripts([src], loadTimeline);
+          gsnApi.loadScripts([src], loadShare);
           return;
         }
 
