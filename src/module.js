@@ -106,6 +106,12 @@
     returnObj.getContentServiceUrl = function (method) {
       return gsn.getContentServiceUrl('/' + method + '/' + returnObj.getChainId() + '/' + returnObj.isNull(returnObj.getSelectedStoreId(), '0') + '/');
     };
+    returnObj.getDefaultLayout = function(defaultUrl) {
+      if (gsn.config.DefaultLayout) {
+        return $sce.trustAsResourceUrl(gsn.config.DefaultLayout);
+      }
+      return defaultUrl;
+    }
 
     returnObj.getYoutechCouponUrl = function () {
       return gsn.config.YoutechCouponUrl;

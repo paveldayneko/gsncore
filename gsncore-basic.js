@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.1
  * gsncore repository
- * Build date: Mon Jul 13 2015 09:56:16 GMT-0500 (CDT)
+ * Build date: Mon Jul 13 2015 10:00:31 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -825,6 +825,12 @@
     returnObj.getContentServiceUrl = function (method) {
       return gsn.getContentServiceUrl('/' + method + '/' + returnObj.getChainId() + '/' + returnObj.isNull(returnObj.getSelectedStoreId(), '0') + '/');
     };
+    returnObj.getDefaultLayout = function(defaultUrl) {
+      if (gsn.config.DefaultLayout) {
+        return $sce.trustAsResourceUrl(gsn.config.DefaultLayout);
+      }
+      return defaultUrl;
+    }
 
     returnObj.getYoutechCouponUrl = function () {
       return gsn.config.YoutechCouponUrl;
@@ -2343,7 +2349,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
       gsnApi.gsn.$rootScope = $rootScope
       $scope = $scope || $rootScope;
-      $scope.defaultLayout = gsnApi.getConfig().DefaultLayout || gsnApi.getThemeUrl('/views/layout.html');
+      $scope.defaultLayout = gsnApi.getDefaultLayout(gsnApi.getThemeUrl('/views/layout.html'));
       $scope.currentLayout = $scope.defaultLayout;
       $scope.currentPath = '/';
       $scope.gvm = { 
