@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.1
  * gsncore repository
- * Build date: Mon Jul 13 2015 10:00:31 GMT-0500 (CDT)
+ * Build date: Mon Jul 13 2015 10:08:13 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -423,7 +423,7 @@
   };
 
   gsn.getContentServiceUrl = function (url) {
-    return returnObj.getApiUrl() + '/Content'
+    return gsn.config.ApiUrl + '/Content' + gsn.isNull(url, '')
   };
 
   gsn.setTheme = function (theme) {

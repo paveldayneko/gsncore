@@ -417,7 +417,7 @@
   };
 
   gsn.getContentServiceUrl = function (url) {
-    return returnObj.getApiUrl() + '/Content'
+    return gsn.config.ApiUrl + '/Content' + gsn.isNull(url, '')
   };
 
   gsn.setTheme = function (theme) {
