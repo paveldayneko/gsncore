@@ -104,6 +104,15 @@
         return;
       }
 
+      if (gsnStore.getProcessDate() == 0) {
+        // wait until all coupons has been processed
+        $timeout(function () {
+          print(items);
+          return;
+        }, 1000);
+        return;
+      }
+
       coupons.length = 0;
       couponClasses.length = 0;
       angular.forEach(items, function (v, k) {
@@ -114,7 +123,7 @@
         var item = v;
         if (gsnApi.isNull(v.ProductCode, null) === null)
         {
-          item = gsnStore.getCoupon(v.ItemId, v.ItemTypeId);
+          item = gsnStore.getCoupon(v.ItemId, v.ItemTypeId) || v;
         }
         
         couponClasses.push('.coupon-message-' + item.ProductCode);

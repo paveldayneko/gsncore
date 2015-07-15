@@ -42,6 +42,7 @@
       storeCouponById: {},
       manuCouponById: {},
       youtechCouponById: {},
+      processCompleted: 0,  // process completed date
       lastProcessDate: 0    // number represent a date in month
     };
 
@@ -290,9 +291,10 @@
       return gsnApi.http(_lc.adPods, url);
     };
 
-    returnObj.hasCompleteCircular = function () {
+    returnObj.hasCompleteCircular = function () { 
       var circ = returnObj.getCircularData();
       var result = false;
+
       if (circ) {
         result = gsnApi.isNull(circ.Circulars, false);
       }
@@ -303,6 +305,10 @@
       }
 
       return result;
+    };
+
+    returnObj.getProcessDate = function() {
+      return _cp.processCompleted;
     };
 
     returnObj.getCircularData = function (forProcessing) {
@@ -559,7 +565,9 @@
         processingQueue.shift()();
 
         $timeout(processWorkQueue, 50);
+        return;
       }
+      _cp.processCompleted = new Date();
     }
 
     function processCircular(circ, items, circularTypes, staticCirculars, circularByTypes) {

@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.1
  * gsncore repository
- * Build date: Mon Jul 13 2015 14:06:49 GMT-0500 (CDT)
+ * Build date: Wed Jul 15 2015 11:36:33 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -3759,6 +3759,15 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
         return;
       }
 
+      if (gsnStore.getProcessDate() == 0) {
+        // wait until all coupons has been processed
+        $timeout(function () {
+          print(items);
+          return;
+        }, 1000);
+        return;
+      }
+
       coupons.length = 0;
       couponClasses.length = 0;
       angular.forEach(items, function (v, k) {
@@ -3769,7 +3778,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
         var item = v;
         if (gsnApi.isNull(v.ProductCode, null) === null)
         {
-          item = gsnStore.getCoupon(v.ItemId, v.ItemTypeId);
+          item = gsnStore.getCoupon(v.ItemId, v.ItemTypeId) || v;
         }
         
         couponClasses.push('.coupon-message-' + item.ProductCode);
@@ -6155,6 +6164,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       storeCouponById: {},
       manuCouponById: {},
       youtechCouponById: {},
+      processCompleted: 0,  // process completed date
       lastProcessDate: 0    // number represent a date in month
     };
 
@@ -6403,9 +6413,10 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       return gsnApi.http(_lc.adPods, url);
     };
 
-    returnObj.hasCompleteCircular = function () {
+    returnObj.hasCompleteCircular = function () { 
       var circ = returnObj.getCircularData();
       var result = false;
+
       if (circ) {
         result = gsnApi.isNull(circ.Circulars, false);
       }
@@ -6416,6 +6427,10 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       }
 
       return result;
+    };
+
+    returnObj.getProcessDate = function() {
+      return _cp.processCompleted;
     };
 
     returnObj.getCircularData = function (forProcessing) {
@@ -6672,7 +6687,9 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         processingQueue.shift()();
 
         $timeout(processWorkQueue, 50);
+        return;
       }
+      _cp.processCompleted = new Date();
     }
 
     function processCircular(circ, items, circularTypes, staticCirculars, circularByTypes) {
