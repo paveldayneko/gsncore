@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.1
  * gsncore repository
- * Build date: Wed Jul 15 2015 11:36:33 GMT-0500 (CDT)
+ * Build date: Wed Jul 15 2015 13:54:51 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -7380,7 +7380,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       digitalCirc: null, 
       filterBy: $location.search().q, 
       filter: {}, 
-      pageIdx: $location.search().p, 
+      pageIdx: 1, 
       circIdx: $location.search().c };
 
     function activate() {
@@ -7415,6 +7415,12 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         $scope.doSearchInternal();
         $scope.vm.digitalCirc = data;
         setPage();
+        if ($location.search().p){
+          // allow for setting page index
+          $timeout(function() {
+            $scope.vm.pageIdx = $location.search().p;
+          }, 1000);
+        }
       }
     }
 
@@ -12739,7 +12745,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
       };
 
-      scope.$watch('vm.pageIdx', function() {
+      scope.$watch(attrs.watch || 'vm.pageIdx', function() {
         var $win = angular.element($window);
         loadImage(attrs.src, function(err, img) {
           if (!err) {

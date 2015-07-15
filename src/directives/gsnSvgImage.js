@@ -29,7 +29,7 @@
 
       };
 
-      scope.$watch('vm.pageIdx', function() {
+      scope.$watch(attrs.watch || 'vm.pageIdx', function() {
         var $win = angular.element($window);
         loadImage(attrs.src, function(err, img) {
           if (!err) {

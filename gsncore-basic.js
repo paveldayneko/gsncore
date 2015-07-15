@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.1
  * gsncore repository
- * Build date: Wed Jul 15 2015 11:36:33 GMT-0500 (CDT)
+ * Build date: Wed Jul 15 2015 13:54:51 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -7766,7 +7766,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
       };
 
-      scope.$watch('vm.pageIdx', function() {
+      scope.$watch(attrs.watch || 'vm.pageIdx', function() {
         var $win = angular.element($window);
         loadImage(attrs.src, function(err, img) {
           if (!err) {
