@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.1
  * gsncore repository
- * Build date: Wed Jul 15 2015 15:12:44 GMT-0500 (CDT)
+ * Build date: Wed Jul 15 2015 15:45:56 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -3992,9 +3992,9 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 (function (angular, undefined) {
   'use strict';
 var serviceId = 'gsnGlobal';
-angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout', '$route', 'gsnApi', 'gsnProfile', 'gsnStore', '$rootScope', 'Facebook', '$analytics', 'gsnYoutech', 'gsnDfp', gsnGlobal]);
+angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout', '$route', 'gsnApi', 'gsnProfile', 'gsnStore', '$rootScope', 'Facebook', '$analytics', 'gsnYoutech', 'gsnDfp', 'gsnAdvertising', gsnGlobal]);
 
-  function gsnGlobal($window, $location, $timeout, $route, gsnApi, gsnProfile, gsnStore, $rootScope, Facebook, $analytics, gsnYoutech, gsnDfp) {
+  function gsnGlobal($window, $location, $timeout, $route, gsnApi, gsnProfile, gsnStore, $rootScope, Facebook, $analytics, gsnYoutech, gsnDfp, gsnAdvertising) {
     var returnObj = {
       init: init,
       hasInit: false
