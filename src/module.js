@@ -102,7 +102,7 @@
     };
 
     returnObj.getContentServiceUrl = function (method) {
-      return gsn.getContentServiceUrl('/' + method + '/' + returnObj.getChainId() + '/' + returnObj.isNull(returnObj.getSelectedStoreId(), '0') + '/');
+      return gsn.getContentServiceUrl('/' + method + '/' + returnObj.getChainId() + '/' + returnObj.isNull(returnObj.getSelectedStoreId(), '0') + '/').replace('clientapi.gsn2.com/', 'clientapi.gsngrocers.com/');
     };
     returnObj.getDefaultLayout = function(defaultUrl) {
       if (gsn.config.DefaultLayout) {

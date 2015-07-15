@@ -29,8 +29,13 @@
 
       };
 
-      scope.$watch(attrs.watch || 'vm.pageIdx', function() {
+      function doLoadImage() {
         var $win = angular.element($window);
+        if (attrs.src == ""){
+          $timeout(doLoadImage, 200);
+          return;
+        }
+
         loadImage(attrs.src, function(err, img) {
           if (!err) {
             element.html('');
@@ -78,8 +83,9 @@
             $win.on('orientationchange', reAdjust);
           }
         });
-      });
+      }
 
+      scope.$watch(attrs.watch || 'vm.pageIdx', doLoadImage);
     }
   }]);
 })(angular);

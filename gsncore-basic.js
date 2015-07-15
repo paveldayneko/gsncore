@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.1
  * gsncore repository
- * Build date: Wed Jul 15 2015 13:54:51 GMT-0500 (CDT)
+ * Build date: Wed Jul 15 2015 15:12:44 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -828,7 +828,7 @@
     };
 
     returnObj.getContentServiceUrl = function (method) {
-      return gsn.getContentServiceUrl('/' + method + '/' + returnObj.getChainId() + '/' + returnObj.isNull(returnObj.getSelectedStoreId(), '0') + '/');
+      return gsn.getContentServiceUrl('/' + method + '/' + returnObj.getChainId() + '/' + returnObj.isNull(returnObj.getSelectedStoreId(), '0') + '/').replace('clientapi.gsn2.com/', 'clientapi.gsngrocers.com/');
     };
     returnObj.getDefaultLayout = function(defaultUrl) {
       if (gsn.config.DefaultLayout) {
@@ -7766,8 +7766,13 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
       };
 
-      scope.$watch(attrs.watch || 'vm.pageIdx', function() {
+      function doLoadImage() {
         var $win = angular.element($window);
+        if (attrs.src == ""){
+          $timeout(doLoadImage, 200);
+          return;
+        }
+
         loadImage(attrs.src, function(err, img) {
           if (!err) {
             element.html('');
@@ -7815,8 +7820,9 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
             $win.on('orientationchange', reAdjust);
           }
         });
-      });
+      }
 
+      scope.$watch(attrs.watch || 'vm.pageIdx', doLoadImage);
     }
   }]);
 })(angular);
