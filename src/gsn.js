@@ -525,7 +525,27 @@
       }
 
       if (root._tk) {
-        _tk.event(properties.category, action, properties.label, properties.value);
+        var extra = {};
+        var item = properties.item;
+        if (item) {
+          // add department, aisle, category, shelf, brand
+          if (item.BrandName)
+            extra.bn = item.BrandName;
+          if (item.ProductCode)
+            extra.ic = item.ProductCode;
+          if (item.Description)
+            extra['in'] = item.Description;
+          if (item.ShelfName)
+            extra.shf = item.ShelfName;
+          if (item.DepartmentName)
+            extra.dpt = item.DepartmentName;
+          if (item.CategoryName)
+            extra.cat = item.CategoryName;
+          if (item.AisleName)
+            extra.ailse = item.AisleName;
+        }
+
+        _tk.event(properties.category, action, properties.label, null, properties.value);
       }
     });
   };

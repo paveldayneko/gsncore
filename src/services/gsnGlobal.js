@@ -250,7 +250,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
       $scope.$on('gsnevent:store-setid', function (event, result) {
         gsnStore.getStore().then(function (store) {
-          $analytics.eventTrack('StoreSelected', { category: store.StoreName, label: store.StoreNumber + '', value: store.StoreId });
+          $analytics.eventTrack('StoreSelected', { category: store.StoreName, label: store.StoreNumber + '' });
           $scope.gvm.currentStore = store;
 
           gsnProfile.getProfile().then(function (rst) {
@@ -324,7 +324,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
               evt = 'YoutechCouponAddUpdate';
             }
 
-            $analytics.eventTrack(evt, { category: (item.ItemTypeId == 13) ? item.ExtCategory : cat.CategoryName, label: item.Description, value: item.ItemId });
+            $analytics.eventTrack(evt, { category: (item.ItemTypeId == 13) ? item.ExtCategory : cat.CategoryName, label: item.Description, item: item });
           } catch (e) {
           }
         }
@@ -339,7 +339,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
                 itemId = item.ItemId;
 
             if (item.ItemTypeId == 8) {
-              $analytics.eventTrack('CircularItemRemove', { category: cat.CategoryName, label: item.Description, value: itemId });
+              $analytics.eventTrack('CircularItemRemove', { category: cat.CategoryName, label: item.Description, item: item });
             } else if (item.ItemTypeId == 2) {
               coupon = gsnStore.getCoupon(item.ItemId, 2);
               if (coupon) {
@@ -348,11 +348,11 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
                   itemId = item.ProductCode;
                 }
               }
-              $analytics.eventTrack('ManufacturerCouponRemove', { category: cat.CategoryName, label: item.Description, value: itemId });
+              $analytics.eventTrack('ManufacturerCouponRemove', { category: cat.CategoryName, label: item.Description, item: item });
             } else if (item.ItemTypeId == 3) {
-              $analytics.eventTrack('ProductRemove', { category: cat.CategoryName, label: item.Description, value: item.ProductId });
+              $analytics.eventTrack('ProductRemove', { category: cat.CategoryName, label: item.Description, item: item });
             } else if (item.ItemTypeId == 5) {
-              $analytics.eventTrack('RecipeIngredientRemove', { category: cat.CategoryName, label: item.Description, value: itemId });
+              $analytics.eventTrack('RecipeIngredientRemove', { category: cat.CategoryName, label: item.Description, item: item });
             } else if (item.ItemTypeId == 6) {
               $analytics.eventTrack('OwnItemRemove', { label: item.Description });
             } else if (item.ItemTypeId == 10) {
@@ -363,7 +363,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
                   itemId = item.ProductCode;
                 }
               }
-              $analytics.eventTrack('StoreCouponRemove', { category: cat.CategoryName, label: item.Description, value: itemId });
+              $analytics.eventTrack('StoreCouponRemove', { category: cat.CategoryName, label: item.Description, item: item });
             } else if (item.ItemTypeId == 13) {
               coupon = gsnStore.getCoupon(item.ItemId, 13);
               if (coupon) {
@@ -372,14 +372,31 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
                   itemId = item.ProductCode;
                 }
               }
-              $analytics.eventTrack('YoutechCouponRemove', { category: item.ExtCategory, label: item.Description, value: itemId });
+              $analytics.eventTrack('YoutechCouponRemove', { category: item.ExtCategory, label: item.Description, item: item });
             } else {
-              $analytics.eventTrack('MiscItemRemove', { category: cat.CategoryName, label: item.Description, value: item.ItemTypeId });
+              $analytics.eventTrack('MiscItemRemove', { category: cat.CategoryName, label: item.Description, item: item });
             }
           } catch (e) {
           }
         }
       });
+
+      $timeout(function() {
+        if ($window._tk){
+          $window._tk.on('track', function(item){
+            // populate with page url, storeid, consumerid, is anonymous
+            item.dt = $scope.currentPath;
+            item.stid = gsnApi.getSelectedStoreId();
+            item.anon = gsnApi.isLoggedIn();
+
+            var profile = $scope.gvm.profile || {};
+            if (profile.Id)
+              item.uid = profile.Id;
+            if (profile.ExternalId)
+              item.loyid = profile.ExternalId;
+          });
+        }
+      }, 500);
 
       //#endregion
     } // init

@@ -38,7 +38,7 @@
 
                 var circ = plug.getCircular(circIdx);
                 if (circ) {
-                  $analytics.eventTrack('PageChange', { category: 'Circular_Type' + circ.CircularTypeId + '_P' + (pageIdx + 1), label: circ.CircularDescription, value: pageIdx });
+                  $analytics.eventTrack('PageChange', { category: 'Circular_Type' + circ.CircularTypeId + '_P' + (pageIdx + 1), label: circ.CircularDescription });
                 }
 
                 return false;

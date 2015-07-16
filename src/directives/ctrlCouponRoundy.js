@@ -285,7 +285,7 @@
           if (rst.success) {
             // log coupon add to card
             //var cat = gsnStore.getCategories()[item.CategoryId];
-            $analytics.eventTrack('CouponAddToCard', { category: item.ExtCategory, label: item.Description1, value: item.ProductCode });
+            $analytics.eventTrack('CouponAddToCard', { category: item.ExtCategory, label: item.Description1, item: item });
 
             $scope.clippedCoupons[item.ProductCode] = item;
             // apply
@@ -297,7 +297,7 @@
       } else {
         // log coupon remove from card
         //var cat = gsnStore.getCategories()[item.CategoryId];
-        $analytics.eventTrack('CouponRemoveFromCard', { category: item.ExtCategory, label: item.Description1, value: item.ProductCode });
+        $analytics.eventTrack('CouponRemoveFromCard', { category: item.ExtCategory, label: item.Description1, item: item });
 
         // apply
         $timeout(function () {
