@@ -222,6 +222,19 @@
       });
       return deferred.promise;
     };
+	
+	returnObj.addOffer = function (offerId) {
+      var deferred = $q.defer();
+      gsnApi.getAccessToken().then(function () {
+        var url = gsnApi.getRoundyProfileUrl() + '/AddOffer/' + gsnApi.getProfileId() + '/' + offerId;
+        $http.post(url, {}, { headers: gsnApi.getApiHeaders() }).success(function (response) {
+          deferred.resolve({ success: true, response: response });
+        }).error(function (response) {
+          errorBroadcast(response, deferred);
+        });
+      });
+      return deferred.promise;
+    };
 
     $rootScope.$on('gsnevent:logout', function () {
       init();
