@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.3
  * gsncore repository
- * Build date: Fri Jul 17 2015 08:22:40 GMT-0500 (CDT)
+ * Build date: Fri Jul 17 2015 09:23:40 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -3896,7 +3896,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       doRefresh: debounce(doRefresh, 500)
     };
 
-    $rootScope.$on('gsnevent:shoppinglistitem-updating', function (event, shoppingList, item) {
+    function shoppingListItemChange(event, shoppingList, item) {
       var currentListId = gsnApi.getShoppingListId();
       if (shoppingList.ShoppingListId == currentListId) {
         var cat = gsnStore.getCategories()[item.CategoryId];
@@ -3904,7 +3904,9 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
         // service.actionParam = {evtname: event.name, dept: cat.CategoryName, pdesc: item.Description, pcode: item.Id, brand: item.BrandName};
         service.doRefresh();
       }
-    });
+    }
+    $rootScope.$on('gsnevent:shoppinglistitem-updating', shoppingListItemChange);
+    $rootScope.$on('gsnevent:shoppinglistitem-removing', shoppingListItemChange);
 
     $rootScope.$on('gsnevent:shoppinglist-loaded', function (event, shoppingList, item) {
       var list = gsnProfile.getShoppingList();
@@ -4343,7 +4345,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         }
       });
 
-      $scope.$on('gsnevent:shoppinglist-item-removing', function (event, shoppingList, item) {
+      $scope.$on('gsnevent:shoppinglistitem-removing', function (event, shoppingList, item) {
         var currentListId = gsnApi.getShoppingListId();
         if (shoppingList.ShoppingListId == currentListId) {
           try {
@@ -4629,7 +4631,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
           if (deferRemove) return returnObj;
           gsnApi.getAccessToken().then(function () {
-            $rootScope.$broadcast('gsnevent:shoppinglist-item-removing', returnObj, item);
+            $rootScope.$broadcast('gsnevent:shoppinglistitem-removing', returnObj, item);
 
             var url = gsnApi.getShoppingListApiUrl() + '/DeleteItems/' + returnObj.ShoppingListId;
             var hPayload = gsnApi.getApiHeaders();

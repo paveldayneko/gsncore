@@ -10,7 +10,7 @@
       doRefresh: debounce(doRefresh, 500)
     };
 
-    $rootScope.$on('gsnevent:shoppinglistitem-updating', function (event, shoppingList, item) {
+    function shoppingListItemChange(event, shoppingList, item) {
       var currentListId = gsnApi.getShoppingListId();
       if (shoppingList.ShoppingListId == currentListId) {
         var cat = gsnStore.getCategories()[item.CategoryId];
@@ -18,8 +18,10 @@
         // service.actionParam = {evtname: event.name, dept: cat.CategoryName, pdesc: item.Description, pcode: item.Id, brand: item.BrandName};
         service.doRefresh();
       }
-    });
-
+    }
+    
+    $rootScope.$on('gsnevent:shoppinglistitem-updating', shoppingListItemChange);
+    $rootScope.$on('gsnevent:shoppinglistitem-removing', shoppingListItemChange);
     $rootScope.$on('gsnevent:shoppinglist-loaded', function (event, shoppingList, item) {
       var list = gsnProfile.getShoppingList();
       if (list) {

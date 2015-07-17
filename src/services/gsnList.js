@@ -205,7 +205,7 @@
 
           if (deferRemove) return returnObj;
           gsnApi.getAccessToken().then(function () {
-            $rootScope.$broadcast('gsnevent:shoppinglist-item-removing', returnObj, item);
+            $rootScope.$broadcast('gsnevent:shoppinglistitem-removing', returnObj, item);
 
             var url = gsnApi.getShoppingListApiUrl() + '/DeleteItems/' + returnObj.ShoppingListId;
             var hPayload = gsnApi.getApiHeaders();

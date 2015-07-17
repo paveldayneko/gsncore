@@ -330,7 +330,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         }
       });
 
-      $scope.$on('gsnevent:shoppinglist-item-removing', function (event, shoppingList, item) {
+      $scope.$on('gsnevent:shoppinglistitem-removing', function (event, shoppingList, item) {
         var currentListId = gsnApi.getShoppingListId();
         if (shoppingList.ShoppingListId == currentListId) {
           try {
