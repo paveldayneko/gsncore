@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.3
  * gsncore repository
- * Build date: Fri Jul 17 2015 12:16:19 GMT-0500 (CDT)
+ * Build date: Fri Jul 17 2015 12:21:24 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -7606,15 +7606,16 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         }
       }
       if (oldValue != newValue){
+        var pageIdx = $scope.vm.pageIdx;
         // must use timeout to sync with UI thread
         $timeout(function () {
           // trigger ad refresh for circular page changed
-          $rootScope.$broadcast('gsnevent:digitalcircular-pagechanging', { circularIndex: $scope.vm.circIdx, pageIndex: $scope.vm.pageIdx });
+          $rootScope.$broadcast('gsnevent:digitalcircular-pagechanging', { circularIndex: $scope.vm.circIdx, pageIndex: pageIdx });
         }, 50);
 
         var circ = $scope.vm.circular;
         if (circ) {
-          $analytics.eventTrack('PageChange', { category: 'Circular_Type' + circ.CircularTypeId + '_P' + (pageIdx + 1), label: circ.CircularDescription });
+          $analytics.eventTrack('PageChange', { category: 'Circular_Type' + circ.CircularTypeId + '_P' + pageIdx, label: circ.CircularDescription });
         }
       }
     }    
