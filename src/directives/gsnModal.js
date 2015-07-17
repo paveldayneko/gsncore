@@ -16,7 +16,7 @@
     return directive;
 
     function link(scope, element, attrs) {
-      var myHtml, templateLoader, tplURL;
+      var myHtml, templateLoader, tplURL, track, hideCb;
       tplURL = scope.$eval(attrs.gsnModal);
       scope.$location = $location;
       myHtml = '';
@@ -25,13 +25,16 @@
       }).success(function(html) {
         return myHtml = '<div class="myModalForm modal" style="display: block"><div class="modal-dialog">' + html + '</div></div>"';
       });
-      var track = null;
       if (attrs.track) {
         track = scope.$eval(attrs.track);
       }
+      hideCb = scope.$eval(attrs.hideCb);
 
       function hideCallback() {
         $rootScope.$broadcast('gsnevent:gsnmodal-hide', element, track);
+        if (typeof(hideCb) === 'function'){
+          hideCb();
+        }
       }
 
       scope.closeModal = function() {
@@ -62,9 +65,8 @@
               cls: attrs.cls,
               timeout: attrs.timeout,
               closeCls: attrs.closeCls || 'close modal',
-              disableScrollTop: attrs.disableScrollTop,
-              hideCallback: hideCallback
-            }, scope.$eval(attrs.hideCb));
+              disableScrollTop: attrs.disableScrollTop 
+            }, hideCallback);
           }); 
         }
         return scope;
