@@ -381,6 +381,15 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         }
       });
 
+      function gsnModalTracking(event, el, track) {
+        if (track) {
+          $analytics.eventTrack(track.action || event, track);
+        }
+      };
+
+      $scope.$on('gsnevent:gsnmodal-hide', gsnModalTracking);
+      $scope.$on('gsnevent:gsnmodal-show', gsnModalTracking);
+
       function doTrakless() {
         if (gsnApi.isNull($window._tk, null) === null) {
           $timeout(doTrakless, 50);

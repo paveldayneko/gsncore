@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.3
  * gsncore repository
- * Build date: Fri Jul 17 2015 09:23:40 GMT-0500 (CDT)
+ * Build date: Fri Jul 17 2015 09:42:23 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -3905,9 +3905,9 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
         service.doRefresh();
       }
     }
+    
     $rootScope.$on('gsnevent:shoppinglistitem-updating', shoppingListItemChange);
     $rootScope.$on('gsnevent:shoppinglistitem-removing', shoppingListItemChange);
-
     $rootScope.$on('gsnevent:shoppinglist-loaded', function (event, shoppingList, item) {
       var list = gsnProfile.getShoppingList();
       if (list) {
@@ -4395,6 +4395,15 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           }
         }
       });
+
+      function gsnModalTracking(event, el, track) {
+        if (track) {
+          $analytics.eventTrack(track.action || event, track);
+        }
+      };
+
+      $scope.$on('gsnevent:gsnmodal-hide', gsnModalTracking);
+      $scope.$on('gsnevent:gsnmodal-show', gsnModalTracking);
 
       function doTrakless() {
         if (gsnApi.isNull($window._tk, null) === null) {
@@ -11618,10 +11627,21 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       }).success(function(html) {
         return myHtml = '<div class="myModalForm modal" style="display: block"><div class="modal-dialog">' + html + '</div></div>"';
       });
+      var track = null;
+      if (attrs.track) {
+        track = scope.$eval(attrs.track);
+      }
+
+      function hideCallback() {
+        $rootScope.broadcast('gsnevent:modal-hide', element, track);
+      }
+
       scope.closeModal = function() {
         return gmodal.hide();
       };
+
       scope.openModal = function(e) {
+        $rootScope.broadcast('gsnevent:modal-show', element, track);
         if (e != null) {
           if (e.preventDefault != null) {
             e.preventDefault();
@@ -11644,7 +11664,8 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
               cls: attrs.cls,
               timeout: attrs.timeout,
               closeCls: attrs.closeCls || 'close modal',
-              disableScrollTop: attrs.disableScrollTop
+              disableScrollTop: attrs.disableScrollTop,
+              hideCallback: hideCallback
             }, scope.$eval(attrs.hideCb));
           }); 
         }

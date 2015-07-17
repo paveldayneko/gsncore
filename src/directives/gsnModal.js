@@ -25,10 +25,21 @@
       }).success(function(html) {
         return myHtml = '<div class="myModalForm modal" style="display: block"><div class="modal-dialog">' + html + '</div></div>"';
       });
+      var track = null;
+      if (attrs.track) {
+        track = scope.$eval(attrs.track);
+      }
+
+      function hideCallback() {
+        $rootScope.broadcast('gsnevent:modal-hide', element, track);
+      }
+
       scope.closeModal = function() {
         return gmodal.hide();
       };
+
       scope.openModal = function(e) {
+        $rootScope.broadcast('gsnevent:modal-show', element, track);
         if (e != null) {
           if (e.preventDefault != null) {
             e.preventDefault();
@@ -51,7 +62,8 @@
               cls: attrs.cls,
               timeout: attrs.timeout,
               closeCls: attrs.closeCls || 'close modal',
-              disableScrollTop: attrs.disableScrollTop
+              disableScrollTop: attrs.disableScrollTop,
+              hideCallback: hideCallback
             }, scope.$eval(attrs.hideCb));
           }); 
         }
