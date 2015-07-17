@@ -389,7 +389,9 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
         $window._tk.on('track', function(item){
           // populate with page url, storeid, consumerid, is anonymous
-          item.dt = $scope.currentPath;
+          if (!item.dt)
+            item.dt = $scope.currentPath;
+          
           item.stid = gsnApi.getSelectedStoreId();
           item.anon = gsnApi.isLoggedIn();
 
