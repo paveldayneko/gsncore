@@ -5,7 +5,7 @@
   var myDirectiveName = 'ctrlCouponRoundy';
 
   angular.module('gsn.core')
-    .controller(myDirectiveName,  ['$scope', 'gsnStore', 'gsnApi', '$timeout', '$analytics', '$filter',  'gsnYoutech', 'gsnProfile', '$location', 'gsnCouponPrinter', myController])
+    .controller(myDirectiveName,  ['$scope', 'gsnStore', 'gsnApi', '$timeout', '$analytics', '$filter',  'gsnYoutech', 'gsnProfile', '$location', 'gsnCouponPrinter', 'gsnRoundyProfile', myController])
     .directive(myDirectiveName, myDirective);
 
   function myDirective() {
@@ -18,7 +18,7 @@
     return directive;
   }    
 
-  function myController($scope, gsnStore, gsnApi, $timeout, $analytics, $filter, gsnYoutech, gsnProfile, $location, gsnCouponPrinter) {
+  function myController($scope, gsnStore, gsnApi, $timeout, $analytics, $filter, gsnYoutech, gsnProfile, $location, gsnCouponPrinter, gsnRoundyProfile) {
     $scope.activate = activate;
     $scope.addCouponToCard = addCouponToCard;
     $scope.printManufacturerCoupon = printManufacturerCoupon;
@@ -294,6 +294,9 @@
             }, 50);
           }
         });
+		//If coupon has SubCategory, add to the Roundy's card
+		if(gsnApi.isNull(item.SubCategory, '') != '')
+		  gsnRoundyProfile.addOffer(item.SubCategory);
       } else {
         // log coupon remove from card
         //var cat = gsnStore.getCategories()[item.CategoryId];
