@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.3
  * gsncore repository
- * Build date: Fri Jul 17 2015 10:00:54 GMT-0500 (CDT)
+ * Build date: Fri Jul 17 2015 10:05:17 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -6668,7 +6668,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       }
 
       function hideCallback() {
-        $rootScope.$broadcast('gsnevent:modal-hide', element, track);
+        $rootScope.$broadcast('gsnevent:gsnmodal-hide', element, track);
       }
 
       scope.closeModal = function() {
@@ -6676,7 +6676,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       };
 
       scope.openModal = function(e) {
-        $rootScope.$broadcast('gsnevent:modal-show', element, track);
+        $rootScope.$broadcast('gsnevent:gsnmodal-show', element, track);
         if (e != null) {
           if (e.preventDefault != null) {
             e.preventDefault();
