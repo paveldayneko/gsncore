@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.3
  * gsncore repository
- * Build date: Fri Jul 17 2015 08:02:03 GMT-0500 (CDT)
+ * Build date: Fri Jul 17 2015 08:14:41 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -4396,21 +4396,22 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           $timeout(doTrakless, 50);
           return;
         }
+        for(var k in $window._tk.trackers) {
+          $window._tk.trackers[k].on('track', function(item){
+            // populate with page url, storeid, consumerid, is anonymous
+            if (!item.dt)
+              item.dt = $scope.currentPath;
+            
+            item.stid = gsnApi.getSelectedStoreId();
+            item.anon = gsnApi.isLoggedIn();
 
-        $window._tk.on('track', function(item){
-          // populate with page url, storeid, consumerid, is anonymous
-          if (!item.dt)
-            item.dt = $scope.currentPath;
-          
-          item.stid = gsnApi.getSelectedStoreId();
-          item.anon = gsnApi.isLoggedIn();
-
-          var profile = $scope.gvm.profile || {};
-          if (profile.Id)
-            item.uid = profile.Id;
-          if (profile.ExternalId)
-            item.loyid = profile.ExternalId;
-        });
+            var profile = $scope.gvm.profile || {};
+            if (profile.Id)
+              item.uid = profile.Id;
+            if (profile.ExternalId)
+              item.loyid = profile.ExternalId;
+          });
+        }
       }
 
       //#endregion

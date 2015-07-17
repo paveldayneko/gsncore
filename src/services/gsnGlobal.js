@@ -386,21 +386,22 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           $timeout(doTrakless, 50);
           return;
         }
+        for(var k in $window._tk.trackers) {
+          $window._tk.trackers[k].on('track', function(item){
+            // populate with page url, storeid, consumerid, is anonymous
+            if (!item.dt)
+              item.dt = $scope.currentPath;
+            
+            item.stid = gsnApi.getSelectedStoreId();
+            item.anon = gsnApi.isLoggedIn();
 
-        $window._tk.on('track', function(item){
-          // populate with page url, storeid, consumerid, is anonymous
-          if (!item.dt)
-            item.dt = $scope.currentPath;
-          
-          item.stid = gsnApi.getSelectedStoreId();
-          item.anon = gsnApi.isLoggedIn();
-
-          var profile = $scope.gvm.profile || {};
-          if (profile.Id)
-            item.uid = profile.Id;
-          if (profile.ExternalId)
-            item.loyid = profile.ExternalId;
-        });
+            var profile = $scope.gvm.profile || {};
+            if (profile.Id)
+              item.uid = profile.Id;
+            if (profile.ExternalId)
+              item.loyid = profile.ExternalId;
+          });
+        }
       }
 
       //#endregion
