@@ -382,7 +382,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       });
 
       function gsnModalTracking(evt, el, track) {
-        var actionName = evt.replace("gsnevent:", "")
+        var actionName = evt.replace("gsnevent:", "-")
         if (track) {
           $analytics.eventTrack(gsnApi.isNull(track.action, '') + actionName, track);
         }

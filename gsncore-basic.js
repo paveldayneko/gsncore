@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.3
  * gsncore repository
- * Build date: Fri Jul 17 2015 09:48:18 GMT-0500 (CDT)
+ * Build date: Fri Jul 17 2015 09:48:45 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -2744,7 +2744,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       });
 
       function gsnModalTracking(evt, el, track) {
-        var actionName = evt.replace("gsnevent:", "")
+        var actionName = evt.replace("gsnevent:", "-")
         if (track) {
           $analytics.eventTrack(gsnApi.isNull(track.action, '') + actionName, track);
         }
