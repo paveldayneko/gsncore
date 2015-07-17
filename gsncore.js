@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.3
  * gsncore repository
- * Build date: Fri Jul 17 2015 08:14:41 GMT-0500 (CDT)
+ * Build date: Fri Jul 17 2015 08:22:40 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -538,15 +538,18 @@
           if (item.BrandName)
             extra.bn = item.BrandName;
           if (item.ProductCode)
-            extra.ic = item.ProductCode;
-          if (item.Description)
-            extra['in'] = item.Description;
+            extra.sku = item.ProductCode;
+          if (!item.ic && item.ItemId)
+            extra.ic = item.ItemId;
+          if (item.ShoppingListItemId)
+            extra.slic = item.ShoppingListItemId;
           if (item.ShelfName)
             extra.shf = item.ShelfName;
           if (item.DepartmentName)
             extra.dpt = item.DepartmentName;
-          if (item.CategoryName)
-            extra.cat = item.CategoryName;
+          if (item.CategoryName && !item.ec)
+            if (!item.ec)
+              extra.ec = item.CategoryName;
           if (item.AisleName)
             extra.ailse = item.AisleName;
         }
