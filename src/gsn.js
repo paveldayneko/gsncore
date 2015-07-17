@@ -548,7 +548,7 @@
             extra.ailse = item.AisleName;
         }
 
-        _tk.event(properties.category, action, properties.label, null, properties.value, extra);
+        _tk.event(properties.category, action, properties.label, properties.property, properties.value, extra);
       }
     });
   };

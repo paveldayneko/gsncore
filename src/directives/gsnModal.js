@@ -16,7 +16,7 @@
     return directive;
 
     function link(scope, element, attrs) {
-      var myHtml, templateLoader, tplURL, track, hideCb;
+      var myHtml, templateLoader, tplURL, track, hideCb, startTime, endTime;
       tplURL = scope.$eval(attrs.gsnModal);
       scope.$location = $location;
       myHtml = '';
@@ -31,6 +31,10 @@
       hideCb = scope.$eval(attrs.hideCb);
 
       function hideCallback() {
+        endTime = new Date();
+        if (!track.property)
+          track.property = endTime.getTime() - startTime.getTime();
+        
         $rootScope.$broadcast('gsnevent:gsnmodal-hide', element, track);
         if (typeof(hideCb) === 'function'){
           hideCb();
@@ -43,6 +47,7 @@
 
       scope.openModal = function(e) {
         $rootScope.$broadcast('gsnevent:gsnmodal-show', element, track);
+        startTime = new Date();
         if (e != null) {
           if (e.preventDefault != null) {
             e.preventDefault();

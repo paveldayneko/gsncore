@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.3
  * gsncore repository
- * Build date: Fri Jul 17 2015 10:12:49 GMT-0500 (CDT)
+ * Build date: Fri Jul 17 2015 10:31:12 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -554,7 +554,7 @@
             extra.ailse = item.AisleName;
         }
 
-        _tk.event(properties.category, action, properties.label, null, properties.value, extra);
+        _tk.event(properties.category, action, properties.label, properties.property, properties.value, extra);
       }
     });
   };
@@ -6653,7 +6653,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     return directive;
 
     function link(scope, element, attrs) {
-      var myHtml, templateLoader, tplURL, track, hideCb;
+      var myHtml, templateLoader, tplURL, track, hideCb, startTime, endTime;
       tplURL = scope.$eval(attrs.gsnModal);
       scope.$location = $location;
       myHtml = '';
@@ -6668,6 +6668,10 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       hideCb = scope.$eval(attrs.hideCb);
 
       function hideCallback() {
+        endTime = new Date();
+        if (!track.property)
+          track.property = endTime.getTime() - startTime.getTime();
+        
         $rootScope.$broadcast('gsnevent:gsnmodal-hide', element, track);
         if (typeof(hideCb) === 'function'){
           hideCb();
@@ -6680,6 +6684,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
       scope.openModal = function(e) {
         $rootScope.$broadcast('gsnevent:gsnmodal-show', element, track);
+        startTime = new Date();
         if (e != null) {
           if (e.preventDefault != null) {
             e.preventDefault();
