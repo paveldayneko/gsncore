@@ -385,12 +385,14 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         var actionName = evt.name.replace("gsnevent:", "-")
         if (track) {
           $analytics.eventTrack(gsnApi.isNull(track.action, '') + actionName, track);
-        }
 
-        // trigger load ads event
-        $timeout(function(){
-          $rootScope.$broadcast('gsnevent:loadads');
-        }, 50);
+          if (track.timedload) {            
+            // trigger load ads event
+            $timeout(function(){
+              $rootScope.$broadcast('gsnevent:loadads');
+            }, parseInt(track.timedload));
+          }
+        }
       };
 
       $scope.$on('gsnevent:gsnmodal-hide', gsnModalTracking);
