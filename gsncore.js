@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.3
  * gsncore repository
- * Build date: Fri Jul 17 2015 10:05:17 GMT-0500 (CDT)
+ * Build date: Fri Jul 17 2015 10:12:49 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -4397,7 +4397,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       });
 
       function gsnModalTracking(evt, el, track) {
-        var actionName = evt.replace("gsnevent:", "-")
+        var actionName = evt.name.replace("gsnevent:", "-")
         if (track) {
           $analytics.eventTrack(gsnApi.isNull(track.action, '') + actionName, track);
         }
@@ -11632,7 +11632,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     return directive;
 
     function link(scope, element, attrs) {
-      var myHtml, templateLoader, tplURL;
+      var myHtml, templateLoader, tplURL, track, hideCb;
       tplURL = scope.$eval(attrs.gsnModal);
       scope.$location = $location;
       myHtml = '';
@@ -11641,13 +11641,16 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       }).success(function(html) {
         return myHtml = '<div class="myModalForm modal" style="display: block"><div class="modal-dialog">' + html + '</div></div>"';
       });
-      var track = null;
       if (attrs.track) {
         track = scope.$eval(attrs.track);
       }
+      hideCb = scope.$eval(attrs.hideCb);
 
       function hideCallback() {
         $rootScope.$broadcast('gsnevent:gsnmodal-hide', element, track);
+        if (typeof(hideCb) === 'function'){
+          hideCb();
+        }
       }
 
       scope.closeModal = function() {
@@ -11678,9 +11681,8 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
               cls: attrs.cls,
               timeout: attrs.timeout,
               closeCls: attrs.closeCls || 'close modal',
-              disableScrollTop: attrs.disableScrollTop,
-              hideCallback: hideCallback
-            }, scope.$eval(attrs.hideCb));
+              disableScrollTop: attrs.disableScrollTop 
+            }, hideCallback);
           }); 
         }
         return scope;
