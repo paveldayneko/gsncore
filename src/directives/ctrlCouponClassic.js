@@ -194,7 +194,7 @@
 
       $analytics.eventTrack('CouponPrintNow', 
         { category: item.ExtCategory, 
-          label: item.Description1, 
+          label: item.Description, 
           item: item });
 
       gsn.emit('PrintNow', item);
@@ -206,7 +206,7 @@
           if (rst.success) {
             // log coupon add to card
             //var cat = gsnStore.getCategories()[item.CategoryId];
-            $analytics.eventTrack('CouponAddToCard', { category: item.ExtCategory, label: item.Description1, item: item });
+            $analytics.eventTrack('CouponAddToCard', { category: item.ExtCategory, label: item.Description, item: item });
 
             $scope.doToggleCartItem(evt, item);
 
@@ -219,7 +219,7 @@
       } else {
         // log coupon remove from card
         //var cat = gsnStore.getCategories()[item.CategoryId];
-        $analytics.eventTrack('CouponRemoveFromCard', { category: item.ExtCategory, label: item.Description1, item: item });
+        $analytics.eventTrack('CouponRemoveFromCard', { category: item.ExtCategory, label: item.Description, item: item });
 
         $scope.doToggleCartItem(evt, item);
 

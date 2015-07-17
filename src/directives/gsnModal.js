@@ -31,7 +31,7 @@
       }
 
       function hideCallback() {
-        $rootScope.broadcast('gsnevent:modal-hide', element, track);
+        $rootScope.$broadcast('gsnevent:modal-hide', element, track);
       }
 
       scope.closeModal = function() {
@@ -39,7 +39,7 @@
       };
 
       scope.openModal = function(e) {
-        $rootScope.broadcast('gsnevent:modal-show', element, track);
+        $rootScope.$broadcast('gsnevent:modal-show', element, track);
         if (e != null) {
           if (e.preventDefault != null) {
             e.preventDefault();

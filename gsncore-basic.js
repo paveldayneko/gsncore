@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.3
  * gsncore repository
- * Build date: Fri Jul 17 2015 09:48:45 GMT-0500 (CDT)
+ * Build date: Fri Jul 17 2015 10:00:54 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -4355,6 +4355,19 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       });
       return deferred.promise;
     };
+	
+	returnObj.addOffer = function (offerId) {
+      var deferred = $q.defer();
+      gsnApi.getAccessToken().then(function () {
+        var url = gsnApi.getRoundyProfileUrl() + '/AddOffer/' + gsnApi.getProfileId() + '/' + offerId;
+        $http.post(url, {}, { headers: gsnApi.getApiHeaders() }).success(function (response) {
+          deferred.resolve({ success: true, response: response });
+        }).error(function (response) {
+          errorBroadcast(response, deferred);
+        });
+      });
+      return deferred.promise;
+    };
 
     $rootScope.$on('gsnevent:logout', function () {
       init();
@@ -6655,7 +6668,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       }
 
       function hideCallback() {
-        $rootScope.broadcast('gsnevent:modal-hide', element, track);
+        $rootScope.$broadcast('gsnevent:modal-hide', element, track);
       }
 
       scope.closeModal = function() {
@@ -6663,7 +6676,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       };
 
       scope.openModal = function(e) {
-        $rootScope.broadcast('gsnevent:modal-show', element, track);
+        $rootScope.$broadcast('gsnevent:modal-show', element, track);
         if (e != null) {
           if (e.preventDefault != null) {
             e.preventDefault();

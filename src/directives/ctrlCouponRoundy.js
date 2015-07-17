@@ -261,17 +261,17 @@
       }
     });
 		
-	function showPrint() {
-	  $scope.printer.printed = null; 
-	  var clippedCouponsInArr = [];
-	  for(var key in $scope.clippedCoupons){
-	    clippedCouponsInArr.push($scope.clippedCoupons[key]);
-	  }
-	  $scope.printer.total = clippedCouponsInArr.length;
-	}
+  	function showPrint() {
+  	  $scope.printer.printed = null; 
+  	  var clippedCouponsInArr = [];
+  	  for(var key in $scope.clippedCoupons){
+  	    clippedCouponsInArr.push($scope.clippedCoupons[key]);
+  	  }
+  	  $scope.printer.total = clippedCouponsInArr.length;
+  	}
 
     function printClippedCoupons() {     
-	  var clippedCouponsInArr = [];
+	    var clippedCouponsInArr = [];
       for(var key in $scope.clippedCoupons){
         clippedCouponsInArr.push($scope.clippedCoupons[key]);
       } 
@@ -285,7 +285,7 @@
           if (rst.success) {
             // log coupon add to card
             //var cat = gsnStore.getCategories()[item.CategoryId];
-            $analytics.eventTrack('CouponAddToCard', { category: item.ExtCategory, label: item.Description1, item: item });
+            $analytics.eventTrack('CouponAddToCard', { category: item.ExtCategory, label: item.Description, item: item });
 
             $scope.clippedCoupons[item.ProductCode] = item;
             // apply
@@ -294,13 +294,15 @@
             }, 50);
           }
         });
-		//If coupon has SubCategory, add to the Roundy's card
-		if(gsnApi.isNull(item.SubCategory, '') != '')
-		  gsnRoundyProfile.addOffer(item.SubCategory);
+
+    		// if coupon has SubCategory, add to the Roundy's card
+    		if(gsnApi.isNull(item.SubCategory, '') != '') {
+    		  gsnRoundyProfile.addOffer(item.SubCategory);
+        }
       } else {
         // log coupon remove from card
         //var cat = gsnStore.getCategories()[item.CategoryId];
-        $analytics.eventTrack('CouponRemoveFromCard', { category: item.ExtCategory, label: item.Description1, item: item });
+        $analytics.eventTrack('CouponRemoveFromCard', { category: item.ExtCategory, label: item.Description, item: item });
 
         // apply
         $timeout(function () {
@@ -316,6 +318,12 @@
         $scope.clippedCoupons[item.ProductCode] = item;
         gsnProfile.clipCoupon(item.ProductCode);
       }
+
+      $analytics.eventTrack('CouponClip', 
+        { category: item.ExtCategory, 
+          label: item.Description, 
+          item: item });
+      
       countClippedCoupons();
     }
 
