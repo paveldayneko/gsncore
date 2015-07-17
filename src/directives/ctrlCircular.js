@@ -184,7 +184,7 @@
         // must use timeout to sync with UI thread
         $timeout(function () {
           // trigger ad refresh for circular page changed
-          $rootScope.$broadcast('gsnevent:digitalcircular-pagechanging', { plugin: scope, circularIndex: $scope.vm.circIdx, pageIndex: $scope.vm.pageIdx });
+          $rootScope.$broadcast('gsnevent:digitalcircular-pagechanging', { circularIndex: $scope.vm.circIdx, pageIndex: $scope.vm.pageIdx });
         }, 50);
 
         var circ = $scope.vm.circular;
