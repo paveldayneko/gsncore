@@ -15,7 +15,7 @@
       if (shoppingList.ShoppingListId == currentListId) {
         var cat = gsnStore.getCategories()[item.CategoryId];
         Gsn.Advertising.addDept(cat.CategoryName);
-        service.actionParam = {evtname: event.name, dept: cat.CategoryName, pdesc: item.Description, pcode: item.Id, brand: item.BrandName};
+        // service.actionParam = {evtname: event.name, dept: cat.CategoryName, pdesc: item.Description, pcode: item.Id, brand: item.BrandName};
         service.doRefresh();
       }
     });
@@ -36,7 +36,7 @@
           }
         });
 
-        service.actionParam = {evtname: event.name, evtcategory: gsnProfile.getShoppingListId() };
+        // service.actionParam = {evtname: event.name, evtcategory: gsnProfile.getShoppingListId() };
       }
     });
 
@@ -63,7 +63,7 @@
     });
 
     $rootScope.$on('gsnevent:digitalcircular-pagechanging', function (event, data) {
-      service.actionParam = {evtname: event.name, evtcategory: data.circularIndex, pdesc: data.pageIndex};
+      // service.actionParam = {evtname: event.name, evtcategory: data.circularIndex, pdesc: data.pageIndex};
       service.doRefresh();
     });
 

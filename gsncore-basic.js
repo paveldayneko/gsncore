@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.3
  * gsncore repository
- * Build date: Thu Jul 16 2015 16:01:55 GMT-0500 (CDT)
+ * Build date: Fri Jul 17 2015 07:46:34 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -2245,7 +2245,7 @@
       if (shoppingList.ShoppingListId == currentListId) {
         var cat = gsnStore.getCategories()[item.CategoryId];
         Gsn.Advertising.addDept(cat.CategoryName);
-        service.actionParam = {evtname: event.name, dept: cat.CategoryName, pdesc: item.Description, pcode: item.Id, brand: item.BrandName};
+        // service.actionParam = {evtname: event.name, dept: cat.CategoryName, pdesc: item.Description, pcode: item.Id, brand: item.BrandName};
         service.doRefresh();
       }
     });
@@ -2266,7 +2266,7 @@
           }
         });
 
-        service.actionParam = {evtname: event.name, evtcategory: gsnProfile.getShoppingListId() };
+        // service.actionParam = {evtname: event.name, evtcategory: gsnProfile.getShoppingListId() };
       }
     });
 
@@ -2293,7 +2293,7 @@
     });
 
     $rootScope.$on('gsnevent:digitalcircular-pagechanging', function (event, data) {
-      service.actionParam = {evtname: event.name, evtcategory: data.circularIndex, pdesc: data.pageIndex};
+      // service.actionParam = {evtname: event.name, evtcategory: data.circularIndex, pdesc: data.pageIndex};
       service.doRefresh();
     });
 
@@ -2738,22 +2738,25 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         }
       });
 
-      $timeout(function() {
-        if ($window._tk){
-          $window._tk.on('track', function(item){
-            // populate with page url, storeid, consumerid, is anonymous
-            item.dt = $scope.currentPath;
-            item.stid = gsnApi.getSelectedStoreId();
-            item.anon = gsnApi.isLoggedIn();
-
-            var profile = $scope.gvm.profile || {};
-            if (profile.Id)
-              item.uid = profile.Id;
-            if (profile.ExternalId)
-              item.loyid = profile.ExternalId;
-          });
+      function doTrakless() {
+        if (gsnApi.isNull($window._tk, null) === null) {
+          $timeout(doTrakless, 50);
+          return;
         }
-      }, 500);
+
+        $window._tk.on('track', function(item){
+          // populate with page url, storeid, consumerid, is anonymous
+          item.dt = $scope.currentPath;
+          item.stid = gsnApi.getSelectedStoreId();
+          item.anon = gsnApi.isLoggedIn();
+
+          var profile = $scope.gvm.profile || {};
+          if (profile.Id)
+            item.uid = profile.Id;
+          if (profile.ExternalId)
+            item.loyid = profile.ExternalId;
+        });
+      }
 
       //#endregion
     } // init
