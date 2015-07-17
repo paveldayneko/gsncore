@@ -167,7 +167,7 @@
       return a.rect.x - b.rect.x;
     }
 
-    function setPage(evt, oldId, newId) {
+    function setPage(oldValue, newValue) {
       if (!$scope.vm.digitalCirc) return;
       if (!$scope.vm.digitalCirc.Circulars) return;
       if ($scope.vm.digitalCirc.Circulars.length <= 0) return;
@@ -180,7 +180,7 @@
           $scope.vm.page.sorted = true;
         }
       }
-      if (oldId != newId){
+      if (oldValue != newValue){
         // must use timeout to sync with UI thread
         $timeout(function () {
           // trigger ad refresh for circular page changed
