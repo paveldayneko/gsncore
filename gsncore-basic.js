@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.3
  * gsncore repository
- * Build date: Fri Jul 17 2015 07:46:34 GMT-0500 (CDT)
+ * Build date: Fri Jul 17 2015 07:50:06 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -551,7 +551,7 @@
             extra.ailse = item.AisleName;
         }
 
-        _tk.event(properties.category, action, properties.label, null, properties.value);
+        _tk.event(properties.category, action, properties.label, null, properties.value, properties.item);
       }
     });
   };
