@@ -181,7 +181,7 @@
         }
       }
       if (oldValue != newValue){
-        var pageIdx = $scope.vm.pageIdx;
+        var pageIdx = gsnApi.isNull($scope.vm.pageIdx, 1);
         // must use timeout to sync with UI thread
         $timeout(function () {
           // trigger ad refresh for circular page changed

@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.3
  * gsncore repository
- * Build date: Fri Jul 17 2015 12:21:24 GMT-0500 (CDT)
+ * Build date: Tue Jul 21 2015 10:47:58 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -1908,11 +1908,11 @@
     // Usage: testValue | replaceWith:'\\s+':'gi':' ' 
     // 
     return function(input, regex, flag, replaceWith) {
-     var patt = new RegExp(regex, flag);      
+      var patt = new RegExp(regex, flag);      
      
-     return input.replace(patt, replaceWith);
-   };
- });
+      return input.replace(patt, replaceWith);
+    };
+  });
 })(angular);
 (function (angular, undefined) {
   'use strict';

@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.3
  * gsncore repository
- * Build date: Fri Jul 17 2015 12:21:24 GMT-0500 (CDT)
+ * Build date: Tue Jul 21 2015 10:47:58 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -7168,11 +7168,11 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     // Usage: testValue | replaceWith:'\\s+':'gi':' ' 
     // 
     return function(input, regex, flag, replaceWith) {
-     var patt = new RegExp(regex, flag);      
+      var patt = new RegExp(regex, flag);      
      
-     return input.replace(patt, replaceWith);
-   };
- });
+      return input.replace(patt, replaceWith);
+    };
+  });
 })(angular);
 (function (angular, undefined) {
   'use strict';
@@ -7606,7 +7606,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         }
       }
       if (oldValue != newValue){
-        var pageIdx = $scope.vm.pageIdx;
+        var pageIdx = gsnApi.isNull($scope.vm.pageIdx, 1);
         // must use timeout to sync with UI thread
         $timeout(function () {
           // trigger ad refresh for circular page changed

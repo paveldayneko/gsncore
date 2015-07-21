@@ -6,9 +6,9 @@
     // Usage: testValue | replaceWith:'\\s+':'gi':' ' 
     // 
     return function(input, regex, flag, replaceWith) {
-     var patt = new RegExp(regex, flag);      
+      var patt = new RegExp(regex, flag);      
      
-     return input.replace(patt, replaceWith);
-   };
- });
+      return input.replace(patt, replaceWith);
+    };
+  });
 })(angular);
