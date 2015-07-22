@@ -32,12 +32,14 @@
 
       function hideCallback() {
         endTime = new Date();
-        if (!track.property)
-          track.property = endTime.getTime() - startTime.getTime();
-        
-        $rootScope.$broadcast('gsnevent:gsnmodal-hide', element, track);
-        if (typeof(hideCb) === 'function'){
-          hideCb();
+        if (track) {
+          if (!track.property)
+            track.property = endTime.getTime() - startTime.getTime();
+          
+          $rootScope.$broadcast('gsnevent:gsnmodal-hide', element, track);
+          if (typeof(hideCb) === 'function'){
+            hideCb();
+          }
         }
       }
 
