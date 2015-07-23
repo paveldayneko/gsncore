@@ -474,7 +474,7 @@
 
     returnObj.doAuthenticate = function (payload) {
       if (payload) {
-        if (!paload.username) {
+        if (!payload.username) {
           payload.username = returnObj.getProfileId();
         }
       }
