@@ -12,7 +12,6 @@
       activated: false,
       isChromePluginAvailable: false
     };
-    var lastIEPluginDetect = false;
     var couponClasses = [];
     var coupons = [];
 
@@ -191,7 +190,11 @@
   	};
   	
   	function isPluginInstalled() {
-        return (gcprinter.isChrome && service.isChromePluginAvailable) || (!gcprinter.isChrome && gcprinter.hasPlugin());
+      if (gcprinter.isChrome) {
+        return service.isChromePluginAvailable;
+      }
+      
+      return gcprinter.hasPlugin();
   	};
   	
   	function isPrinterSupported() {
