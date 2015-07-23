@@ -10,7 +10,8 @@
       loadingScript: false,
       isScriptReady: false,
       activated: false,
-      isChromePluginAvailable: false
+      isDetecting: false,
+      pluginFound: false
     };
     var couponClasses = [];
     var coupons = [];
@@ -77,9 +78,6 @@
         service.isScriptReady = true;
         init();
         $rootScope.$broadcast('gsnevent:gcprinter-initcomplete');
-        if (!isPluginInstalled()) {
-          continousDetect();
-        }
       });
       return;
     }
@@ -124,7 +122,7 @@
         {
           item = gsnStore.getCoupon(v.ItemId, v.ItemTypeId) || v;
         }
-        
+
         couponClasses.push('.coupon-message-' + item.ProductCode);
         coupons.push(item.ProductCode);
       });
@@ -145,6 +143,11 @@
     function printInternal() {
       if (!isPluginInstalled()) {
         $rootScope.$broadcast('gsnevent:gcprinter-not-found');
+
+        if (!service.isDetecting) {
+          service.isDetecting = true;
+          continousDetect();
+        }
       }
       else if (gcprinter.isPluginBlocked()) {
         $rootScope.$broadcast('gsnevent:gcprinter-blocked');
@@ -160,11 +163,11 @@
         gcprinter.print(siteId, coupons);
       }
     };
-		
+
     // continously checks plugin to detect when it's installed
-    function continousDetect() {	
+    function continousDetect() {
       if (isPluginInstalled()) {
-        pluginSuccess();        
+        pluginSuccess();
         return;
       }
 
@@ -178,25 +181,26 @@
         }, 2000);
       }
     };
-	
+
   	function pluginSuccess() {
         // force init
-        gcprinter.init(true);
-          
+        service.pluginFound = true;
+
         $timeout(function() {
-          service.isChromePluginAvailable = true;
           $rootScope.$broadcast('gsnevent:gcprinter-ready');
         }, 5);
+
+        gcprinter.init(true);
   	};
-  	
+
   	function isPluginInstalled() {
-      if (gcprinter.isChrome) {
-        return service.isChromePluginAvailable;
+      if (gcprinter.isChrome){
+        return service.pluginFound;
       }
-      
+
       return gcprinter.hasPlugin();
   	};
-  	
+
   	function isPrinterSupported() {
         var result = false;
         try {
