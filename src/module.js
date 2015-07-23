@@ -473,8 +473,10 @@
     };
 
     returnObj.doAuthenticate = function (payload) {
-      if (!paload.username) {
-        payload.username = returnObj.getProfileId();
+      if (payload) {
+        if (!paload.username) {
+          payload.username = returnObj.getProfileId();
+        }
       }
 
       // make the auth call

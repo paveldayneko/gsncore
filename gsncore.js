@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.3
  * gsncore repository
- * Build date: Thu Jul 23 2015 05:36:07 GMT-0500 (CDT)
+ * Build date: Thu Jul 23 2015 05:36:33 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -1222,8 +1222,10 @@
     };
 
     returnObj.doAuthenticate = function (payload) {
-      if (!paload.username) {
-        payload.username = returnObj.getProfileId();
+      if (payload) {
+        if (!paload.username) {
+          payload.username = returnObj.getProfileId();
+        }
       }
 
       // make the auth call
