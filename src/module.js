@@ -1,7 +1,7 @@
 (function (gsn, angular, undefined) {
   'use strict';
-  
-  /* fake definition of angular-facebook if there is none */ 
+
+  /* fake definition of angular-facebook if there is none */
   angular.module('facebook', []).provider('Facebook', function test(){
     return { init: function() {}, $get: function() { return new test(); } };
   });
@@ -86,7 +86,7 @@
     returnObj.browser = gsn.browser;
 
     returnObj.parsePartialContentData = gsn.parsePartialContentData;
-    
+
     returnObj.delete = gsn.delete;
     //#endregion
 
@@ -329,7 +329,7 @@
           if (allStoreCount == v.StoreIds.length) {
             contentDataResult = v;
           }
-          
+
           return;
         }
 
@@ -473,6 +473,10 @@
     };
 
     returnObj.doAuthenticate = function (payload) {
+      if (!paload.username) {
+        payload.username = returnObj.getProfileId();
+      }
+
       // make the auth call
       $http.post(gsn.config.AuthServiceUrl + "/Token2", payload, { headers: { 'Content-Type': 'application/json', shopping_list_id: returnObj.getShoppingListId() } })
           .success(function (response) {
