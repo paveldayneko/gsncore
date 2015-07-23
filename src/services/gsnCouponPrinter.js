@@ -78,7 +78,7 @@
         service.isScriptReady = true;
         init();
         $rootScope.$broadcast('gsnevent:gcprinter-initcomplete');
-        if (isPluginNotInstalled()) {
+        if (!isPluginInstalled()) {
           continousDetect();
         }
       });
@@ -144,7 +144,7 @@
     };
 
     function printInternal() {
-      if (isPluginNotInstalled()) {
+      if (!isPluginInstalled()) {
         $rootScope.$broadcast('gsnevent:gcprinter-not-found');
       }
       else if (gcprinter.isPluginBlocked()) {
@@ -164,7 +164,7 @@
 		
     // continously checks plugin to detect when it's installed
     function continousDetect() {	
-      if (!isPluginNotInstalled()) {
+      if (isPluginInstalled()) {
         pluginSuccess();        
         return;
       }
@@ -185,14 +185,13 @@
         gcprinter.init(true);
           
         $timeout(function() {
-          if (!gsnApi.browser.isIE)
-            service.isChromePluginAvailable = true;
+          service.isChromePluginAvailable = true;
           $rootScope.$broadcast('gsnevent:gcprinter-ready');
         }, 5);
   	};
   	
-  	function isPluginNotInstalled() {
-        return !gcprinter.hasPlugin() && !(!gsnApi.browser.isIE && service.isChromePluginAvailable);
+  	function isPluginInstalled() {
+        return (gcprinter.isChrome && service.isChromePluginAvailable) || (!gcprinter.isChrome && gcprinter.hasPlugin());
   	};
   	
   	function isPrinterSupported() {
