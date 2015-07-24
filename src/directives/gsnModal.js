@@ -16,7 +16,7 @@
     return directive;
 
     function link(scope, element, attrs) {
-      var myHtml, templateLoader, tplURL, track, hideCb, startTime, endTime;
+      var myHtml, templateLoader, tplURL, track, hideCb, startTime, endTime, timeoutOfOpen;
       tplURL = scope.$eval(attrs.gsnModal);
       scope.$location = $location;
       myHtml = '';
@@ -44,6 +44,8 @@
       }
 
       scope.closeModal = function() {
+	    if(timeoutOfOpen != null)
+		  $timeout.cancel(timeoutOfOpen);
         return gmodal.hide();
       };
 
@@ -94,7 +96,7 @@
       if (attrs.showIf) {
         scope.$watch(attrs.showIf, function(newValue) {
           if (newValue > 0) {
-            $timeout(scope.openModal, 550);
+            timeoutOfOpen = $timeout(scope.openModal, 1550);
           }
         });
       }
@@ -102,17 +104,17 @@
       if (attrs.show) {
         scope.$watch(attrs.show, function (newValue) {
           if (newValue) {
-            $timeout(scope.openModal, 550);
+            timeoutOfOpen = $timeout(scope.openModal, 550);
           } else {
             $timeout(scope.closeModal, 550);
           }
         });
       }
 			
-	  if (attrs.eventToClose) {
+      if (attrs.eventToClose) {
         scope.$on(attrs.eventToClose, function() {
-		  scope.closeModal();
-		});
+          $timeout(scope.closeModal, 5);
+        });
       }
     };
   }]);
