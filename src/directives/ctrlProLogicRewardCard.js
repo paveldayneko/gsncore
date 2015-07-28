@@ -144,10 +144,20 @@
 
         // Reload the loyalty card data.
         $scope.loadLoyaltyCardData();
+      };	  
+      var household = $scope.loyaltyCard.Household;
+      var address = household.Addresses.Address;
+      household.Addresses = {};
+      household.Addresses.Address = [];
+      household.Addresses.Address.push(address);
+      household.PromotionVariables.PromotionVariable = [];
+      var payload = {
+        Household: household,
+        Member: $scope.loyaltyCard.Member
       };
-
-      var url = gsnApi.getStoreUrl().replace(/store/gi, 'ProLogic') + '/SaveCardMember/' + gsnApi.getChainId();
-      $http.post(url, $scope.loyaltyCard, { headers: gsnApi.getApiHeaders() }).success(handleResponse).error(handleResponse);
+	  
+      var url = gsnApi.getStoreUrl().replace(/store/gi, 'ProLogic') + '/SaveCardMember/' + gsnApi.getChainId() + '?cardMemberData=' + JSON.stringify($scope.loyaltyCard);
+      $http.post(url, {}, { headers: gsnApi.getApiHeaders() }).success(handleResponse).error(handleResponse);
     };
 
     ////
