@@ -2,11 +2,11 @@
   'use strict';
   var myModule = angular.module('gsn.core');
 
-  myModule.filter('escape', [function () {
+  myModule.filter('unescapeHtml', [function () {
     // Usage: allow for escaping html
     // 
-    return function (text) {
-      return escape(text);
+    return function (text, escape) {
+      return escape ? escape(text) : unescape(text);
     };
   }]);
 
