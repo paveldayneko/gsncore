@@ -8,7 +8,7 @@
     return function(input, regex, flag, replaceWith) {
       var patt = new RegExp(regex, flag);      
      
-      return escape(input).replace(patt, replaceWith);
+      return input.replace(patt, replaceWith);
     };
   });
 })(angular);
