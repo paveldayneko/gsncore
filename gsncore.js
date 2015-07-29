@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.3
  * gsncore repository
- * Build date: Tue Jul 28 2015 12:19:31 GMT-0500 (CDT)
+ * Build date: Wed Jul 29 2015 09:42:27 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -7094,6 +7094,19 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
   'use strict';
   var myModule = angular.module('gsn.core');
 
+  myModule.filter('escape', [function () {
+    // Usage: allow for escaping html
+    // 
+    return function (text) {
+      return escape(text);
+    };
+  }]);
+
+})(angular);
+(function (angular, undefined) {
+  'use strict';
+  var myModule = angular.module('gsn.core');
+
   myModule.filter('groupBy', ['gsnApi', function (gsnApi) {
     // Usage: for doing grouping
     // 
@@ -7182,7 +7195,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     return function(input, regex, flag, replaceWith) {
       var patt = new RegExp(regex, flag);      
      
-      return input.replace(patt, replaceWith);
+      return escape(input).replace(patt, replaceWith);
     };
   });
 })(angular);
