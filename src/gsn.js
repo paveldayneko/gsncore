@@ -348,7 +348,7 @@
           var e = obj[k];
           if (e) {
             if( Object.prototype.toString.call( e ) !== '[object Array]' ) {
-              e = [e]; 
+              e = [e];
             }
             e.push(item);
           }
@@ -378,7 +378,7 @@
   };
 
   // allow for IE compatible delete
-  gsn.delete = function(obj, key) {
+  gsn.del = function(obj, key) {
     obj[key] = undefined;
     try {
       delete obj[k];
@@ -560,7 +560,7 @@
       root._tk.util.Emitter(gsn);
     }
   };
-  
+
   // support angular initialization
   gsn.initAngular = function ($sceProvider, $sceDelegateProvider, $locationProvider, $httpProvider, FacebookProvider) {
     gsn.applyConfig(root.globalConfig.data || {});
@@ -664,7 +664,7 @@
       if (typeof(uris) == 'string'){
         uris = [uris];
       }
-      
+
       var toProcess = [].concat(uris);
       processNext();
     }

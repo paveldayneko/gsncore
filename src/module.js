@@ -87,7 +87,7 @@
 
     returnObj.parsePartialContentData = gsn.parsePartialContentData;
 
-    returnObj.delete = gsn.delete;
+    returnObj.del = gsn.del;
     //#endregion
 
     //#region gsn.config pass-through

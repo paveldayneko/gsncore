@@ -16,7 +16,7 @@
     };
 
     return directive;
-  }    
+  }
 
   function myController($scope, gsnStore, gsnApi, $timeout, $analytics, $filter, gsnYoutech, gsnProfile, $location, gsnCouponPrinter, gsnRoundyProfile) {
     $scope.activate = activate;
@@ -79,14 +79,14 @@
       var manuCoupons = gsnStore.getManufacturerCoupons(),
           youtechCouponsOriginal = gsnStore.getYoutechCoupons(),
           instoreCoupons = gsnStore.getInstoreCoupons();
-  
+
       if ($scope.couponType == 'printable') {
         gsnCouponPrinter.init();
       }
-      
+
       preprocessCoupons(manuCoupons, youtechCouponsOriginal, instoreCoupons);
     }
-    
+
     function preprocessCoupons(manuCoupons, youtechCouponsOriginal, instoreCoupons) {
 
       if (!$scope.preSelectedCoupons.items) {
@@ -218,7 +218,7 @@
     $scope.$watch('filterByComplex', activate);
     $timeout(activate, 500);
 
-    //#region Internal Methods             
+    //#region Internal Methods
     function printManufacturerCoupon(evt, item) {
       gsnCouponPrinter.print([item]);
     }
@@ -260,9 +260,9 @@
 		$scope.printer.total = 0;
       }
     });
-		
+
   	function showPrint() {
-  	  $scope.printer.printed = null; 
+  	  $scope.printer.printed = null;
   	  var clippedCouponsInArr = [];
   	  for(var key in $scope.clippedCoupons){
   	    clippedCouponsInArr.push($scope.clippedCoupons[key]);
@@ -270,11 +270,11 @@
   	  $scope.printer.total = clippedCouponsInArr.length;
   	}
 
-    function printClippedCoupons() {     
+    function printClippedCoupons() {
 	    var clippedCouponsInArr = [];
       for(var key in $scope.clippedCoupons){
         clippedCouponsInArr.push($scope.clippedCoupons[key]);
-      } 
+      }
       gsnCouponPrinter.print(clippedCouponsInArr);
       $scope.$emit('gsnevent:closemodal');
     }
@@ -319,11 +319,11 @@
         gsnProfile.clipCoupon(item.ProductCode);
       }
 
-      $analytics.eventTrack('CouponClip', 
-        { category: item.ExtCategory, 
-          label: item.Description, 
+      $analytics.eventTrack('CouponClip',
+        { category: item.ExtCategory,
+          label: item.Description,
           item: item });
-      
+
       countClippedCoupons();
     }
 
@@ -333,7 +333,7 @@
 
     function unclipCoupon(item) {
       if ($scope.clippedCoupons[item.ProductCode]) {
-        $scope.clippedCoupons = gsnApi.delete($scope.clippedCoupons, item.ProductCode);
+        $scope.clippedCoupons = gsnApi.del($scope.clippedCoupons, item.ProductCode);
         gsnProfile.unclipCoupon(item.ProductCode);
       }
       countClippedCoupons();

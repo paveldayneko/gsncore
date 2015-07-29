@@ -61,7 +61,7 @@
       $scope.topicsByValue = gsnApi.mapObject($scope.topics, 'key');
       $scope.parentTopics = $scope.topicsByValue[''];
 
-      delete $scope.topicsByValue[''];
+      $scope.topicsByValue = gsnApi.del($scope.topicsByValue['']);
     }
 
     $scope.getSubTopics = function () {
