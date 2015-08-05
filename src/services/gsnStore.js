@@ -642,6 +642,7 @@
         }
         
         circularMaster.items.push(item);
+        item.SmallImageUrl = item.ImageUrl.replace('upload.gsngrocers.com/', 'upload.gsngrocers.com/rs/120,fit/');
         items.push(item);
       });
     }

@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.3
+ * version 1.6.4
  * gsncore repository
- * Build date: Wed Jul 29 2015 18:16:29 GMT-0500 (CDT)
+ * Build date: Wed Aug 05 2015 15:17:13 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -6854,6 +6854,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         }
         
         circularMaster.items.push(item);
+        item.SmallImageUrl = item.ImageUrl.replace('upload.gsngrocers.com/', 'upload.gsngrocers.com/rs/120,fit/');
         items.push(item);
       });
     }
