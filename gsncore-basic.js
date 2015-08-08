@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.4
  * gsncore repository
- * Build date: Wed Aug 05 2015 15:17:13 GMT-0500 (CDT)
+ * Build date: Sat Aug 08 2015 00:27:17 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -8040,9 +8040,6 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       }
 
       loadShare();
-
-
-      $timeout(loadShare, 500);
     }
   }]);
 

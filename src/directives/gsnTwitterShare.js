@@ -44,9 +44,6 @@
       }
 
       loadShare();
-
-
-      $timeout(loadShare, 500);
     }
   }]);
 
