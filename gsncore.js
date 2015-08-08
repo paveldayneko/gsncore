@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.4
  * gsncore repository
- * Build date: Sat Aug 08 2015 00:27:17 GMT-0500 (CDT)
+ * Build date: Sat Aug 08 2015 00:35:56 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -13018,17 +13018,19 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       var loadingScript = false;
       
       function loadShare() {
+
         if (typeof twttr === "undefined") {
-          $timeout(loadShare, 500);
+
           if (loadingScript) return;
           loadingScript = true;
-
           // dynamically load twitter
           var src = '//platform.twitter.com/widgets.js';
           gsnApi.loadScripts([src], loadShare);
           return;
         }
 
+        if (element.html().length > 10) return;
+        
         var options = scope.$eval(attrs.gsnTwitterShare);
         angular.extend(defaults, options);
         twttr.widgets.createShareButton(
