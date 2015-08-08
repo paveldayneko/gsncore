@@ -19,7 +19,6 @@
 
       function loadTimeline() {
         if (typeof twttr === "undefined") {
-          $timeout(loadTimeline, 500);
           if (loadingScript) return;
           loadingScript = true;
 
