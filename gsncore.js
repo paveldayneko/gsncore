@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.4
+ * version 1.6.5
  * gsncore repository
- * Build date: Sat Aug 08 2015 00:36:30 GMT-0500 (CDT)
+ * Build date: Tue Sep 01 2015 17:44:39 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -851,7 +851,7 @@
     };
 
     returnObj.getContentServiceUrl = function (method) {
-      return gsn.getContentServiceUrl('/' + method + '/' + returnObj.getChainId() + '/' + returnObj.isNull(returnObj.getSelectedStoreId(), '0') + '/').replace('clientapi.gsn2.com/', 'clientapi.gsngrocers.com/');
+      return gsn.getContentServiceUrl('/' + method + '/' + returnObj.getChainId() + '/' + returnObj.isNull(returnObj.getSelectedStoreId(), '0') + '/').replace('clientapi.gsn2.com/', 'clientapi.gsngrocers.com/').replace('https://', $location.protocol() + '://');
     };
     returnObj.getDefaultLayout = function(defaultUrl) {
       if (gsn.config.DefaultLayout) {
