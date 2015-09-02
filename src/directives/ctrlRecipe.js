@@ -97,16 +97,9 @@
     function addSelectedIngredients() {
       var toAdd = [];
       angular.forEach($scope.vm.recipe.Ingredients, function (v, k) {
-        if (v.selected) {
-          if (v.Quantity > 0) {
-            v.Quantity = Math.round(v.Quantity + 0.4);
-          } else {
-            v.Quantity = 1;
-          }
-
-          if (gsnApi.isNull($scope.recipeQuantity, null) !== null) {
-            v.Quantity = $scope.recipeQuantity;
-          }
+        if (v.selected) {          
+            v.Quantity = 1; 
+            v.Comment=v.StandardText;		
 
           toAdd.push(v);
         }
