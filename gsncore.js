@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.5
+ * version 1.6.6
  * gsncore repository
- * Build date: Tue Sep 01 2015 17:44:39 GMT-0500 (CDT)
+ * Build date: Tue Sep 08 2015 11:50:21 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -9510,16 +9510,9 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     function addSelectedIngredients() {
       var toAdd = [];
       angular.forEach($scope.vm.recipe.Ingredients, function (v, k) {
-        if (v.selected) {
-          if (v.Quantity > 0) {
-            v.Quantity = Math.round(v.Quantity + 0.4);
-          } else {
-            v.Quantity = 1;
-          }
-
-          if (gsnApi.isNull($scope.recipeQuantity, null) !== null) {
-            v.Quantity = $scope.recipeQuantity;
-          }
+        if (v.selected) {          
+            v.Quantity = 1; 
+            v.Comment=v.StandardText;		
 
           toAdd.push(v);
         }
