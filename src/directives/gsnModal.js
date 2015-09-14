@@ -23,7 +23,7 @@
       templateLoader = $http.get(tplURL, {
         cache: $templateCache
       }).success(function(html) {
-        return myHtml = '<div class="myModalForm modal" style="display: block"><div class="modal-dialog">' + html + '</div></div>"';
+        return myHtml = '<div class="myModalForm" style="display: block"><div class="modal-dialog">' + html + '</div></div>"';
       });
       if (attrs.track) {
         track = scope.$eval(attrs.track);

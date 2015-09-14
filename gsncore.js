@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.6
+ * version 1.6.7
  * gsncore repository
- * Build date: Tue Sep 08 2015 11:50:21 GMT-0500 (CDT)
+ * Build date: Mon Sep 14 2015 17:30:50 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -4956,7 +4956,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     var service = {
       alert: function (message) {
         if (!$window.isPhoneGap) {
-          gmodal.show({content: '<div class="myModalForm modal" style="display: block"><div class="modal-dialog"><div class="modal-content"><div class="modal-body">' + message + '<br /><br/><button class="btn btn-default gmodal-close pull-right" style="width: 80px" data-ng-click="closeModal()">OK</button><br /></div></div></div></div>', hideOn: "click,esc,tap"})
+          gmodal.show({content: '<div class="myModalForm" style="display: block"><div class="modal-dialog"><div class="modal-content"><div class="modal-body">' + message + '<br /><br/><button class="btn btn-default gmodal-close pull-right" style="width: 80px" data-ng-click="closeModal()">OK</button><br /></div></div></div></div>', hideOn: "click,esc,tap"})
           return;
         }
 
@@ -11688,7 +11688,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       templateLoader = $http.get(tplURL, {
         cache: $templateCache
       }).success(function(html) {
-        return myHtml = '<div class="myModalForm modal" style="display: block"><div class="modal-dialog">' + html + '</div></div>"';
+        return myHtml = '<div class="myModalForm" style="display: block"><div class="modal-dialog">' + html + '</div></div>"';
       });
       if (attrs.track) {
         track = scope.$eval(attrs.track);
