@@ -391,7 +391,7 @@
       return profileStorage.storeId || 0;
     };
 
-    returnObj.setSelectedStoreId = function (storeId) {
+    returnObj.setSelectedStoreId = function (storeId, newUrl, timeout) {
       // make sure we don't set a bad store id
       var storeIdInt = parseInt(storeId);
       if (returnObj.isNaN(storeIdInt, 0) <= 0) {
@@ -400,7 +400,12 @@
 
       var previousStoreId = profileStorage.storeId;
       profileStorage.storeId = storeId;
-      $rootScope.$broadcast('gsnevent:store-setid', {newValue: storeId, oldValue: previousStoreId });
+      $rootScope.$broadcast('gsnevent:store-setid', { newValue: storeId, oldValue: previousStoreId });
+      if (newUrl) {
+        $timeout(function() {
+          returnObj.goUrl(newUrl, '_reload')
+        }, timeout || 500);
+      }
     };
 
     returnObj.getProfileId = function () {
