@@ -102,7 +102,7 @@
       function processData(data) {
         partialData = gsnApi.parsePartialContentData(data);
         scope.partialContents = scope.getContentList();
-        scope.layout = scope.getConfig('layout').Description || 'default';
+        scope.pcvm.layout = scope.getConfig('layout').Description || 'default';
       }
       //#endregion
     }
