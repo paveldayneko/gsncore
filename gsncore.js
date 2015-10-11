@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.11
  * gsncore repository
- * Build date: Sat Oct 10 2015 22:44:27 GMT-0500 (CDT)
+ * Build date: Sat Oct 10 2015 22:50:37 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -6475,7 +6475,9 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
     returnObj.getPartial = function (contentName) {
       var url = gsnApi.getContentServiceUrl('GetPartial');
-      url += '?name=' + encodeURIComponent(contentName) + '&nocache=' + (new Date()).getHours();
+      var today = new Date();
+      var nocache = today.getFullYear() + '' + today.getMonth() + '' + today.getDate() + '' + today.getHours();
+      url += '?name=' + encodeURIComponent(contentName) + '&nocache=' +  nocache;
 
       return gsnApi.http({}, url);
     };
