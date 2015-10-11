@@ -256,7 +256,9 @@
 
     returnObj.getPartial = function (contentName) {
       var url = gsnApi.getContentServiceUrl('GetPartial');
-      url += '?name=' + encodeURIComponent(contentName) + '&nocache=' + (new Date()).getHours();
+      var today = new Date();
+      var nocache = today.getFullYear() + '' + today.getMonth() + '' + today.getDate() + '' + today.getHours();
+      url += '?name=' + encodeURIComponent(contentName) + '&nocache=' +  nocache;
 
       return gsnApi.http({}, url);
     };
