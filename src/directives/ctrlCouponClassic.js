@@ -22,10 +22,7 @@
     $scope.addCouponToCard = addCouponToCard;
     $scope.printManufacturerCoupon = printManufacturerCoupon;
     $scope.loadMore = loadMore;
-    $scope.printer = { blocked: 0, 
-      notsupported: 0, notinstalled: 0, printed: null, 
-      count: 0, total: 0, isChrome: /chrome/gi.test(gsnApi.userAgent) };
-
+    $scope.printer = { blocked: 0, notsupported: 0, notinstalled: 0, printed: null, count: 0, total: 0, isChrome: /chrome/gi.test(gsnApi.userAgent) };
 
     $scope.isValidProLogic = false;
     $scope.selectedCoupons = {
@@ -184,6 +181,7 @@
         if (count > 0) {
           $scope.printer.count = count;
         }
+        $scope.printer.total = 0;
       }
     });
     $timeout(activate, 500);

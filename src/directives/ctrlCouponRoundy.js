@@ -257,7 +257,7 @@
         if (count > 0) {
           $scope.printer.count = count;
         }
-		$scope.printer.total = 0;
+		    $scope.printer.total = 0;
       }
     });
 

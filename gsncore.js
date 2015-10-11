@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.10
+ * version 1.6.11
  * gsncore repository
- * Build date: Tue Sep 29 2015 21:01:27 GMT-0500 (CDT)
+ * Build date: Sat Oct 10 2015 22:44:27 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -6475,7 +6475,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
     returnObj.getPartial = function (contentName) {
       var url = gsnApi.getContentServiceUrl('GetPartial');
-      url += '?name=' + encodeURIComponent(contentName);
+      url += '?name=' + encodeURIComponent(contentName) + '&nocache=' + (new Date()).getHours();
 
       return gsnApi.http({}, url);
     };
@@ -7849,10 +7849,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     $scope.addCouponToCard = addCouponToCard;
     $scope.printManufacturerCoupon = printManufacturerCoupon;
     $scope.loadMore = loadMore;
-    $scope.printer = { blocked: 0, 
-      notsupported: 0, notinstalled: 0, printed: null, 
-      count: 0, total: 0, isChrome: /chrome/gi.test(gsnApi.userAgent) };
-
+    $scope.printer = { blocked: 0, notsupported: 0, notinstalled: 0, printed: null, count: 0, total: 0, isChrome: /chrome/gi.test(gsnApi.userAgent) };
 
     $scope.isValidProLogic = false;
     $scope.selectedCoupons = {
@@ -8011,6 +8008,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         if (count > 0) {
           $scope.printer.count = count;
         }
+        $scope.printer.total = 0;
       }
     });
     $timeout(activate, 500);
