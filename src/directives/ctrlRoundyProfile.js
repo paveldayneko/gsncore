@@ -317,7 +317,7 @@
             case "SameCustomer":
               //Found
               $scope.foundProfile = result.response.Response.Profile;
-              $scope.foundProfile.FreshPerksCard = $scope.foundProfile.ExternalId;
+              $scope.foundProfile.FreshPerksCard = $scope.foundProfile.ExternalId;              
               $scope.input.updateProfile = true;
               goFoundCardScreen();
               break;
@@ -325,6 +325,7 @@
               gsnRoundyProfile.associateLoyaltyCardToProfile($scope.foundProfile.FreshPerksCard).then(function (rslt) {
                 //TODO: check errors 
                 gsnRoundyProfile.profile.FreshPerksCard = $scope.foundProfile.FreshPerksCard;
+                gsnRoundyProfile.profile.ExternalId = $scope.foundProfile.FreshPerksCard;
                 gsnRoundyProfile.profile.IsECard = false;
                 close();
               });
