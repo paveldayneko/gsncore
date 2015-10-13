@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.11
+ * version 1.6.12
  * gsncore repository
- * Build date: Sat Oct 10 2015 22:50:37 GMT-0500 (CDT)
+ * Build date: Tue Oct 13 2015 11:46:07 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -6635,7 +6635,9 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       }
       else if (search.store) {
         var storeByUrl = gsnApi.mapObject(storeList, 'StoreUrl');
-        gsnApi.setSelectedStoreId(storeByNumber[search.store].StoreId);
+        if (storeByNumber[search.store]) {
+          gsnApi.setSelectedStoreId(storeByNumber[search.store].StoreId);
+        }
       }
     }
 
