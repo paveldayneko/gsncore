@@ -416,7 +416,9 @@
       }
       else if (search.store) {
         var storeByUrl = gsnApi.mapObject(storeList, 'StoreUrl');
-        gsnApi.setSelectedStoreId(storeByNumber[search.store].StoreId);
+        if (storeByNumber[search.store]) {
+          gsnApi.setSelectedStoreId(storeByNumber[search.store].StoreId);
+        }
       }
     }
 
