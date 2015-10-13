@@ -107,8 +107,9 @@
           if ($scope.profile.FirstName)
             profile.FirstName = $scope.profile.FirstName;
           if ($scope.profile.LastName)
-            profile.LastName = $scope.profile.LastName;
+            profile.LastName = $scope.profile.LastName;          
           profile.PrimaryStoreId = $scope.profile.PrimaryStoreId;
+          profile.ExternalId = $scope.profile.ExternalId;
           $rootScope.$broadcast('gsnevent:profile-load-success', { success: true, response: profile });
         }
       });
@@ -316,7 +317,7 @@
             case "SameCustomer":
               //Found
               $scope.foundProfile = result.response.Response.Profile;
-              $scope.foundProfile.FreshPerksCard = $scope.foundProfile.ExternalId;
+              $scope.foundProfile.FreshPerksCard = $scope.foundProfile.ExternalId;              
               $scope.input.updateProfile = true;
               goFoundCardScreen();
               break;
@@ -324,6 +325,7 @@
               gsnRoundyProfile.associateLoyaltyCardToProfile($scope.foundProfile.FreshPerksCard).then(function (rslt) {
                 //TODO: check errors 
                 gsnRoundyProfile.profile.FreshPerksCard = $scope.foundProfile.FreshPerksCard;
+                gsnRoundyProfile.profile.ExternalId = $scope.foundProfile.FreshPerksCard;
                 gsnRoundyProfile.profile.IsECard = false;
                 close();
               });
@@ -358,6 +360,7 @@
           $scope.validateErrorMessage = 'Loyalty Card can not be removed now';
         } else {
           gsnRoundyProfile.profile.FreshPerksCard = null;
+          gsnRoundyProfile.profile.ExternalId = null;
           $scope.isLoading = false;
           $scope.close();
         }
@@ -403,6 +406,7 @@
           gsnRoundyProfile.profile = $scope.foundProfile;
           gsnRoundyProfile.profile.IsECard = true;
           gsnRoundyProfile.profile.FreshPerksCard = result.response.Response.LoyaltyECardNumber;
+          gsnRoundyProfile.profile.ExternalId = result.response.Response.LoyaltyECardNumber;
           close();
         }
       });
