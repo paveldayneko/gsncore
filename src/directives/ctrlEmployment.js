@@ -100,8 +100,10 @@
     ////
     $scope.activate = function () {
 
-      // Get the PositionId
+      // Get the PositionId and StoreId
       $scope.jobPositionId = $location.search().Pid;
+      $scope.storeId = $location.search().Sid;
+
 
       // Generate the Urls.
       var Url = gsnApi.getStoreUrl().replace(/store/gi, 'job') + '/GetChainJobPositions/' + gsnApi.getChainId();
@@ -121,8 +123,19 @@
             if ($scope.jobPositionList[index].JobPositionId == $scope.jobPositionId) {
 
               // Store the list of job openings.
-              $scope.jobOpenings = $scope.jobPositionList[index].JobOpenings;
+              $scope.jobOpenings = angular.fromJson($scope.jobPositionList[index].Openings);
               $scope.jobPositionTitle = $scope.jobPositionList[index].JobPositionTitle;
+
+               if ($scope.storeId) {
+                for (var i = $scope.jobOpenings.length - 1; i >= 0; i--) {
+                  if ($scope.jobOpenings[i].StoreId!=$scope.storeId) {
+                    $scope.jobOpenings.splice(i, 1);
+                  } else {
+                    $scope.email.selectedStore = $scope.jobOpenings[i].OpeningStore;
+                    break;
+                  }
+                }
+              }
 
               // Break out of the loop, we found our man.
               break;
