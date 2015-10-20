@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.13
+ * version 1.6.14
  * gsncore repository
- * Build date: Mon Oct 19 2015 02:04:34 GMT-0500 (Central Daylight Time)
+ * Build date: Tue Oct 20 2015 16:28:00 GMT-0500 (CDT)
  */
 ; (function () {
   'use strict';
@@ -5087,6 +5087,8 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       processingQueue.push(function () {
         if (cb) cb();
         _cp.lastProcessDate = new Date().getDate();
+        // sort by circulartypeid
+        gsnApi.sortOn(circularData.Circulars, 'CircularTypeId');
         $rootScope.$broadcast('gsnevent:circular-loaded', { success: true, response: circularData });
         return;
       });

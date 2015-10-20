@@ -25,7 +25,7 @@ var allSources = ['src/gsn.js', 'src/module.js', 'src/gsn-ui-map.js', 'src/angul
   'src/directives/!(ctrlCouponRoundy|ctrlRoundyProfile).js'];
 
 gulp.task('bump', function(){
-    return gulp.src(['./package.json'])
+    return gulp.src(['./package.json', './component.json'])
         .pipe(bump({type: 'patch'}))
         .pipe(gulp.dest('./'));
 });
