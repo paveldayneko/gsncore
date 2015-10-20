@@ -556,6 +556,8 @@
       processingQueue.push(function () {
         if (cb) cb();
         _cp.lastProcessDate = new Date().getDate();
+        // sort by circulartypeid
+        gsnApi.sortOn(circularData.Circulars, 'CircularTypeId');
         $rootScope.$broadcast('gsnevent:circular-loaded', { success: true, response: circularData });
         return;
       });
