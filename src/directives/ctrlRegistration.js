@@ -20,7 +20,7 @@
   function myController($scope, gsnProfile, gsnApi, $timeout, gsnStore, $interpolate, $http, $rootScope, $window, $location, $analytics) {
     $scope.activate = activate;
     $scope.totalSavings = '';
-    $scope.profile = { PrimaryStoreId: gsnApi.getSelectedStoreId(), ReceiveEmail: true };
+    $scope.profile = { PrimaryStoreId: gsnApi.getSelectedStoreId(), ReceiveEmail: false };
 
     $scope.hasSubmitted = false;    // true when user has click the submit button
     $scope.isValidSubmit = true;    // true when result of submit is valid
