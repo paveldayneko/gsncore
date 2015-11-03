@@ -567,7 +567,7 @@
         Email: email,
         UserName: username,
         Password: gsnApi.isNull(profile.Password, ''),
-        ReceiveEmail: gsnApi.isNull(profile.ReceiveEmail, true),   
+        ReceiveEmail: gsnApi.isNull(profile.ReceiveEmail, false),   
         ReceiveSms: gsnApi.isNull(profile.ReceiveSms, true),        
         Phone: gsnApi.isNull(profile.Phone, '').replace(/[^0-9]+/gi, ''),
         PrimaryStoreId: gsnApi.isNull(profile.PrimaryStoreId, gsnApi.getSelectedStoreId()),
