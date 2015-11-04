@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.14
+ * version 1.6.15
  * gsncore repository
- * Build date: Tue Oct 20 2015 16:28:00 GMT-0500 (CDT)
+ * Build date: Wed Nov 04 2015 16:00:52 GMT+0300 (Belarus Standard Time)
  */
 ; (function () {
   'use strict';
@@ -4092,7 +4092,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         Email: email,
         UserName: username,
         Password: gsnApi.isNull(profile.Password, ''),
-        ReceiveEmail: gsnApi.isNull(profile.ReceiveEmail, true),   
+        ReceiveEmail: gsnApi.isNull(profile.ReceiveEmail, false),   
         ReceiveSms: gsnApi.isNull(profile.ReceiveSms, true),        
         Phone: gsnApi.isNull(profile.Phone, '').replace(/[^0-9]+/gi, ''),
         PrimaryStoreId: gsnApi.isNull(profile.PrimaryStoreId, gsnApi.getSelectedStoreId()),
