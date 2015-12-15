@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.15
+ * version 1.6.16
  * gsncore repository
- * Build date: Wed Nov 04 2015 16:00:52 GMT+0300 (Belarus Standard Time)
+ * Build date: Tue Dec 15 2015 16:05:23 GMT-0600 (CST)
  */
 ; (function () {
   'use strict';
