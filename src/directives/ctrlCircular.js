@@ -54,10 +54,19 @@
       if (gsnStore.hasCompleteCircular()) {
         var data = gsnStore.getCircularData();
 
-        if (data.Circulars.length <= 0) {
-          return;
-        }
-        
+		//Filter circulars
+		if(data.Circulars.length > 0) {
+			var filteredByStoreCircs = []
+			var storeId = gsnApi.isNull(gsnApi.getSelectedStoreId(), 0);
+			angular.forEach(data.Circulars, function (circ) {
+				if(gsn.contains(circ.StoreIds, storeId))
+					filteredByStoreCircs.push(circ);
+			});
+			data.Circulars = filteredByStoreCircs;
+		} else {
+			return;
+		}
+		
         if (data.Circulars.length == 1) {
           if (gsnApi.isNull($scope.vm.circIdx, null) === null) {
             $scope.vm.circIdx = 1;
