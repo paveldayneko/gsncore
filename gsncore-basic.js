@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.16
  * gsncore repository
- * Build date: Tue Dec 15 2015 16:05:23 GMT-0600 (CST)
+ * Build date: Tue Dec 29 2015 16:37:01 GMT+0300 (Belarus Standard Time)
  */
 ; (function () {
   'use strict';
@@ -6318,6 +6318,27 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       });
     }
   }]);
+})(angular);
+(function (angular, undefined) {
+  'use strict';
+  var myModule = angular.module('gsn.core');
+
+  myModule.directive('gsnDynamic', ['$compile', function ($compile) {
+    var directive = {
+      restrict: 'A',
+      replace: true,
+      link: link
+    };
+    return directive;
+
+    function link(scope, element, attrs) {
+	  scope.$watch(attrs.dynamic, function(html) {
+        element.html(html);
+        $compile(element.contents())(scope);
+      });
+    }
+  }]);
+
 })(angular);
 (function (angular, undefined) {
   var createDirective, module, pluginName, _i, _len, _ref;
