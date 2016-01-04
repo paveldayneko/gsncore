@@ -103,8 +103,11 @@
 
 
     $scope.doRecipeSearch = function () {
-      var search = $scope.recipeSearch, attributes = '', resultString = 'SearchTerm:' + gsnApi.isNull(search.term, '') + ';';
-
+      var search = $scope.recipeSearch, attributes = '', resultString = '';
+	  
+      if (gsnApi.isNull(search.term, '').length > 0) {
+        resultString += 'SearchTerm:' + gsnApi.isNull(search.term, '') + ';';
+      }
       if (gsnApi.isNull(search.preptime, '').length > 0) {
         resultString += 'Time:' + gsnApi.isNull(search.preptime, '') + ';';
       }
