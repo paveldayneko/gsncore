@@ -20,11 +20,11 @@
       scope.isAndroid = gsnApi.browser.isAndroid;
 
       // going to show this popUp only for iOs and Android users
-       if (!gsnApi.browser.isMobile && !(scope.isIOS||scope.isAndroid))
-         return;
+      if (!(scope.isIOS || scope.isAndroid))
+        return;
 
-       if ($localStorage.hasMobileApp)
-         return;
+      if ($localStorage.hasMobileApp)
+        return;
 
       var url = 'http://clientapi.gsngrocers.com/api/v1/content/meta/' + gsnApi.getChainId() + '/?name=home%20page&meta=mobileAppPage&type=text/html&nocache=';
       var today = new Date();
@@ -46,7 +46,9 @@
 
       scope.downloadApp = function(url) {
         $localStorage.hasMobileApp = true;
+        var result = gmodal.hide();
         gsnApi.goUrl(url, '_self');
+        return result;
       };
 
       scope.rejectApp = function() {
