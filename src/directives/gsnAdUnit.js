@@ -39,7 +39,7 @@
         } else {
           if (hasTile) {
             // find adunit
-            elm.find('.gsnadunit').addClass('gsnunit');
+            elm.find('.gsnadunit').addClass('brickunit');
             
             // broadcast message
             $rootScope.$broadcast('gsnevent:loadads');

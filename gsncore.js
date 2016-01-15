@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.20
  * gsncore repository
- * Build date: Thu Jan 14 2016 19:39:13 GMT-0600 (CST)
+ * Build date: Fri Jan 15 2016 09:15:37 GMT-0600 (CST)
  */
 ; (function () {
   'use strict';
@@ -10937,7 +10937,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         } else {
           if (hasTile) {
             // find adunit
-            elm.find('.gsnadunit').addClass('gsnunit');
+            elm.find('.gsnadunit').addClass('brickunit');
             
             // broadcast message
             $rootScope.$broadcast('gsnevent:loadads');
