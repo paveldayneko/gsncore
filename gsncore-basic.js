@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.19
+ * version 1.6.20
  * gsncore repository
- * Build date: Tue Jan 12 2016 17:16:52 GMT+0300 (Belarus Standard Time)
+ * Build date: Thu Jan 14 2016 19:39:13 GMT-0600 (CST)
  */
 ; (function () {
   'use strict';
@@ -1993,19 +1993,18 @@
 
   function gsnAdvertising($timeout, $location, gsnProfile, gsnApi, $window) {
     var returnObj = {};
-    var myGsn = $window.Gsn.Advertising;
+    var bricktag = $window.bricktag;
+    
+    if (!bricktag)
+      return returnObj;
 
-    myGsn.onAllEvents = function(evt){
-      gsn.emit(evt.en, evt.detail);
-    };
-
-    myGsn.on('clickRecipe', function (data) {
+    bricktag.on('clickRecipe', function (data) {
       $timeout(function () {
         $location.url('/recipe/' + data.detail.RecipeId);
       });
     });
 
-    myGsn.on('clickProduct', function (data) {
+    bricktag.on('clickProduct', function (data) {
       $timeout(function () {
         var product = data.detail;
         if (product) {
@@ -2023,7 +2022,7 @@
       });
     });
 
-    myGsn.on('clickLink', function (data) {
+    bricktag.on('clickLink', function (data) {
       $timeout(function () {
         var linkData = data.detail;
         if (linkData) {
@@ -2032,6 +2031,8 @@
           if (target == '_blank') {
             // this is a link out to open in new window
             // $window.open(url, '');
+            // commented out because it is not possible to open with interaction
+            // it must be done on the ads itself
           } else {
             // assume this is an internal redirect
             if (url.indexOf('/') < 0) {
@@ -2272,12 +2273,17 @@
       actionParam: null,
       doRefresh: debounce(doRefresh, 500)
     };
+    var bricktag = $window.bricktag || {
+      addDept: function() {},
+      refresh: function() {},
+      setDefault: function() {}
+    };
 
     function shoppingListItemChange(event, shoppingList, item) {
       var currentListId = gsnApi.getShoppingListId();
       if (shoppingList.ShoppingListId == currentListId) {
         var cat = gsnStore.getCategories()[item.CategoryId];
-        Gsn.Advertising.addDept(cat.CategoryName);
+        bricktag.addDept(cat.CategoryName);
         // service.actionParam = {evtname: event.name, dept: cat.CategoryName, pdesc: item.Description, pcode: item.Id, brand: item.BrandName};
         service.doRefresh();
       }
@@ -2297,7 +2303,7 @@
 
           if (categories[item.CategoryId]) {
             var newKw = categories[item.CategoryId].CategoryName;
-            Gsn.Advertising.addDept(newKw);
+            bricktag.addDept(newKw);
           }
         });
 
@@ -2310,7 +2316,7 @@
       gsnProfile.getProfile().then(function(p){
         var isLoggedIn = gsnApi.isLoggedIn();
 
-        Gsn.Advertising.setDefault({ 
+        bricktag.setDefault({ 
           page: currentPath, 
           storeid: gsnApi.getSelectedStoreId(), 
           consumerid: gsnProfile.getProfileId(), 
@@ -2339,51 +2345,14 @@
     // initialization
     function init() {
       if (service.isIE) {
-        Gsn.Advertising.minSecondBetweenRefresh = 15;
+        bricktag.minSecondBetweenRefresh = 15;
       }
-    }
-
-    // attempt to update network id
-    function updateNetworkId() {
-      gsnStore.getStore().then(function (rst) {
-        if (service.store != rst) {
-          var baseNetworkId;
-
-          if (rst) {
-            baseNetworkId = '/' + rst.City + '-' + rst.StateName + '-' + rst.PostalCode + '-' + rst.StoreId;
-            baseNetworkId = baseNetworkId.replace(/(undefined)+/gi, '').replace(/\s+/gi, '');
-          }
-          Gsn.Advertising.gsnNetworkStore = baseNetworkId;
-        }
-      });
     }
 
     // refresh method
     function doRefresh() {
       ($rootScope.gvm || {}).adsCollapsed = false;
-      updateNetworkId();
-      
-      // targetted campaign
-      if (parseFloat(gsnApi.isNull($sessionStorage.GsnCampaign, 0)) <= 0) {
-
-        $sessionStorage.GsnCampaign = gsnApi.getProfileId();
-
-        // try to get campaign
-        gsnProfile.getCampaign().then(function (rst) {
-          if (rst.success) {
-            angular.forEach(rst.response, function (v, k) {
-              Gsn.Advertising.addDept(v.Value);
-            });
-          }
-          Gsn.Advertising.refresh(service.actionParam, service.forceRefresh);
-          service.forceRefresh = false;
-        });
-
-        // don't need to continue with the refresh since it's being patched through get campaign above
-        return;
-      }
-
-      Gsn.Advertising.refresh(service.actionParam, service.forceRefresh);
+      bricktag.refresh(service.actionParam, service.forceRefresh);
       service.forceRefresh = false;
     }
   }

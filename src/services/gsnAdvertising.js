@@ -6,19 +6,18 @@
 
   function gsnAdvertising($timeout, $location, gsnProfile, gsnApi, $window) {
     var returnObj = {};
-    var myGsn = $window.Gsn.Advertising;
+    var bricktag = $window.bricktag;
+    
+    if (!bricktag)
+      return returnObj;
 
-    myGsn.onAllEvents = function(evt){
-      gsn.emit(evt.en, evt.detail);
-    };
-
-    myGsn.on('clickRecipe', function (data) {
+    bricktag.on('clickRecipe', function (data) {
       $timeout(function () {
         $location.url('/recipe/' + data.detail.RecipeId);
       });
     });
 
-    myGsn.on('clickProduct', function (data) {
+    bricktag.on('clickProduct', function (data) {
       $timeout(function () {
         var product = data.detail;
         if (product) {
@@ -36,7 +35,7 @@
       });
     });
 
-    myGsn.on('clickLink', function (data) {
+    bricktag.on('clickLink', function (data) {
       $timeout(function () {
         var linkData = data.detail;
         if (linkData) {
@@ -45,6 +44,8 @@
           if (target == '_blank') {
             // this is a link out to open in new window
             // $window.open(url, '');
+            // commented out because it is not possible to open with interaction
+            // it must be done on the ads itself
           } else {
             // assume this is an internal redirect
             if (url.indexOf('/') < 0) {
