@@ -188,6 +188,7 @@
 
     //#region Internal Methods             
     function printManufacturerCoupon(evt, item) {
+      $scope.printer.total = 1;
       gsnCouponPrinter.print([item]);
 
       $analytics.eventTrack('CouponPrintNow', 
