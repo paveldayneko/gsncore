@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.20
+ * version 1.6.21
  * gsncore repository
- * Build date: Fri Jan 15 2016 09:15:37 GMT-0600 (CST)
+ * Build date: Mon Jan 18 2016 12:35:51 GMT-0600 (CST)
  */
 ; (function () {
   'use strict';
@@ -853,6 +853,7 @@
     returnObj.getContentServiceUrl = function (method) {
       return gsn.getContentServiceUrl('/' + method + '/' + returnObj.getChainId() + '/' + returnObj.isNull(returnObj.getSelectedStoreId(), '0') + '/').replace('clientapi.gsn2.com/', 'clientapi.gsngrocers.com/').replace('https://', $location.protocol() + '://');
     };
+
     returnObj.getDefaultLayout = function(defaultUrl) {
       if (gsn.config.DefaultLayout) {
         return $sce.trustAsResourceUrl(gsn.config.DefaultLayout);
@@ -1381,6 +1382,10 @@
       $timeout(function () {
         $rootScope.appState = 'ready';
       }, 200);
+    };
+
+    returnObj.onevent = function(fn) {
+      $rootScope.$on('gsnevent:*', fn);
     };
 
     //#region authentication event handling
@@ -7999,6 +8004,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
     //#region Internal Methods             
     function printManufacturerCoupon(evt, item) {
+      $scope.printer.total = 1;
       gsnCouponPrinter.print([item]);
 
       $analytics.eventTrack('CouponPrintNow', 
