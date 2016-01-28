@@ -58,9 +58,8 @@
                 var ratio = actualWidth / (width || actualWidth || 1);
                 var newHeight = ratio * height;
 
-                if (newHeight > height){
-                  angular.element(attrs.syncHeight).height(newHeight);
-                }
+                angular.element(attrs.syncHeight).height(newHeight);
+
               }, 200);
 
               resizer();
