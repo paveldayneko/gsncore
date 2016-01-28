@@ -1,15 +1,5 @@
 var gulp =       require('gulp');
-var gutil =      require('gulp-util');
-var uglify =     require('gulp-uglify');
-var jshint =     require('gulp-jshint');;
-var rename =     require('gulp-rename');
-var concat =     require('gulp-concat');
-var header =     require('gulp-header');
-var git =        require('gulp-git');
-var runSeq =     require('run-sequence');
-var inject =     require('gulp-inject');
-var fs =         require('fs');
-var bump =       require('gulp-bump');
+var $    =       require('gulp-load-plugins')();
 var exec =       require('child_process').exec;
 
 var pkg = require('./package.json');
@@ -24,19 +14,30 @@ var banner = [
 var allSources = ['src/gsn.js', 'src/module.js', 'src/gsn-ui-map.js', 'src/angular-recaptcha.js', 'vendor/**.js', 'src/services/*.js', 'src/filters/*.js', 
   'src/directives/!(ctrlCouponRoundy|ctrlRoundyProfile).js'];
 
-gulp.task('bump', function(){
-    return gulp.src(['./package.json', './component.json'])
-        .pipe(bump({type: 'patch'}))
-        .pipe(gulp.dest('./'));
-});
-
 gulp.task('build', function() {
   return gulp.src(allSources)
-    .pipe(concat('gsncore.js'))
-    .pipe(header(banner, {pkg: pkg}))
+    .pipe($.concat('gsncore.js'))
+    .pipe($.header(banner, {pkg: pkg}))
     .pipe(gulp.dest('.'));
 });
 
+gulp.task('bump', function() {
+  gulp.src(['package.json', 'bower.json'])
+  .pipe($.bump({type: 'patch'}))
+  .pipe(gulp.dest('.'));
+});
+
+gulp.task('bump:minor', function() {
+  gulp.src(['package.json', 'bower.json'])
+  .pipe($.bump({type: 'minor'}))
+  .pipe(gulp.dest('.'));
+});
+
+gulp.task('bump:major', function() {
+  gulp.src(['package.json', 'bower.json'])
+  .pipe($.bump({type: 'major'}))
+  .pipe(gulp.dest('.'));
+});
 
 gulp.task('build-basic', function() {
   return gulp.src(['src/gsn.js', 'src/module.js', 'src/gsn-ui-map.js', 'src/bindonce.js', 'src/angular-recaptcha.js', 'src/filters/*.js', 'src/services/!(gsnProLogicRewardCard).js'
@@ -56,22 +57,22 @@ gulp.task('build-basic', function() {
     , 'vendor/ng-infinite-scroll.min.js'
     , 'vendor/ui-utils.min.js'
     ])
-    .pipe(concat('gsncore-basic.js'))
-    .pipe(header(banner, {pkg: pkg}))
+    .pipe($.concat('gsncore-basic.js'))
+    .pipe($.header(banner, {pkg: pkg}))
     .pipe(gulp.dest('.'));
 });
 
 
 gulp.task('default', ['build', 'build-basic'], function() {
   gulp.src('./gsncore-basic.js')
-    .pipe(uglify())
-    .pipe(header(banner, {pkg: pkg}))
-    .pipe(rename({suffix: '.min'}))
+    .pipe($.uglify())
+    .pipe($.header(banner, {pkg: pkg}))
+    .pipe($.rename({suffix: '.min'}))
     .pipe(gulp.dest('.'));
 
   return gulp.src('./gsncore.js')
-    .pipe(uglify())
-    .pipe(header(banner, {pkg: pkg}))
-    .pipe(rename({suffix: '.min'}))
+    .pipe($.uglify())
+    .pipe($.header(banner, {pkg: pkg}))
+    .pipe($.rename({suffix: '.min'}))
     .pipe(gulp.dest('.'));
 });

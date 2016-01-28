@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.21
+ * version 1.6.22
  * gsncore repository
- * Build date: Mon Jan 18 2016 12:35:51 GMT-0600 (CST)
+ * Build date: Thu Jan 28 2016 09:28:51 GMT-0600 (CST)
  */
 ; (function () {
   'use strict';
@@ -7987,9 +7987,8 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
                 var ratio = actualWidth / (width || actualWidth || 1);
                 var newHeight = ratio * height;
 
-                if (newHeight > height){
-                  angular.element(attrs.syncHeight).height(newHeight);
-                }
+                angular.element(attrs.syncHeight).height(newHeight);
+
               }, 200);
 
               resizer();
