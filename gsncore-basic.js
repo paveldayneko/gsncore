@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.24
+ * version 1.6.25
  * gsncore repository
- * Build date: Mon Feb 01 2016 21:06:03 GMT-0600 (CST)
+ * Build date: Mon Feb 01 2016 21:16:17 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
@@ -873,7 +873,9 @@
     returnObj.getContentServiceUrl = function(method) {
       var url = gsn.getContentServiceUrl('/' + method + '/' + returnObj.getChainId() + '/' + returnObj.isNull(returnObj.getSelectedStoreId(), '0') + '/');
       if (gsn.config.useProxy) {
-        return urlurl.replace('clientapi.gsn2.com/', '/').replace('https://', '').replace('http://', '');
+        url = url.replace('clientapi.gsn2.com/', '/').replace('https://', '').replace('http://', '');
+        url = url.replace('clientapix.gsn2.com/', '/');
+        return url;
       }
 
       return url.replace('clientapi.gsn2.com/', 'clientapi.gsngrocers.com/').replace('https://', $location.protocol() + '://');

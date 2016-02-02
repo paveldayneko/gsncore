@@ -111,7 +111,9 @@
     returnObj.getContentServiceUrl = function(method) {
       var url = gsn.getContentServiceUrl('/' + method + '/' + returnObj.getChainId() + '/' + returnObj.isNull(returnObj.getSelectedStoreId(), '0') + '/');
       if (gsn.config.useProxy) {
-        return urlurl.replace('clientapi.gsn2.com/', '/').replace('https://', '').replace('http://', '');
+        url = url.replace('clientapi.gsn2.com/', '/').replace('https://', '').replace('http://', '');
+        url = url.replace('clientapix.gsn2.com/', '/');
+        return url;
       }
 
       return url.replace('clientapi.gsn2.com/', 'clientapi.gsngrocers.com/').replace('https://', $location.protocol() + '://');
