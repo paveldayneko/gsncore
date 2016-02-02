@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.22
+ * version 1.6.23
  * gsncore repository
- * Build date: Thu Jan 28 2016 09:28:51 GMT-0600 (CST)
+ * Build date: Mon Feb 01 2016 19:04:22 GMT-0600 (CST)
  */
 ; (function () {
   'use strict';
@@ -10454,7 +10454,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
   }
 
 })(angular);
-(function (angular, undefined) {
+(function(angular, undefined) {
   'use strict';
 
   var myDirectiveName = 'ctrlStoreLocator';
@@ -10488,7 +10488,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     $scope.currentStoreId = gsnApi.getSelectedStoreId();
     $scope.searchCompleted = false;
     $scope.searchRadius = 10;
-    $scope.searchIcon = null;   // https://sites.google.com/site/gmapsdevelopment/
+    $scope.searchIcon = null; // https://sites.google.com/site/gmapsdevelopment/
     $scope.searchMarker = null;
     $scope.searchFailed = false;
     $scope.searchFailedResultCount = 1;
@@ -10500,9 +10500,9 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       activated: false
     };
 
-    gsnStore.getStores().then(function(rsp){
+    gsnStore.getStores().then(function(rsp) {
       var storeList = rsp.response;
-      var storeNumber = $scope.currentPath.replace(/\D*/, '');
+      var storeNumber = $scope.storeNumber || $scope.currentPath.replace(/\D*/, '');
       var storeUrl = '';
       if ($scope.currentPath.indexOf('/store/') >= 0) {
         storeUrl = $scope.currentPath.replace('/store/', '').replace(/[^a-z-]*/g, '');
@@ -10516,14 +10516,12 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         store = $scope.storeByUrl[storeUrl];
       }
 
-      if (store){
+      if (store) {
         $scope.storeList = [store];
-      }
-      else if (storeNumber.length > 0 || storeUrl.length > 0) {
+      } else if (storeNumber.length > 0 || storeUrl.length > 0) {
         // store not found when either storeNumber or storeUrl is valid
         gsnApi.goUrl('/404')
-      }
-      else {
+      } else {
         $scope.storeList = rsp.response;
       }
       if ($scope.storeList.length <= 1 && $scope.singleStoreRedirect) {
@@ -10532,7 +10530,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       $scope.showAllStores();
     });
 
-    gsnStore.getStore().then(function (store) {
+    gsnStore.getStore().then(function(store) {
       var show = gsnApi.isNull($location.search().show, '');
       if (show == 'event') {
         if (store) {
@@ -10542,12 +10540,11 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     });
 
     function activate() {
-      
+
       var gmap = (window.google || {}).maps || {};
-      if ((typeof( gmap.Geocoder ) === 'undefined') 
-        || (typeof( gmap.InfoWindow ) === 'undefined')
-        || (typeof( gmap.Map ) === 'undefined'))
-      {
+      if ((typeof (gmap.Geocoder) === 'undefined')
+        || (typeof (gmap.InfoWindow) === 'undefined')
+        || (typeof (gmap.Map) === 'undefined')) {
         $timeout(activate, 1000);
         if ($scope.gvm.googleMapLoaded) return;
 
@@ -10580,14 +10577,14 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           mapTypeId: google.maps.MapTypeId.ROADMAP
         };
       }
-    
+
       // set default search with query string
       var search = $location.search;
       $scope.search.storeLocator = search.search || search.q;
-      $scope.doSearch(true);  
+      $scope.doSearch(true);
     }
 
-    $scope.openMarkerInfo = function (marker, zoom) {
+    $scope.openMarkerInfo = function(marker, zoom) {
       $scope.currentMarker = marker;
 
       if (zoom) {
@@ -10597,17 +10594,17 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       $scope.myInfoWindow.open($scope.myMap, marker);
     };
 
-    $scope.isCurrentStore = function (marker) {
+    $scope.isCurrentStore = function(marker) {
       if (!marker) return false;
 
       return gsnApi.isNull($scope.currentStoreId, 0) == marker.location.StoreId;
     };
 
-    $scope.setSearchResult = function (center) {
+    $scope.setSearchResult = function(center) {
       $scope.searchCompleted = true;
       $scope.distanceOrigin = gsnApi.isNull(center, null);
       $scope.mapOptions.center = center;
-      $timeout(function () {
+      $timeout(function() {
         $scope.showAllStores(center);
 
         if ($scope.searchIcon) {
@@ -10620,7 +10617,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
               icon: $scope.searchIcon
             });
 
-            google.maps.event.addListener($scope.searchMarker, 'click', function () {
+            google.maps.event.addListener($scope.searchMarker, 'click', function() {
               $scope.openMarkerInfo($scope.searchMarker);
             });
           }
@@ -10630,12 +10627,12 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       }, 50);
     };
 
-    $scope.initializeMarker = function (stores) {
+    $scope.initializeMarker = function(stores) {
       $scope.currentMarker = null;
 
       // clear old marker
       if ($scope.myMarkers) {
-        angular.forEach($scope.myMarkers, function (marker) {
+        angular.forEach($scope.myMarkers, function(marker) {
           marker.setMap(null);
         });
       }
@@ -10657,7 +10654,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           tempMarkers.push($scope.createMarker(data[i]));
         }
       }
-      if (i == 1){
+      if (i == 1) {
         $scope.currentMarker = tempMarkers[i];
       }
 
@@ -10670,7 +10667,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     };
 
     // find the best zoom to fit all markers
-    $scope.fitAllMarkers = debounce(function () {
+    $scope.fitAllMarkers = debounce(function() {
       if (gsnApi.isNull($scope.myMap, null) === null) {
         return;
       }
@@ -10697,14 +10694,14 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       $scope.myMap.fitBounds(bounds);
     }, 200);
 
-    $scope.showAllStores = function (distanceOrigin) {
+    $scope.showAllStores = function(distanceOrigin) {
       if (!$scope.mapOptions) {
         $timeout(function() {
           $scope.showAllStores(distanceOrigin);
         }, 500);
         return;
       }
-      
+
       $scope.distanceOrigin = gsnApi.isNull(distanceOrigin, null);
       $scope.mapOptions.zoom = defaultZoom;
       var result = $scope.storeList;
@@ -10712,10 +10709,11 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       if (gsn.isNull($scope.distanceOrigin, null) !== null) {
         result = [];
         var searchRadius = parseFloat($scope.searchRadius);
-        if (isNaN(searchRadius)) searchRadius = 10;
+        if (isNaN(searchRadius))
+          searchRadius = 10;
 
         // calculate distance from center
-        angular.forEach($scope.storeList, function (store) {
+        angular.forEach($scope.storeList, function(store) {
           var storeLatLng = new google.maps.LatLng(store.Latitude, store.Longitude);
           store.Distance = google.maps.geometry.spherical.computeDistanceBetween(distanceOrigin, storeLatLng) * 0.000621371192;
           store.zDistance = parseFloat(gsnApi.isNull(store.Distance, 0)).toFixed(2);
@@ -10740,18 +10738,18 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       $scope.fitAllMarkers();
     };
 
-    $scope.canShow = function (store) {
+    $scope.canShow = function(store) {
       return !$scope.pharmacyOnly || ($scope.pharmacyOnly && gsnApi.isNull(store.PharmacyHours, '').length > 0);
     };
 
-    $scope.doClear = function () {
+    $scope.doClear = function() {
       $scope.search.storeLocator = '';
       $scope.searchCompleted = false;
       $scope.showAllStores();
       $scope.fitAllMarkers();
     };
 
-    $scope.doSearch = function (isSilent) {
+    $scope.doSearch = function(isSilent) {
       $scope.searchCompleted = false;
       $scope.searchFailed = false;
       var newValue = $scope.search.storeLocator;
@@ -10764,7 +10762,9 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         } else {
 
           var geocoder = new google.maps.Geocoder();
-          geocoder.geocode({ 'address': newValue }, function (results, status) {
+          geocoder.geocode({
+            'address': newValue
+          }, function(results, status) {
             if (status == google.maps.GeocoderStatus.OK) {
               point = new google.maps.LatLng(results[0].geometry.location.lat(), results[0].geometry.location.lng());
               $scope.geoLocationCache[newValue] = point;
@@ -10779,28 +10779,27 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       }
     };
 
-    $scope.viewEvents = function (marker) {
+    $scope.viewEvents = function(marker) {
       gsnApi.setSelectedStoreId(marker.location.StoreId);
       $location.path($scope.decodeServerUrl(marker.location.Redirect));
     };
 
-    $scope.viewSpecials = function (marker) {
+    $scope.viewSpecials = function(marker) {
       gsnApi.setSelectedStoreId(marker.location.StoreId);
       $location.url('/circular');
     };
 
-    $scope.selectStore = function (marker, reload) {
+    $scope.selectStore = function(marker, reload) {
       $scope.gvm.reloadOnStoreSelection = reload;
       gsnApi.setSelectedStoreId(marker.location.StoreId);
       if (gsnApi.isNull($location.search().show, '') == 'event') {
         $location.url($scope.decodeServerUrl(marker.location.Redirect));
-      }
-      else if (gsnApi.isNull($location.search().fromUrl, '').length > 0) {
+      } else if (gsnApi.isNull($location.search().fromUrl, '').length > 0) {
         $location.url($location.search().fromUrl);
       }
     };
 
-    $scope.$on('gsnevent:store-persisted', function (evt, store) {
+    $scope.$on('gsnevent:store-persisted', function(evt, store) {
       if ($scope.gvm.reloadOnStoreSelection) {
         $scope.goUrl($scope.currentPath, '_reload');
       }
@@ -10808,7 +10807,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
     // wait until map has been created, then add markers
     // since map must be there and center must be set before markers show up on map
-    $scope.$watch('myMap', function (newValue) {
+    $scope.$watch('myMap', function(newValue) {
       if (newValue) {
         if ($scope.storeList[0]) {
           newValue.setCenter(new google.maps.LatLng($scope.storeList[0].Latitude, $scope.storeList[0].Longitude), defaultZoom);
@@ -10821,15 +10820,15 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       }
     });
 
-    $scope.$on('gsnevent:storelist-loaded', function (event, data) {
+    $scope.$on('gsnevent:storelist-loaded', function(event, data) {
       gsnApi.reload();
     });
 
-    $scope.$on('gsnevent:store-setid', function (event, result) {
+    $scope.$on('gsnevent:store-setid', function(event, result) {
       $scope.currentStoreId = gsnApi.getSelectedStoreId();
     });
 
-    $scope.$watch('pharmacyOnly', function (event, result) {
+    $scope.$watch('pharmacyOnly', function(event, result) {
       if (!$scope.activated) return;
 
       var newValue = $scope.search.storeLocator;
@@ -10846,7 +10845,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
     // helper method to add marker to map
     // populate marker array and distance
-    $scope.createMarker = function (location) {
+    $scope.createMarker = function(location) {
       var point = new google.maps.LatLng(location.Latitude, location.Longitude);
 
       //location.Phone = location.Phone.replace(/\D+/gi, '');
@@ -10856,7 +10855,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         location: location
       });
 
-      google.maps.event.addListener(marker, 'click', function () {
+      google.maps.event.addListener(marker, 'click', function() {
         $scope.openMarkerInfo(marker);
       });
 
@@ -10865,7 +10864,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
       return marker;
     };
-    //#endregion
+  //#endregion
   }
 
 })(angular);
