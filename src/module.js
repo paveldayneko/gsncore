@@ -112,7 +112,7 @@
       var url = gsn.getContentServiceUrl('/' + method + '/' + returnObj.getChainId() + '/' + returnObj.isNull(returnObj.getSelectedStoreId(), '0') + '/');
       if (gsn.config.useProxy) {
         url = url.replace('clientapi.gsn2.com/', '/').replace('https://', '').replace('http://', '');
-        url = url.replace('clientapix.gsn2.com/', '/');
+        url = url.replace('clientapix.gsn2.com/', '/').replace('/api/v1', '/proxy');
         return url;
       }
 
