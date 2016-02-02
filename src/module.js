@@ -1,9 +1,14 @@
-(function (gsn, angular, undefined) {
+(function(gsn, angular, undefined) {
   'use strict';
 
   /* fake definition of angular-facebook if there is none */
-  angular.module('facebook', []).provider('Facebook', function test(){
-    return { init: function() {}, $get: function() { return new test(); } };
+  angular.module('facebook', []).provider('Facebook', function test() {
+    return {
+      init: function() {},
+      $get: function() {
+        return new test();
+      }
+    };
   });
   angular.module('ui.map', []);
   angular.module('ui.event', []);
@@ -18,25 +23,27 @@
     function($locationProvider, $sceDelegateProvider, $sceProvider, $httpProvider, FacebookProvider, $analyticsProvider) {
       gsn.init($locationProvider, $sceDelegateProvider, $sceProvider, $httpProvider, FacebookProvider, $analyticsProvider)
     }
-   ])
-  .run(['$rootScope', 'gsnGlobal', 'gsnApi', '$window', function ($rootScope, gsnGlobal, gsnApi, $window) {
-    var head = angular.element('head');
-    var myHtml = '<!--[if lt IE 10]>\n' +
-      '<script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script>' +
-      '<script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/2.2.0/es5-shim.min.js"></script>' +
-      '<script src="https://cdnjs.cloudflare.com/ajax/libs/json2/20130526/json2.min.js"></script>' +
-      '\n<![endif]-->';
-    head.append(myHtml);
+  ])
+    .run(['$rootScope', 'gsnGlobal', 'gsnApi', '$window', function($rootScope, gsnGlobal, gsnApi, $window) {
+      var head = angular.element('head');
+      var myHtml = '<!--[if lt IE 10]>\n' +
+        '<script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script>' +
+        '<script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/2.2.0/es5-shim.min.js"></script>' +
+        '<script src="https://cdnjs.cloudflare.com/ajax/libs/json2/20130526/json2.min.js"></script>' +
+        '\n<![endif]-->';
+      head.append(myHtml);
 
-    $rootScope.siteMenu = gsnApi.getConfig().SiteMenu;
-    $rootScope.win = $window;
-    gsnGlobal.init(true);
-  }]);
+      $rootScope.siteMenu = gsnApi.getConfig().SiteMenu;
+      $rootScope.win = $window;
+      gsnGlobal.init(true);
+    }]);
 
   mygsncore.service(serviceId, ['$rootScope', '$window', '$timeout', '$q', '$http', '$location', '$localStorage', '$sce', gsnApi]);
 
   function gsnApi($rootScope, $window, $timeout, $q, $http, $location, $localStorage, $sce) {
-    var returnObj = { previousDefer: null };
+    var returnObj = {
+      previousDefer: null
+    };
     var profileStorage = $localStorage;
 
     $rootScope[serviceId] = returnObj;
@@ -71,7 +78,7 @@
       return $sce.trustAsResourceUrl(gsn.getContentUrl(url));
     };
 
-    returnObj.getThemeUrl = function (url) {
+    returnObj.getThemeUrl = function(url) {
       return $sce.trustAsResourceUrl(gsn.getThemeUrl(url));
     };
 
@@ -91,18 +98,23 @@
     //#endregion
 
     //#region gsn.config pass-through
-    returnObj.getConfig = function () {
+    returnObj.getConfig = function() {
       return gsn.config;
     };
 
     returnObj.getApiUrl = gsn.getApiUrl;
 
-    returnObj.getStoreUrl = function () {
+    returnObj.getStoreUrl = function() {
       return gsn.config.StoreServiceUrl;
     };
 
-    returnObj.getContentServiceUrl = function (method) {
-      return gsn.getContentServiceUrl('/' + method + '/' + returnObj.getChainId() + '/' + returnObj.isNull(returnObj.getSelectedStoreId(), '0') + '/').replace('clientapi.gsn2.com/', 'clientapi.gsngrocers.com/').replace('https://', $location.protocol() + '://');
+    returnObj.getContentServiceUrl = function(method) {
+      var url = gsn.getContentServiceUrl('/' + method + '/' + returnObj.getChainId() + '/' + returnObj.isNull(returnObj.getSelectedStoreId(), '0') + '/');
+      if (gsn.config.useProxy) {
+        return urlurl.replace('clientapi.gsn2.com/', '/').replace('https://', '').replace('http://', '');
+      }
+
+      return url.replace('clientapi.gsn2.com/', 'clientapi.gsngrocers.com/').replace('https://', $location.protocol() + '://');
     };
 
     returnObj.getDefaultLayout = function(defaultUrl) {
@@ -112,7 +124,7 @@
       return defaultUrl;
     }
 
-    returnObj.getYoutechCouponUrl = function () {
+    returnObj.getYoutechCouponUrl = function() {
       return gsn.config.YoutechCouponUrl;
     };
 
@@ -120,86 +132,86 @@
       return gsn.config.RoundyProfileUrl;
     };
 
-    returnObj.getProductServiceUrl = function () {
+    returnObj.getProductServiceUrl = function() {
       return gsn.config.ProductServiceUrl;
     };
 
-    returnObj.getShoppingListApiUrl = function () {
+    returnObj.getShoppingListApiUrl = function() {
       return gsn.config.ShoppingListServiceUrl;
     };
 
-    returnObj.getProfileApiUrl = function () {
+    returnObj.getProfileApiUrl = function() {
       return gsn.config.ProfileServiceUrl;
     };
 
-    returnObj.getLoggingApiUrl = function () {
+    returnObj.getLoggingApiUrl = function() {
       return gsn.config.LoggingServiceUrl;
     };
 
-    returnObj.getMidaxServiceUrl = function () {
+    returnObj.getMidaxServiceUrl = function() {
       return gsn.config.MidaxServiceUrl;
     };
 
-    returnObj.getUseLocalStorage = function () {
+    returnObj.getUseLocalStorage = function() {
       return returnObj.isNull(gsn.config.UseLocalStorage, false);
     };
 
-    returnObj.getVersion = function () {
+    returnObj.getVersion = function() {
       /// <summary>Get the application version</summary>
 
       return gsn.config.Version;
     };
 
-    returnObj.getGoogleSiteSearchCode = function () {
+    returnObj.getGoogleSiteSearchCode = function() {
       return gsn.config.GoogleSiteSearchCode;
     };
 
-    returnObj.getGoogleSiteVerificationId = function () {
+    returnObj.getGoogleSiteVerificationId = function() {
       return gsn.config.GoogleSiteVerificationId;
     };
 
-    returnObj.isBetween = function (value, min, max) {
+    returnObj.isBetween = function(value, min, max) {
       return value > min && value < max;
     };
 
-    returnObj.getFacebookPermission = function () {
+    returnObj.getFacebookPermission = function() {
       // if empty, get at least email permission
       return returnObj.isNull(gsn.config.FacebookPermission, 'email');
     };
 
-    returnObj.getGoogleAnalyticAccountId1 = function () {
+    returnObj.getGoogleAnalyticAccountId1 = function() {
       return returnObj.isNull(gsn.config.GoogleAnalyticAccountId1, '');
     };
 
-    returnObj.getGoogleAnalyticAccountId2 = function () {
+    returnObj.getGoogleAnalyticAccountId2 = function() {
       return returnObj.isNull(gsn.config.GoogleAnalyticAccountId2, '');
     };
 
-    returnObj.getEmailRegEx = function () {
+    returnObj.getEmailRegEx = function() {
       return gsn.config.EmailRegex;
     };
 
-    returnObj.getDfpNetworkId = function () {
+    returnObj.getDfpNetworkId = function() {
       return gsn.config.DfpNetworkId;
     };
 
-    returnObj.getServiceUnavailableMessage = function () {
+    returnObj.getServiceUnavailableMessage = function() {
       return gsn.config.ServiceUnavailableMessage;
     };
 
-    returnObj.getChainId = function () {
+    returnObj.getChainId = function() {
       return gsn.config.ChainId;
     };
 
-    returnObj.getChainName = function () {
+    returnObj.getChainName = function() {
       return gsn.config.ChainName;
     };
 
-    returnObj.getHomeData = function () {
+    returnObj.getHomeData = function() {
       return gsn.config.HomePage;
     };
 
-    returnObj.getRegistrationFromEmailAddress = function () {
+    returnObj.getRegistrationFromEmailAddress = function() {
       return gsn.config.RegistrationFromEmailAddress;
     };
 
@@ -207,11 +219,11 @@
       return angular.element('<div>' + html + '</div>').find(find).length;
     };
 
-    returnObj.equalsIgnoreCase = function (val1, val2) {
+    returnObj.equalsIgnoreCase = function(val1, val2) {
       return angular.lowercase(val1) == angular.lowercase(val2);
     };
 
-    returnObj.toLowerCase = function (str) {
+    returnObj.toLowerCase = function(str) {
       return angular.lowercase(str);
     };
 
@@ -221,7 +233,7 @@
       try {
         // attempt to hide any modal
         angular.element('.modal').modal('hide');
-      } catch(e) {}
+      } catch (e) {}
 
       target = returnObj.isNull(target, '');
 
@@ -232,7 +244,7 @@
         if ($window.top) {
           try {
             $window.top.location = url;
-          } catch(e) {
+          } catch (e) {
             $window.location = url;
           }
         } else {
@@ -242,7 +254,7 @@
         return;
       }
 
-      $timeout(function () {
+      $timeout(function() {
         // allow external call to be in scope apply
         $location.url(url);
       }, 5);
@@ -256,13 +268,13 @@
     gsn.goUrl = returnObj.goUrl;
     //#endregion
 
-    returnObj.clearSelection = function (items) {
-      angular.forEach(items, function (item) {
+    returnObj.clearSelection = function(items) {
+      angular.forEach(items, function(item) {
         item.selected = false;
       });
     };
 
-    returnObj.getBindableItem = function (newItem) {
+    returnObj.getBindableItem = function(newItem) {
       var item = angular.copy(newItem);
       item.NewQuantity = item.Quantity || 1;
       if ($rootScope.gsnProfile) {
@@ -276,7 +288,7 @@
       return item;
     };
 
-    returnObj.updateBindableItem = function (item) {
+    returnObj.updateBindableItem = function(item) {
       if (item.ItemId) {
         if ($rootScope.gsnProfile) {
           var shoppingList = $rootScope.gsnProfile.getShoppingList();
@@ -289,15 +301,15 @@
       }
     };
 
-    returnObj.doSiteSearch = function (search) {
+    returnObj.doSiteSearch = function(search) {
       returnObj.goUrl('/search?q=' + encodeURIComponent(search));
     };
 
-    returnObj.doItemSearch = function (search) {
+    returnObj.doItemSearch = function(search) {
       returnObj.goUrl('/product/search?q=' + encodeURIComponent(search));
     };
 
-    returnObj.decodeServerUrl = function (url) {
+    returnObj.decodeServerUrl = function(url) {
       /// <summary>decode url path returned by our server</summary>
       /// <param name="url" type="Object"></param>
 
@@ -317,7 +329,7 @@
       }
 
       var i = 0;
-      angular.forEach(myContentData, function (v, k) {
+      angular.forEach(myContentData, function(v, k) {
         var storeIds = returnObj.isNull(v.StoreIds, []);
 
         // get first content as default or value content without storeids
@@ -334,7 +346,7 @@
           return;
         }
 
-        angular.forEach(storeIds, function (v1, k1) {
+        angular.forEach(storeIds, function(v1, k1) {
           if (storeId == v1) {
             contentDataResult = v;
             possibleResult.push(v);
@@ -343,10 +355,10 @@
       });
 
       var maxStoreIdCount = allStoreCount;
-      if (possibleResult.length > 1){
+      if (possibleResult.length > 1) {
         // use result with least number of stores
-        angular.forEach(possibleResult, function(v, k){
-          if (v.StoreIds.length > 1 && v.StoreIds.length < maxStoreIdCount){
+        angular.forEach(possibleResult, function(v, k) {
+          if (v.StoreIds.length > 1 && v.StoreIds.length < maxStoreIdCount) {
             maxStoreIdCount = v.StoreIds.length;
             contentDataResult = v;
           }
@@ -356,20 +368,20 @@
       return contentDataResult;
     };
 
-    returnObj.getThemeContent = function (contentPosition) {
+    returnObj.getThemeContent = function(contentPosition) {
       return returnObj.parseStoreSpecificContent(returnObj.getHomeData().ContentData[contentPosition]);
     };
 
-    returnObj.getThemeConfig = function (name) {
+    returnObj.getThemeConfig = function(name) {
       return returnObj.parseStoreSpecificContent(returnObj.getHomeData().ConfigData[name]);
     };
 
-    returnObj.getThemeConfigDescription = function (name, defaultValue) {
+    returnObj.getThemeConfigDescription = function(name, defaultValue) {
       var resultObj = returnObj.getThemeConfig(name).Description;
       return returnObj.isNull(resultObj, defaultValue);
     };
 
-    returnObj.getFullPath = function (path, includePort) {
+    returnObj.getFullPath = function(path, includePort) {
       var normalizedPath = (returnObj.isNull(path, '') + '').replace(/$\/+/gi, '');
       if (normalizedPath.indexOf('http') > -1) {
         return path;
@@ -382,17 +394,17 @@
       return normalizedPath;
     };
 
-    returnObj.getPageCount = function (data, pageSize) {
+    returnObj.getPageCount = function(data, pageSize) {
       data = data || [];
       return (Math.ceil(data.length / pageSize) || 1);
     };
 
     //#region storeId, shoppingListId, anonymousToken, etc...
-    returnObj.getSelectedStoreId = function () {
+    returnObj.getSelectedStoreId = function() {
       return profileStorage.storeId || 0;
     };
 
-    returnObj.setSelectedStoreId = function (storeId, newUrl, timeout) {
+    returnObj.setSelectedStoreId = function(storeId, newUrl, timeout) {
       // make sure we don't set a bad store id
       var storeIdInt = parseInt(storeId);
       if (returnObj.isNaN(storeIdInt, 0) <= 0) {
@@ -401,7 +413,10 @@
 
       var previousStoreId = profileStorage.storeId;
       profileStorage.storeId = storeId;
-      $rootScope.$broadcast('gsnevent:store-setid', { newValue: storeId, oldValue: previousStoreId });
+      $rootScope.$broadcast('gsnevent:store-setid', {
+        newValue: storeId,
+        oldValue: previousStoreId
+      });
       if (newUrl) {
         $timeout(function() {
           returnObj.goUrl(newUrl, '_reload')
@@ -409,16 +424,16 @@
       }
     };
 
-    returnObj.getProfileId = function () {
+    returnObj.getProfileId = function() {
       var accessToken = getAccessToken();
       return returnObj.isNaN(parseInt(returnObj.isNull(accessToken.user_id, 0)), 0);
     };
 
-    returnObj.getShoppingListId = function () {
+    returnObj.getShoppingListId = function() {
       return returnObj.isNull(profileStorage.shoppingListId, 0);
     };
 
-    returnObj.setShoppingListId = function (shoppingListId, dontBroadcast) {
+    returnObj.setShoppingListId = function(shoppingListId, dontBroadcast) {
       profileStorage.shoppingListId = returnObj.isNull(shoppingListId, 0);
 
       if (dontBroadcast) return;
@@ -427,7 +442,7 @@
     };
     //#endregion
 
-    returnObj.getApiHeaders = function () {
+    returnObj.getApiHeaders = function() {
       // assume access token data is available at this point
       var accessTokenData = getAccessToken();
       var payload = {
@@ -441,7 +456,7 @@
       return payload;
     };
 
-    returnObj.isAnonymous = function () {
+    returnObj.isAnonymous = function() {
       /// <summary>Determine if a user is logged in.</summary>
 
       var accessTokenData = getAccessToken();
@@ -449,7 +464,7 @@
       return returnObj.isNull(accessTokenData.grant_type, '') == 'anonymous';
     };
 
-    returnObj.isLoggedIn = function () {
+    returnObj.isLoggedIn = function() {
       /// <summary>Determine if a user is logged in.</summary>
 
       var accessTokenData = getAccessToken();
@@ -460,7 +475,7 @@
     gsn.isLoggedIn = returnObj.isLoggedIn;
     gsn.getUserId = returnObj.getProfileId;
 
-    returnObj.logOut = function () {
+    returnObj.logOut = function() {
       /// <summary>Log a user out.</summary>
 
       // attempt to reset to anonymous token
@@ -475,10 +490,12 @@
         returnObj.getAccessToken();
       }
 
-      $rootScope.$broadcast('gsnevent:logout', { ProfileId: previousProfileId });
+      $rootScope.$broadcast('gsnevent:logout', {
+        ProfileId: previousProfileId
+      });
     };
 
-    returnObj.doAuthenticate = function (payload) {
+    returnObj.doAuthenticate = function(payload) {
       if (payload) {
         if (!payload.username) {
           payload.username = returnObj.getProfileId();
@@ -486,35 +503,48 @@
       }
 
       // make the auth call
-      $http.post(gsn.config.AuthServiceUrl + "/Token2", payload, { headers: { 'Content-Type': 'application/json', shopping_list_id: returnObj.getShoppingListId() } })
-          .success(function (response) {
-            // Since server automatically send grant_type ('anonymous'/'password') for refresh payload
-            // DO NOT SET: response.grant_type = payload.grant_type;
-            response.expires_dt = (new Date().getTime()) + 1000 * response.expires_in;
+      $http.post(gsn.config.AuthServiceUrl + "/Token2", payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          shopping_list_id: returnObj.getShoppingListId()
+        }
+      })
+        .success(function(response) {
+          // Since server automatically send grant_type ('anonymous'/'password') for refresh payload
+          // DO NOT SET: response.grant_type = payload.grant_type;
+          response.expires_dt = (new Date().getTime()) + 1000 * response.expires_in;
 
-            setAccessToken(response);
-            var defer = returnObj.previousDefer;
-            if (defer) {
-              returnObj.previousDefer = null;
-              defer.resolve(response);
-            }
+          setAccessToken(response);
+          var defer = returnObj.previousDefer;
+          if (defer) {
+            returnObj.previousDefer = null;
+            defer.resolve(response);
+          }
 
-            $rootScope.$broadcast('gsnevent:login-success', { success: true, payload: payload, response: response });
-          }).error(function (response) {
-            var refreshTokenFailed = (payload.grant_type == 'refresh_token' && returnObj.isNull(response.ExceptionMessage, '').indexOf('expired') > 0);
-
-            // if refresh failed, it is being handled in 'gsnevent:auth-invalidrefresh'
-            if (!refreshTokenFailed) {
-              // if anonymous login failed, something must be wrong with the server
-              // a message should be display on the UI side?
-              $rootScope.$broadcast('gsnevent:login-failed', { success: true, payload: payload, response: response });
-            }
+          $rootScope.$broadcast('gsnevent:login-success', {
+            success: true,
+            payload: payload,
+            response: response
           });
+        }).error(function(response) {
+        var refreshTokenFailed = (payload.grant_type == 'refresh_token' && returnObj.isNull(response.ExceptionMessage, '').indexOf('expired') > 0);
+
+        // if refresh failed, it is being handled in 'gsnevent:auth-invalidrefresh'
+        if (!refreshTokenFailed) {
+          // if anonymous login failed, something must be wrong with the server
+          // a message should be display on the UI side?
+          $rootScope.$broadcast('gsnevent:login-failed', {
+            success: true,
+            payload: payload,
+            response: response
+          });
+        }
+      });
     };
 
     returnObj.setAccessToken = setAccessToken;
 
-    returnObj.getAccessToken = function () {
+    returnObj.getAccessToken = function() {
       var deferred = returnObj.isNull(returnObj.previousDefer, null) === null ? $q.defer() : returnObj.previousDefer;
 
       // check access token
@@ -523,8 +553,11 @@
       // if valid token, resolve
       if (returnObj.isNull(accessTokenPayload, null) === null) {
         returnObj.previousDefer = null;
-        $timeout(function () {
-          deferred.resolve({ success: true, response: getAccessToken() });
+        $timeout(function() {
+          deferred.resolve({
+            success: true,
+            response: getAccessToken()
+          });
         }, 10);
 
         return deferred.promise;
@@ -546,36 +579,45 @@
     //  -- it will create a defer and return promise
     //  -- it will make http request and call defer resolve on success
     // when it has defer or data, it will return the promise
-    returnObj.http = function (cacheObject, url, payload) {
+    returnObj.http = function(cacheObject, url, payload) {
       // when it has data, it will simulate resolve and return promise
       // when it doesn't have defer, it will create a defer and trigger request
       // otherwise, just return the promise
       if (cacheObject.response) {
         // small timeout to simulate async
-        $timeout(function () {
+        $timeout(function() {
           cacheObject.deferred.resolve(cacheObject.response);
         }, 50);
-      }
-      else if (returnObj.isNull(cacheObject.deferred, null) === null) {
+      } else if (returnObj.isNull(cacheObject.deferred, null) === null) {
         cacheObject.deferred = $q.defer();
-        var successHandler = function (response) {
-          cacheObject.response = { success: true, response: response };
+        var successHandler = function(response) {
+          cacheObject.response = {
+            success: true,
+            response: response
+          };
           cacheObject.deferred.resolve(cacheObject.response);
         };
-        var errorHandler = function (response) {
-          cacheObject.response = { success: false, response: response };
+        var errorHandler = function(response) {
+          cacheObject.response = {
+            success: false,
+            response: response
+          };
           cacheObject.deferred.resolve(cacheObject.response);
         };
 
         if (url.indexOf('/undefined') > 0) {
           errorHandler('Client error: invalid request.');
         } else {
-          returnObj.getAccessToken().then(function () {
+          returnObj.getAccessToken().then(function() {
             cacheObject.url = url;
             if (payload) {
-              $http.post(url, payload, { headers: returnObj.getApiHeaders() }).success(successHandler).error(errorHandler);
+              $http.post(url, payload, {
+                headers: returnObj.getApiHeaders()
+              }).success(successHandler).error(errorHandler);
             } else {
-              $http.get(url, { headers: returnObj.getApiHeaders() }).success(successHandler).error(errorHandler);
+              $http.get(url, {
+                headers: returnObj.getApiHeaders()
+              }).success(successHandler).error(errorHandler);
             }
           });
         }
@@ -586,24 +628,31 @@
 
     returnObj.httpGetOrPostWithCache = returnObj.http;
 
-    returnObj.isValidCaptcha = function (challenge, response) {
+    returnObj.isValidCaptcha = function(challenge, response) {
       var defer = $q.defer();
-      $http.post(gsn.config.AuthServiceUrl + "/ValidateCaptcha", { challenge: challenge, response: response }, { headers: { 'Content-Type': 'application/json' } })
-          .success(function (rsp) {
-            defer.resolve((rsp == 'true'));
-          }).error(function (rsp) {
-            defer.resolve(false);
-          });
+      $http.post(gsn.config.AuthServiceUrl + "/ValidateCaptcha", {
+        challenge: challenge,
+        response: response
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .success(function(rsp) {
+          defer.resolve((rsp == 'true'));
+        }).error(function(rsp) {
+        defer.resolve(false);
+      });
       return defer.promise;
     };
 
-    returnObj.goBack = function () {
-      $timeout(function () {
+    returnObj.goBack = function() {
+      $timeout(function() {
         $window.history.back();
       }, 10);
     };
 
-    returnObj.initApp = function () {
+    returnObj.initApp = function() {
       $rootScope.appState = 'initializing';
 
       // injecting getContentUrl and getThemeUrl for css
@@ -630,7 +679,7 @@
       }
 
       // give the UI 2/10 of a second to be ready
-      $timeout(function () {
+      $timeout(function() {
         $rootScope.appState = 'ready';
       }, 200);
     };
@@ -640,7 +689,7 @@
     };
 
     //#region authentication event handling
-    $rootScope.$on('gsnevent:auth-expired', function (evt, args) {
+    $rootScope.$on('gsnevent:auth-expired', function(evt, args) {
       var accessTokenData = getAccessToken();
 
       // invalidate the token
@@ -653,7 +702,7 @@
       returnObj.getAccessToken();
     });
 
-    $rootScope.$on('gsnevent:auth-invalidrefresh', function (evt, args) {
+    $rootScope.$on('gsnevent:auth-invalidrefresh', function(evt, args) {
       var accessTokenData = getAccessToken();
       if (accessTokenData.grant_type == 'anonymous') {
         // anonymous refresh expired so clear anonymous token
@@ -724,6 +773,6 @@
       $localStorage.anonymousToken = tk;
     }
 
-//#endregion
+  //#endregion
   }
 })(gsn, angular);

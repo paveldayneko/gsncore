@@ -1,4 +1,4 @@
-﻿; (function () {
+﻿;(function() {
   'use strict';
 
   // Baseline setup
@@ -15,17 +15,15 @@
 
   // Save bytes in the minified (but not gzipped) version:
   var ArrayProto = Array.prototype,
-      ObjProto = Object.prototype;
+    ObjProto = Object.prototype;
 
   // Create quick reference variables for speed access to core prototypes.
-  var
-    slice = ArrayProto.slice,
+  var slice = ArrayProto.slice,
     hasOwnProperty = ObjProto.hasOwnProperty;
 
   // All **ECMAScript 5** native function implementations that we hope to use
   // are declared here.
-  var
-    nativeForEach = ArrayProto.forEach,
+  var nativeForEach = ArrayProto.forEach,
     nativeMap = ArrayProto.map,
     nativeSome = ArrayProto.some,
     nativeIndexOf = ArrayProto.indexOf,
@@ -33,7 +31,7 @@
 
   /* jshint -W055 */
   // Create a safe reference to the gsn object for use below.
-  var gsn = function (obj) {
+  var gsn = function(obj) {
     if (obj instanceof gsn) return obj;
     if (!(this instanceof gsn)) return new gsn(obj);
     this._wrapped = obj;
@@ -109,7 +107,7 @@
     hasInit: false
   };
 
-  gsn.identity = function (value) {
+  gsn.identity = function(value) {
     return value;
   };
 
@@ -133,7 +131,8 @@
 
     // other browser
     return false;
-  };
+  }
+  ;
 
   gsn.browser = {
     isIE: detectIe(),
@@ -148,7 +147,7 @@
   // The cornerstone, an `each` implementation, aka `forEach`.
   // Handles objects with the built-in `forEach`, arrays, and raw objects.
   // Delegates to **ECMAScript 5**'s native `forEach` if available.
-  var each = gsn.each = gsn.forEach = function (obj, iterator, context) {
+  var each = gsn.each = gsn.forEach = function(obj, iterator, context) {
     if (gsn.isNull(obj, null) === null) return;
     if (nativeForEach && obj.forEach === nativeForEach) {
       obj.forEach(iterator, context);
@@ -166,11 +165,11 @@
 
   // Return the results of applying the iterator to each element.
   // Delegates to **ECMAScript 5**'s native `map` if available.
-  gsn.map = gsn.collect = function (obj, iterator, context) {
+  gsn.map = gsn.collect = function(obj, iterator, context) {
     var results = [];
     if (gsn.isNull(obj, null) === null) return results;
     if (nativeMap && obj.map === nativeMap) return obj.map(iterator, context);
-    each(obj, function (value, index, list) {
+    each(obj, function(value, index, list) {
       results.push(iterator.call(context, value, index, list));
     });
     return results;
@@ -181,10 +180,10 @@
   // --------------------
   // Extend a given object with all the properties in passed-in object(s).
   // gsn.extend(destination, *source);
-  gsn.extend = function (obj) {
-    each(slice.call(arguments, 1), function (source) {
+  gsn.extend = function(obj) {
+    each(slice.call(arguments, 1), function(source) {
       if (typeof (source) !== 'undefined') {
-        gsn.forEach(source, function (v, k) {
+        gsn.forEach(source, function(v, k) {
           if (gsn.isNull(v, null) !== null) {
             obj[k] = v;
           }
@@ -197,12 +196,12 @@
   // Determine if at least one element in the object matches a truth test.
   // Delegates to **ECMAScript 5**'s native `some` if available.
   // Aliased as `any`.
-  var any = gsn.some = gsn.any = function (obj, predicate, context) {
+  var any = gsn.some = gsn.any = function(obj, predicate, context) {
     predicate = predicate || gsn.identity;
     var result = false;
     if (gsn.isNull(obj, null) === null) return result;
     if (nativeSome && obj.some === nativeSome) return obj.some(predicate, context);
-    each(obj, function (value, index, list) {
+    each(obj, function(value, index, list) {
       if (result || (result = predicate.call(context, value, index, list))) return breaker;
       return null;
     });
@@ -211,26 +210,26 @@
 
   // Determine if the array or object contains a given value (using `===`).
   // Aliased as `include`.
-  gsn.contains = gsn.include = function (obj, target) {
+  gsn.contains = gsn.include = function(obj, target) {
     if (gsn.isNull(obj, null) === null) return false;
     if (nativeIndexOf && obj.indexOf === nativeIndexOf) return obj.indexOf(target) != -1;
-    return any(obj, function (value) {
+    return any(obj, function(value) {
       return value === target;
     });
   };
 
   // extend the current config
-  gsn.applyConfig = function (config, dontUseProxy) {
+  gsn.applyConfig = function(config, dontUseProxy) {
     if (!gsn.config.hasInit) {
       gsn.config.hasInit = true;
       gsn.extend(gsn.config, config);
       gsn.config.HomePage = gsn.parsePartialContentData(gsn.config.HomePage);
       var siteMenu = gsn.config.SiteMenu || '';
-      if (typeof(siteMenu) == 'string') {
+      if (typeof (siteMenu) == 'string') {
         gsn.config.SiteMenu = siteMenu.length > 10 ? JSON.parse(siteMenu) : [];
-        gsn.forEach(gsn.config.SiteMenu, function (v, k) {
+        gsn.forEach(gsn.config.SiteMenu, function(v, k) {
           v.Position = parseInt(v.Position);
-          gsn.forEach(v.SubMenu, function (v2, k2) {
+          gsn.forEach(v.SubMenu, function(v2, k2) {
             v2.Position = parseInt(v2.Position);
           });
         });
@@ -254,39 +253,41 @@
 
     // if not useProxy, replace proxy with valid api url
     if (!useProxy) {
-      gsn.forEach(gsn.config, function (v, k) {
+      gsn.forEach(gsn.config, function(v, k) {
         if (typeof (v) !== 'string' || v == 'ApiUrl') return;
         if (v.indexOf('/proxy/') >= 0) {
           gsn.config[k] = v.replace('/proxy/', gsn.config.ApiUrl + '/');
         }
       });
     }
+
+    config.useProxy = useProxy;
   };
 
   // return defaultValue if null
-  gsn.isNull = function (obj, defaultValue) {
+  gsn.isNull = function(obj, defaultValue) {
     return (typeof (obj) === 'undefined' || obj === null) ? defaultValue : obj;
   };
 
   // return defaultValue if NaN
-  gsn.isNaN = function (obj, defaultValue) {
+  gsn.isNaN = function(obj, defaultValue) {
     return (isNaN(obj)) ? defaultValue : obj;
   };
 
   // sort a collection base on a field name
-  gsn.sortOn = function (collection, name) {
+  gsn.sortOn = function(collection, name) {
     if (gsn.isNull(collection, null) === null) return null;
     if (collection.length <= 0) return [];
 
     // detect attribute type, problem is if your first object is null or not string then this breaks
     if (typeof (collection[0][name]) == 'string') {
-      collection.sort(function (a, b) {
+      collection.sort(function(a, b) {
         if ((a[name] && a[name].toLowerCase()) < (b[name] && b[name].toLowerCase())) return -1;
         if ((a[name] && a[name].toLowerCase()) > (b[name] && b[name].toLowerCase())) return 1;
         return 0;
       });
     } else {
-      collection.sort(function (a, b) {
+      collection.sort(function(a, b) {
         if (a[name] < b[name]) return -1;
         if (a[name] > b[name]) return 1;
         return 0;
@@ -297,7 +298,7 @@
   };
 
   // clean keyword - for support of sending keyword to google dfp
-  gsn.cleanKeyword = function (keyword) {
+  gsn.cleanKeyword = function(keyword) {
     var result = keyword.replace(/[^a-zA-Z0-9]+/gi, '_').replace(/^[_]+/gi, '');
     if (gsn.isNull(result.toLowerCase, null) !== null) {
       result = result.toLowerCase();
@@ -306,7 +307,7 @@
   };
 
   // group a list by a field name/attribute and execute post process function
-  gsn.groupBy = function (list, attribute, postProcessFunction) {
+  gsn.groupBy = function(list, attribute, postProcessFunction) {
     if (gsn.isNull(list, null) === null) return [];
 
     // First, reset declare result.
@@ -314,11 +315,14 @@
     var grouper = {};
 
     // this make sure all elements are correctly sorted
-    gsn.forEach(list, function (item) {
+    gsn.forEach(list, function(item) {
       var groupKey = item[attribute];
       var group = grouper[groupKey];
       if (gsn.isNull(group, null) === null) {
-        group = { key: groupKey, items: [] };
+        group = {
+          key: groupKey,
+          items: []
+        };
         grouper[groupKey] = group;
       }
       group.items.push(item);
@@ -326,7 +330,7 @@
 
     // finally, sort on group
     var i = 0;
-    gsn.forEach(grouper, function (myGroup) {
+    gsn.forEach(grouper, function(myGroup) {
       myGroup.$idx = i++;
       groups.push(myGroup);
 
@@ -337,22 +341,21 @@
   };
 
   // map a list to object, todo: there is this better array map some where
-  gsn.mapObject = function (list, attribute) {
+  gsn.mapObject = function(list, attribute) {
     var obj = {};
     if (list) {
       if (gsn.isNull(list.length, -1) < 0) {
         obj[list[attribute]] = list;
       } else {
-        gsn.map(list, function (item, i) {
+        gsn.map(list, function(item, i) {
           var k = item[attribute];
           var e = obj[k];
           if (e) {
-            if( Object.prototype.toString.call( e ) !== '[object Array]' ) {
+            if (Object.prototype.toString.call(e) !== '[object Array]') {
               e = [e];
             }
             e.push(item);
-          }
-          else {
+          } else {
             e = item;
           }
           obj[k] = e;
@@ -364,16 +367,18 @@
 
   // Retrieve the names of an object's properties.
   // Delegates to **ECMAScript 5**'s native `Object.keys`
-  gsn.keys = nativeKeys || function (obj) {
-    if (obj !== Object(obj)) throw new TypeError('Invalid object');
-    var keys = [];
-    for (var key in obj) if (gsn.has(obj, key)) keys.push(key);
-    return keys;
+  gsn.keys = nativeKeys || function(obj) {
+      if (obj !== Object(obj))
+        throw new TypeError('Invalid object');
+      var keys = [];
+      for (var key in obj)
+        if (gsn.has(obj, key)) keys.push(key);
+      return keys;
   };
 
   // Shortcut function for checking if an object has a given property directly
   // on itself (in other words, not on a prototype).
-  gsn.has = function (obj, key) {
+  gsn.has = function(obj, key) {
     return hasOwnProperty.call(obj, key);
   };
 
@@ -382,8 +387,7 @@
     obj[key] = undefined;
     try {
       delete obj[k];
-    }
-    catch (e) {
+    } catch (e) {
       var items = {};
       gsn.each(obj, function(v, k) {
         if (k != key)
@@ -395,18 +399,18 @@
     return obj;
   };
 
-  gsn.getUrl = function (baseUrl, url) {
+  gsn.getUrl = function(baseUrl, url) {
     url = gsn.isNull(url, '');
     var data = ((url.indexOf('?') > 0) ? '&' : '?') + 'nocache=' + gsn.config.Version;
     return (baseUrl + url + data).replace(/(\\\\)+/gi, '\\');
   };
 
   // get the content url
-  gsn.getContentUrl = function (url) {
+  gsn.getContentUrl = function(url) {
     return gsn.getUrl(gsn.config.ContentBaseUrl, url);
   };
 
-  gsn.getThemeUrl = function (url) {
+  gsn.getThemeUrl = function(url) {
     var baseUrl = gsn.config.ContentBaseUrl;
 
     if (gsn.isNull(gsn.config.SiteTheme, '').length > 0) {
@@ -416,7 +420,7 @@
     return gsn.getUrl(baseUrl, url);
   };
 
-  gsn.getContentServiceUrl = function (url) {
+  gsn.getContentServiceUrl = function(url) {
     return gsn.getApiUrl() + '/Content' + gsn.isNull(url, '')
   };
 
@@ -424,11 +428,11 @@
     return gsn.config.ApiUrl !== '' ? gsn.config.ApiUrl : '/proxy';
   };
 
-  gsn.setTheme = function (theme) {
+  gsn.setTheme = function(theme) {
     gsn.config.SiteTheme = theme;
   };
 
-  gsn.goUrl = function (url, target) {
+  gsn.goUrl = function(url, target) {
     // do nothing, dummy function to be polyfill later
   };
 
@@ -453,7 +457,9 @@
         ga('create', gsn.config.GoogleAnalyticAccountId1, 'auto');
 
         if (secondTracker) {
-          ga('create', gsn.config.GoogleAnalyticAccountId2, 'auto', { 'name': 'trackerTwo' });
+          ga('create', gsn.config.GoogleAnalyticAccountId2, 'auto', {
+            'name': 'trackerTwo'
+          });
         }
       } else if (secondTracker) {
         secondTracker = false;
@@ -467,7 +473,7 @@
     // GA already supports buffered invocations so we don't need
     // to wrap these inside angulartics.waitForVendorApi
 
-    $analyticsProvider.registerPageTrack(function (path) {
+    $analyticsProvider.registerPageTrack(function(path) {
       // begin tracking
       if (root.ga) {
         ga('send', 'pageview', path);
@@ -501,7 +507,7 @@
     *
     * @link https://developers.google.com/analytics/devguides/collection/analyticsjs/events
     */
-    $analyticsProvider.registerEventTrack(function (action, properties) {
+    $analyticsProvider.registerEventTrack(function(action, properties) {
       // GA requires that eventValue be an integer, see:
       // https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#eventValue
       // https://github.com/luisfarzati/angulartics/issues/81
@@ -512,9 +518,13 @@
 
       if (root.ga) {
         if (properties.noninteraction) {
-          ga('send', 'event', properties.category, action, properties.label, properties.value, { nonInteraction: 1 });
+          ga('send', 'event', properties.category, action, properties.label, properties.value, {
+            nonInteraction: 1
+          });
           if (secondTracker) {
-            ga('trackerTwo.send', 'event', properties.category, action, properties.label, properties.value, { nonInteraction: 1 });
+            ga('trackerTwo.send', 'event', properties.category, action, properties.label, properties.value, {
+              nonInteraction: 1
+            });
           }
         } else {
           ga('send', 'event', properties.category, action, properties.label, properties.value);
@@ -556,13 +566,13 @@
   gsn.init = function($locationProvider, $sceDelegateProvider, $sceProvider, $httpProvider, FacebookProvider, $analyticsProvider) {
     gsn.initAngular($sceProvider, $sceDelegateProvider, $locationProvider, $httpProvider, FacebookProvider);
     gsn.initAnalytics($analyticsProvider);
-    if (typeof(root._tk) !== 'undefined'){
+    if (typeof (root._tk) !== 'undefined') {
       root._tk.util.Emitter(gsn);
     }
   };
 
   // support angular initialization
-  gsn.initAngular = function ($sceProvider, $sceDelegateProvider, $locationProvider, $httpProvider, FacebookProvider) {
+  gsn.initAngular = function($sceProvider, $sceDelegateProvider, $locationProvider, $httpProvider, FacebookProvider) {
     gsn.applyConfig(root.globalConfig.data || {});
     gsn.config.ContentBaseUrl = root.location.port > 1000 && root.location.port < 5000 ? "/asset/" + gsn.config.ChainId : gsn.config.ContentBaseUrl;
     gsn.config.hasRoundyProfile = [215, 216, 217, 218].indexOf(gsn.config.ChainId) > -1;
@@ -577,16 +587,16 @@
     $sceProvider.enabled(!gsn.browser.isIE && root.location.protocol.indexOf('http') >= 0);
 
     $sceDelegateProvider.resourceUrlWhitelist(gsn.config.SceWhiteList || [
-      'self',
-      'http://*.gsn.io/**',
-      'http://*.*.gsn.io/**',
-      'http://*.*.*.gsn.io/**',
-      'http://*.gsn2.com/**',
-      'https://*.gsn2.com/**',
-      'http://*.gsngrocers.com/**',
-      'https://*.gsngrocers.com/**',
-      'http://localhost:*/**',
-      'file:///**']);
+        'self',
+        'http://*.gsn.io/**',
+        'http://*.*.gsn.io/**',
+        'http://*.*.*.gsn.io/**',
+        'http://*.gsn2.com/**',
+        'https://*.gsn2.com/**',
+        'http://*.gsngrocers.com/**',
+        'https://*.gsngrocers.com/**',
+        'http://localhost:*/**',
+        'file:///**']);
 
 
     //gets rid of the /#/ in the url and allows things like 'bootstrap collapse' to function
@@ -594,7 +604,7 @@
       $locationProvider.html5Mode(true).hashPrefix('!');
     }
 
-    if (typeof($httpProvider) !== "undefined") {
+    if (typeof ($httpProvider) !== "undefined") {
       $httpProvider.interceptors.push('gsnAuthenticationHandler');
 
       //Enable cross domain calls
@@ -604,11 +614,11 @@
       $httpProvider.defaults.headers.common['X-Requested-With'] = null;
     }
 
-    if (typeof(FastClick) !== "undefined") {
+    if (typeof (FastClick) !== "undefined") {
       FastClick.attach(document.body);
     }
 
-    if (typeof(FacebookProvider) !== "undefined") {
+    if (typeof (FacebookProvider) !== "undefined") {
       FacebookProvider.init(gsn.config.FacebookAppId);
     }
   };
@@ -616,7 +626,7 @@
 
   if (root.globalConfig) {
     gsn.config.ApiUrl = gsn.isNull(root.globalConfig.apiUrl, '').replace(/\/+$/g, '');
-    if (gsn.config.ApiUrl == ''){
+    if (gsn.config.ApiUrl == '') {
       gsn.config.ApiUrl = '/proxy'
     }
   }
@@ -651,17 +661,16 @@
         if (typeof (callbackFunc) === 'function') callbackFunc();
       }
     }
-    /* jshint +W040 */
+  /* jshint +W040 */
   }
 
-  gsn.loadScripts = function (uris, callbackFunc) {
+  gsn.loadScripts = function(uris, callbackFunc) {
     if (gsn.isNull(uris.length, 0) <= 0) {
       if (typeof (callbackFunc) === 'function') {
         callbackFunc();
       }
-    }
-    else {
-      if (typeof(uris) == 'string'){
+    } else {
+      if (typeof (uris) == 'string') {
         uris = [uris];
       }
 
@@ -674,8 +683,7 @@
         if (typeof (callbackFunc) === 'function') {
           callbackFunc();
         }
-      }
-      else {
+      } else {
         var item = toProcess[0];
         toProcess.splice(0, 1);
         loadSingleScript(item, processNext);
@@ -683,7 +691,7 @@
     }
   };
 
-  gsn.loadIframe = function (parentEl, html) {
+  gsn.loadIframe = function(parentEl, html) {
     var iframe = document.createElement('iframe');
     parentEl[0].appendChild(iframe);
 
@@ -693,7 +701,8 @@
       iframe.src = 'javascript:window["contents"]';
     } else {
       var doc = iframe.document;
-      if (iframe.contentDocument) doc = iframe.contentDocument;
+      if (iframe.contentDocument)
+        doc = iframe.contentDocument;
       doc.open();
       doc.write(html);
       doc.close();
@@ -706,7 +715,11 @@
 
   gsn.parsePartialContentData = function(data) {
     if (gsn.isNull(data, null) === null) {
-      data = { ConfigData: {}, ContentData: {}, ContentList: [] };
+      data = {
+        ConfigData: {},
+        ContentData: {},
+        ContentList: []
+      };
     }
 
     var result = data;
@@ -719,7 +732,7 @@
 
     // parse home config
     if (result.Contents) {
-      gsn.forEach(result.Contents, function (v, k) {
+      gsn.forEach(result.Contents, function(v, k) {
         if (v.IsMetaData) configData.push(v);
         else contentData.push(v);
       });
