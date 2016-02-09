@@ -1,8 +1,8 @@
-﻿(function (angular, undefined) {
+﻿(function(angular, undefined) {
   'use strict';
   var myModule = angular.module('gsn.core');
 
-  var ngModifyElementDirective = function (opt) {
+  var ngModifyElementDirective = function(opt) {
     // Usage: add meta dynamically
     // 
     // Creates: 2013-12-12 TomN
@@ -10,10 +10,10 @@
     var options = angular.copy(opt);
 
     return myModule.directive(options.name, [
-      function () {
+      function() {
         return {
           restrict: 'A',
-          link: function (scope, e, attrs) {
+          link: function(scope, e, attrs) {
             var modifierName = '$' + options.name;
 
             // Disable parent modifier so that it doesn't
@@ -41,9 +41,10 @@
             scope[modifierName] = currentModifier;
 
             var $element = angular.element(options.selector);
-            if ($element.length <= 0 && typeof(options.html) == 'string') {
-              $element = angular.element(options.html)
-              angular.element('head')[0].appendChild($element[0]);
+            if ($element.length <= 0 && typeof (options.html) == 'string') {
+              $element = angular.element(options.html);
+              var pNode = angular.element('head')[0];
+              pNode.insertBefore($element[0], angular.element('title')[0]);
             }
 
             // Keep track of the original value, so that it
@@ -53,7 +54,7 @@
             // Watch for changes to the interpolation, and reflect
             // them into the DOM.
             var currentValue = originalValue;
-            attrs.$observe(options.name, function (newValue, oldValue) {
+            attrs.$observe(options.name, function(newValue, oldValue) {
               // Don't stomp on child modifications if *we* disabled.
               if (currentModifier.isEnabled) {
                 currentValue = newValue;
@@ -62,7 +63,7 @@
             });
 
             // When we go out of scope restore the original value.
-            scope.$on('$destroy', function () {
+            scope.$on('$destroy', function() {
               options.set($element, originalValue, currentValue);
 
               // Turn the parent back on, if it indeed was on.
@@ -81,10 +82,10 @@
   ngModifyElementDirective({
     name: 'gsnTitle',
     selector: 'title',
-    get: function (e) {
+    get: function(e) {
       return e.text();
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.text(v);
     }
   });
@@ -93,10 +94,10 @@
   ngModifyElementDirective({
     name: 'gsnMetaViewport',
     selector: 'meta[name="viewport"]',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });
@@ -105,10 +106,10 @@
   ngModifyElementDirective({
     name: 'gsnMetaAuthor',
     selector: 'meta[name="author"]',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });
@@ -117,10 +118,10 @@
   ngModifyElementDirective({
     name: 'gsnMetaDescription',
     selector: 'meta[name="description"]',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });
@@ -129,10 +130,10 @@
   ngModifyElementDirective({
     name: 'gsnMetaKeywords',
     selector: 'meta[name="keywords"]',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });
@@ -142,10 +143,10 @@
     name: 'gsnMetaGoogleSiteVerification',
     selector: 'meta[name="google-site-verification"]',
     html: '<meta name="google-site-verification" content="" />',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });
@@ -156,49 +157,49 @@
     name: 'gsnOgTitle',
     selector: 'meta[name="og:title"]',
     html: '<meta name="og:title" content="" />',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });
-  
+
   // og:type - The type of your object, e.g., "movie". See the complete list of supported types.
   ngModifyElementDirective({
     name: 'gsnOgType',
     selector: 'meta[name="og:type"]',
     html: '<meta name="og:type" content="" />',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });
-  
+
   // og:image - An image URL which should represent your object within the graph. The image must be at least 50px by 50px and have a maximum aspect ratio of 3:1.
   ngModifyElementDirective({
     name: 'gsnOgImage',
     selector: 'meta[name="og:image"]',
     html: '<meta name="og:image" content="" />',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });
-  
+
   // og:url - The canonical URL of your object that will be used as its permanent ID in the graph.
   ngModifyElementDirective({
     name: 'gsnOgUrl',
     selector: 'meta[name="og:url"]',
     html: '<meta name="og:url" content="" />',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });
@@ -208,10 +209,10 @@
     name: 'gsnOgDescription',
     selector: 'meta[name="og:description"]',
     html: '<meta name="og:description" content="" />',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });

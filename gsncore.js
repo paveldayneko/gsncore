@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.27
+ * version 1.6.28
  * gsncore repository
- * Build date: Mon Feb 01 2016 21:50:43 GMT-0600 (CST)
+ * Build date: Mon Feb 08 2016 21:05:16 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
@@ -13337,11 +13337,11 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
   }]);
 
 })(angular);
-(function (angular, undefined) {
+(function(angular, undefined) {
   'use strict';
   var myModule = angular.module('gsn.core');
 
-  var ngModifyElementDirective = function (opt) {
+  var ngModifyElementDirective = function(opt) {
     // Usage: add meta dynamically
     // 
     // Creates: 2013-12-12 TomN
@@ -13349,10 +13349,10 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     var options = angular.copy(opt);
 
     return myModule.directive(options.name, [
-      function () {
+      function() {
         return {
           restrict: 'A',
-          link: function (scope, e, attrs) {
+          link: function(scope, e, attrs) {
             var modifierName = '$' + options.name;
 
             // Disable parent modifier so that it doesn't
@@ -13380,9 +13380,10 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
             scope[modifierName] = currentModifier;
 
             var $element = angular.element(options.selector);
-            if ($element.length <= 0 && typeof(options.html) == 'string') {
-              $element = angular.element(options.html)
-              angular.element('head')[0].appendChild($element[0]);
+            if ($element.length <= 0 && typeof (options.html) == 'string') {
+              $element = angular.element(options.html);
+              var pNode = angular.element('head')[0];
+              pNode.insertBefore($element[0], angular.element('title')[0]);
             }
 
             // Keep track of the original value, so that it
@@ -13392,7 +13393,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
             // Watch for changes to the interpolation, and reflect
             // them into the DOM.
             var currentValue = originalValue;
-            attrs.$observe(options.name, function (newValue, oldValue) {
+            attrs.$observe(options.name, function(newValue, oldValue) {
               // Don't stomp on child modifications if *we* disabled.
               if (currentModifier.isEnabled) {
                 currentValue = newValue;
@@ -13401,7 +13402,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
             });
 
             // When we go out of scope restore the original value.
-            scope.$on('$destroy', function () {
+            scope.$on('$destroy', function() {
               options.set($element, originalValue, currentValue);
 
               // Turn the parent back on, if it indeed was on.
@@ -13420,10 +13421,10 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
   ngModifyElementDirective({
     name: 'gsnTitle',
     selector: 'title',
-    get: function (e) {
+    get: function(e) {
       return e.text();
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.text(v);
     }
   });
@@ -13432,10 +13433,10 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
   ngModifyElementDirective({
     name: 'gsnMetaViewport',
     selector: 'meta[name="viewport"]',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });
@@ -13444,10 +13445,10 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
   ngModifyElementDirective({
     name: 'gsnMetaAuthor',
     selector: 'meta[name="author"]',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });
@@ -13456,10 +13457,10 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
   ngModifyElementDirective({
     name: 'gsnMetaDescription',
     selector: 'meta[name="description"]',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });
@@ -13468,10 +13469,10 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
   ngModifyElementDirective({
     name: 'gsnMetaKeywords',
     selector: 'meta[name="keywords"]',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });
@@ -13481,10 +13482,10 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     name: 'gsnMetaGoogleSiteVerification',
     selector: 'meta[name="google-site-verification"]',
     html: '<meta name="google-site-verification" content="" />',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });
@@ -13495,49 +13496,49 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     name: 'gsnOgTitle',
     selector: 'meta[name="og:title"]',
     html: '<meta name="og:title" content="" />',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });
-  
+
   // og:type - The type of your object, e.g., "movie". See the complete list of supported types.
   ngModifyElementDirective({
     name: 'gsnOgType',
     selector: 'meta[name="og:type"]',
     html: '<meta name="og:type" content="" />',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });
-  
+
   // og:image - An image URL which should represent your object within the graph. The image must be at least 50px by 50px and have a maximum aspect ratio of 3:1.
   ngModifyElementDirective({
     name: 'gsnOgImage',
     selector: 'meta[name="og:image"]',
     html: '<meta name="og:image" content="" />',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });
-  
+
   // og:url - The canonical URL of your object that will be used as its permanent ID in the graph.
   ngModifyElementDirective({
     name: 'gsnOgUrl',
     selector: 'meta[name="og:url"]',
     html: '<meta name="og:url" content="" />',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });
@@ -13547,19 +13548,19 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     name: 'gsnOgDescription',
     selector: 'meta[name="og:description"]',
     html: '<meta name="og:description" content="" />',
-    get: function (e) {
+    get: function(e) {
       return e.attr('content');
     },
-    set: function (e, v) {
+    set: function(e, v) {
       return e.attr('content', v);
     }
   });
 })(angular);
-(function (angular, undefined) {
+(function(angular, undefined) {
   'use strict';
   var myModule = angular.module('gsn.core');
 
-  myModule.directive('ngGiveHead', [function () {
+  myModule.directive('ngGiveHead', [function() {
     // Usage: ability to add to head element.  Becareful, since only one element is valid, this should only be use in layout html.
     // 
     // Creates: 2013-12-12 TomN
@@ -13575,12 +13576,13 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       var el = angular.element('<' + attrs.ngGiveHead + '>');
       if (attrs.attributes) {
         var myAttrs = scope.$eval(attrs.attributes);
-        angular.forEach(myAttrs, function (v, k) {
+        angular.forEach(myAttrs, function(v, k) {
           el.attr(k, v);
         });
       }
 
-      angular.element('head')[0].appendChild(el[0]);
+      var pNode = angular.element('head')[0];
+      pNode.insertBefore(el[0], angular.element('title')[0]);
     }
   }]);
 })(angular);

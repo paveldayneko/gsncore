@@ -1,8 +1,8 @@
-﻿(function (angular, undefined) {
+﻿(function(angular, undefined) {
   'use strict';
   var myModule = angular.module('gsn.core');
 
-  myModule.directive('ngGiveHead', [function () {
+  myModule.directive('ngGiveHead', [function() {
     // Usage: ability to add to head element.  Becareful, since only one element is valid, this should only be use in layout html.
     // 
     // Creates: 2013-12-12 TomN
@@ -18,12 +18,13 @@
       var el = angular.element('<' + attrs.ngGiveHead + '>');
       if (attrs.attributes) {
         var myAttrs = scope.$eval(attrs.attributes);
-        angular.forEach(myAttrs, function (v, k) {
+        angular.forEach(myAttrs, function(v, k) {
           el.attr(k, v);
         });
       }
 
-      angular.element('head')[0].appendChild(el[0]);
+      var pNode = angular.element('head')[0];
+      pNode.insertBefore(el[0], angular.element('title')[0]);
     }
   }]);
 })(angular);
