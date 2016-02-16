@@ -437,11 +437,6 @@
   };
 
   gsn.initAnalytics = function($analyticsProvider) {
-    // provide backward compatibility if not googletag
-    if (gsn.config.GoogleTagId) {
-      return;
-    }
-
     // GA already supports buffered invocations so we don't need
     // to wrap these inside angulartics.waitForVendorApi
     if ($analyticsProvider.settings) {
@@ -449,21 +444,12 @@
     }
 
     var firstTracker = (gsn.isNull(gsn.config.GoogleAnalyticAccountId1, '').length > 0);
-    var secondTracker = (gsn.isNull(gsn.config.GoogleAnalyticAccountId2, '').length > 0);
 
     if (root.ga) {
       // creating google analytic object
       if (firstTracker) {
         ga('create', gsn.config.GoogleAnalyticAccountId1, 'auto');
 
-        if (secondTracker) {
-          ga('create', gsn.config.GoogleAnalyticAccountId2, 'auto', {
-            'name': 'trackerTwo'
-          });
-        }
-      } else if (secondTracker) {
-        secondTracker = false;
-        ga('create', gsn.config.GoogleAnalyticAccountId2, 'auto');
       }
 
       // enable demographic
@@ -477,22 +463,11 @@
       // begin tracking
       if (root.ga) {
         ga('send', 'pageview', path);
-
-        if (secondTracker) {
-          ga('trackerTwo.send', 'pageview', path);
-        }
       }
 
       // piwik tracking
       if (root._tk) {
         _tk.pageview()
-      }
-
-      // quantcast tracking
-      if (root._qevents) {
-        _qevents.push({
-          qacct: "p-1bL6rByav5EUo"
-        });
       }
     });
 
@@ -521,16 +496,6 @@
           ga('send', 'event', properties.category, action, properties.label, properties.value, {
             nonInteraction: 1
           });
-          if (secondTracker) {
-            ga('trackerTwo.send', 'event', properties.category, action, properties.label, properties.value, {
-              nonInteraction: 1
-            });
-          }
-        } else {
-          ga('send', 'event', properties.category, action, properties.label, properties.value);
-          if (secondTracker) {
-            ga('trackerTwo.send', 'event', properties.category, action, properties.label, properties.value);
-          }
         }
       }
 
