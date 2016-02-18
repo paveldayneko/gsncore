@@ -118,6 +118,17 @@
       $scope.doSearchInternal();
     };
 
+    $scope.getIndex = function(step) {
+      var newIndex = $scope.vm.pageIdx + step;
+      if (newIndex > $scope.vm.pageCount) {
+        newIndex = 1;
+      } else if (newIndex < 1) {
+        newIndex = 1;
+      }
+
+      return newIndex;
+    }
+
     $scope.$on('gsnevent:shoppinglist-loaded', activate);
     $scope.$on('gsnevent:digitalcircular-itemselect', $scope.doAddCircularItem);
 
@@ -203,6 +214,7 @@
           });
         }, 50);
 
+        $scope.vm.pageCount = $scope.vm.digitalCirc.Circulars[vm.circIdx - 1].Pages.length;
         var circ = $scope.vm.circular;
         if (circ) {
           $analytics.eventTrack('PageChange', {

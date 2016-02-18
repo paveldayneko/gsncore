@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.30
+ * version 1.6.31
  * gsncore repository
- * Build date: Thu Feb 18 2016 12:03:06 GMT-0600 (CST)
+ * Build date: Thu Feb 18 2016 12:19:16 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
@@ -7596,6 +7596,17 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       $scope.doSearchInternal();
     };
 
+    $scope.getIndex = function(step) {
+      var newIndex = $scope.vm.pageIdx + step;
+      if (newIndex > $scope.vm.pageCount) {
+        newIndex = 1;
+      } else if (newIndex < 1) {
+        newIndex = 1;
+      }
+
+      return newIndex;
+    }
+
     $scope.$on('gsnevent:shoppinglist-loaded', activate);
     $scope.$on('gsnevent:digitalcircular-itemselect', $scope.doAddCircularItem);
 
@@ -7681,6 +7692,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           });
         }, 50);
 
+        $scope.vm.pageCount = $scope.vm.digitalCirc.Circulars[vm.circIdx - 1].Pages.length;
         var circ = $scope.vm.circular;
         if (circ) {
           $analytics.eventTrack('PageChange', {
