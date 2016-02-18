@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.33
+ * version 1.6.34
  * gsncore repository
- * Build date: Thu Feb 18 2016 12:31:19 GMT-0600 (CST)
+ * Build date: Thu Feb 18 2016 13:51:21 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
@@ -7508,6 +7508,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     $scope.allItems = [];
     $scope.loadMore = loadMore;
     $scope.vm = {
+      pageCount: 1,
       loadCount: 0,
       cacheItems: [],
       digitalCirc: null,
@@ -7675,6 +7676,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
 
       $scope.vm.circular = $scope.vm.digitalCirc.Circulars[$scope.vm.circIdx - 1];
       if ($scope.vm.circular) {
+        $scope.vm.pageCount = $scope.vm.circular.Pages.length;
         $scope.vm.page = $scope.vm.circular.Pages[$scope.vm.pageIdx - 1];
         if (!$scope.vm.page.sorted) {
           $scope.vm.page.Items.sort(sortMe);
@@ -7692,7 +7694,6 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           });
         }, 50);
 
-        $scope.vm.pageCount = $scope.vm.circular.Pages.length;
         var circ = $scope.vm.circular;
         if (circ) {
           $analytics.eventTrack('PageChange', {

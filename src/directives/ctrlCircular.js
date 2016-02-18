@@ -30,6 +30,7 @@
     $scope.allItems = [];
     $scope.loadMore = loadMore;
     $scope.vm = {
+      pageCount: 1,
       loadCount: 0,
       cacheItems: [],
       digitalCirc: null,
@@ -197,6 +198,7 @@
 
       $scope.vm.circular = $scope.vm.digitalCirc.Circulars[$scope.vm.circIdx - 1];
       if ($scope.vm.circular) {
+        $scope.vm.pageCount = $scope.vm.circular.Pages.length;
         $scope.vm.page = $scope.vm.circular.Pages[$scope.vm.pageIdx - 1];
         if (!$scope.vm.page.sorted) {
           $scope.vm.page.Items.sort(sortMe);
@@ -214,7 +216,6 @@
           });
         }, 50);
 
-        $scope.vm.pageCount = $scope.vm.circular.Pages.length;
         var circ = $scope.vm.circular;
         if (circ) {
           $analytics.eventTrack('PageChange', {
