@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.29
+ * version 1.6.30
  * gsncore repository
- * Build date: Tue Feb 16 2016 15:23:15 GMT-0600 (CST)
+ * Build date: Thu Feb 18 2016 12:03:06 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
@@ -7956,11 +7956,11 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     }
   }]);
 })(angular);
-(function (angular, undefined) {
+(function(angular, undefined) {
   'use strict';
   var myModule = angular.module('gsn.core');
 
-  myModule.directive("gsnSvgImage", ['$window', '$timeout', 'debounce', function ($window, $timeout, debounce) {
+  myModule.directive("gsnSvgImage", ['$window', '$timeout', 'debounce', function($window, $timeout, debounce) {
 
     var directive = {
       link: link,
@@ -7968,28 +7968,27 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     };
     return directive;
 
-
-
     function link(scope, element, attrs) {
       var src = attrs.src, svg;
-      var width = 0, height = 0;
+      var width = 0,
+        height = 0;
 
       var loadImage = function(src, cb) {
-          var img = new Image();    
-          img.src = src;
-          var error = null;
-          img.onload = function() {
-              cb(null, img);
-          };
-          img.onerror = function() {
-              cb('ERROR LOADING IMAGE ' + src, null);
-          };
+        var img = new Image();
+        img.src = src;
+        var error = null;
+        img.onload = function() {
+          cb(null, img);
+        };
+        img.onerror = function() {
+          cb('ERROR LOADING IMAGE ' + src, null);
+        };
 
       };
 
       function doLoadImage() {
         var $win = angular.element($window);
-        if (attrs.src == ""){
+        if (attrs.src == "") {
           $timeout(doLoadImage, 200);
           return;
         }
@@ -7999,7 +7998,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
             element.html('');
             element.append(img);
             width = img.width || img.naturalWidth || img.offsetWidth;
-            height = img.height || img.naturalHeight || img.offsetHeight; 
+            height = img.height || img.naturalHeight || img.offsetHeight;
 
             // set viewBox
             img = angular.element(attrs.gsnSvgImage);
@@ -8010,8 +8009,8 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
             img.show();
             var isIE = /Trident.*rv:11\.0/.test(navigator.userAgent) || /msie/gi.test(navigator.userAgent);
 
-            if (isIE && attrs.syncHeight){
-              var resizer = debounce(function(){
+            if (isIE && attrs.syncHeight) {
+              var resizer = debounce(function() {
                 var actualWidth = element.parent().width();
                 var ratio = actualWidth / (width || actualWidth || 1);
                 var newHeight = ratio * height;
@@ -8032,6 +8031,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
               // remove active item
               $timeout(function() {
                 scope.vm.activeItem = null;
+                scope.vm.loadCount++;
               }, 200);
             }, 200);
             reAdjust();
