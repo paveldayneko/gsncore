@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.31
+ * version 1.6.32
  * gsncore repository
- * Build date: Thu Feb 18 2016 12:20:12 GMT-0600 (CST)
+ * Build date: Thu Feb 18 2016 12:27:20 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
@@ -7561,7 +7561,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
         if ($location.search().p) {
           // allow for setting page index
           $timeout(function() {
-            $scope.vm.pageIdx = $location.search().p;
+            $scope.vm.pageIdx = parseInt($location.search().p || 1);
           }, 1000);
         }
       }
@@ -7597,7 +7597,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
     };
 
     $scope.getIndex = function(step) {
-      var newIndex = $scope.vm.pageIdx + step;
+      var newIndex = parseInt($scope.vm.pageIdx || 1) + step;
       if (newIndex > $scope.vm.pageCount) {
         newIndex = 1;
       } else if (newIndex < 1) {

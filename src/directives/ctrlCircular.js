@@ -83,7 +83,7 @@
         if ($location.search().p) {
           // allow for setting page index
           $timeout(function() {
-            $scope.vm.pageIdx = $location.search().p;
+            $scope.vm.pageIdx = parseInt($location.search().p || 1);
           }, 1000);
         }
       }
@@ -119,7 +119,7 @@
     };
 
     $scope.getIndex = function(step) {
-      var newIndex = $scope.vm.pageIdx + step;
+      var newIndex = parseInt($scope.vm.pageIdx || 1) + step;
       if (newIndex > $scope.vm.pageCount) {
         newIndex = 1;
       } else if (newIndex < 1) {
