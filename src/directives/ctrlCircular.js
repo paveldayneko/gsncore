@@ -123,7 +123,7 @@
       if (newIndex > $scope.vm.pageCount) {
         newIndex = 1;
       } else if (newIndex < 1) {
-        newIndex = 1;
+        newIndex = $scope.vm.pageCount;
       }
 
       return newIndex;

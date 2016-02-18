@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.32
+ * version 1.6.33
  * gsncore repository
- * Build date: Thu Feb 18 2016 12:27:20 GMT-0600 (CST)
+ * Build date: Thu Feb 18 2016 12:31:19 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
@@ -7601,7 +7601,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
       if (newIndex > $scope.vm.pageCount) {
         newIndex = 1;
       } else if (newIndex < 1) {
-        newIndex = 1;
+        newIndex = $scope.vm.pageCount;
       }
 
       return newIndex;
