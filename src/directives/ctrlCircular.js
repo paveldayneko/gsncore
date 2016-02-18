@@ -214,7 +214,7 @@
           });
         }, 50);
 
-        $scope.vm.pageCount = $scope.vm.digitalCirc.Circulars[vm.circIdx - 1].Pages.length;
+        $scope.vm.pageCount = $scope.vm.circular.Pages.length;
         var circ = $scope.vm.circular;
         if (circ) {
           $analytics.eventTrack('PageChange', {

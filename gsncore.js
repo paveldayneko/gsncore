@@ -2,7 +2,7 @@
  * gsncore
  * version 1.6.31
  * gsncore repository
- * Build date: Thu Feb 18 2016 12:19:16 GMT-0600 (CST)
+ * Build date: Thu Feb 18 2016 12:20:12 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
@@ -7692,7 +7692,7 @@ angular.module('gsn.core').service(serviceId, ['$window', '$location', '$timeout
           });
         }, 50);
 
-        $scope.vm.pageCount = $scope.vm.digitalCirc.Circulars[vm.circIdx - 1].Pages.length;
+        $scope.vm.pageCount = $scope.vm.circular.Pages.length;
         var circ = $scope.vm.circular;
         if (circ) {
           $analytics.eventTrack('PageChange', {
