@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.6.34
+ * version 1.7.0
  * gsncore repository
- * Build date: Thu Feb 18 2016 13:51:21 GMT-0600 (CST)
+ * Build date: Tue Feb 23 2016 11:27:58 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
@@ -590,7 +590,15 @@
     }
 
     if (typeof (FacebookProvider) !== "undefined") {
-      FacebookProvider.init(gsn.config.FacebookAppId);
+      if (gsn.config.facebookVersion) {
+        FacebookProvider.init({
+          appId: gsn.config.FacebookAppId,
+          xfbml: true,
+          version: gsn.config.facebookVersion
+        });
+      } else {
+        FacebookProvider.init(gsn.config.FacebookAppId);
+      }
     }
   };
   //#endregion
