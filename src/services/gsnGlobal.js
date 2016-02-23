@@ -188,6 +188,11 @@
         $rootScope.$broadcast('gsnevent:shoppinglist-toggle-item', item);
       };
 
+      $scope.$on('$routeChangeStart', function(evt, next, current) {
+        if (typeof gmodal !== 'undefined') {
+          gmodal.hide();
+        }
+      });
       // events handling
 
       $scope.$on('$routeChangeStart', function(evt, next, current) {
@@ -202,7 +207,6 @@
         $scope.gvm.search = $location.search();
         $scope.gvm.menuInactive = false;
         $scope.gvm.shoppingListActive = false;
-
         if (next.requireLogin && !$scope.isLoggedIn) {
           $scope.goUrl('/signin?fromUrl=' + encodeURIComponent($location.url()));
           return;
