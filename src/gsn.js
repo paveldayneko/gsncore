@@ -584,7 +584,15 @@
     }
 
     if (typeof (FacebookProvider) !== "undefined") {
-      FacebookProvider.init(gsn.config.FacebookAppId);
+      if (gsn.config.facebookVersion) {
+        FacebookProvider.init({
+          appId: gsn.config.FacebookAppId,
+          xfbml: true,
+          version: gsn.config.facebookVersion
+        });
+      } else {
+        FacebookProvider.init(gsn.config.FacebookAppId);
+      }
     }
   };
   //#endregion
