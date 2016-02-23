@@ -188,9 +188,9 @@
         $rootScope.$broadcast('gsnevent:shoppinglist-toggle-item', item);
       };
 
-      $scope.$on('$routeChangeStart', function(evt, next, current) {
+      $scope.$on('$routeChangeSuccess', function(evt, next, current) {
         if (typeof gmodal !== 'undefined') {
-          gmodal.hide();
+          $timeout(gmodal.hide, 50);
         }
       });
       // events handling

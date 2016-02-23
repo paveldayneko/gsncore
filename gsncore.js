@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.1
+ * version 1.7.3
  * gsncore repository
- * Build date: Tue Feb 23 2016 11:57:04 GMT-0600 (CST)
+ * Build date: Tue Feb 23 2016 12:19:43 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
@@ -4244,6 +4244,11 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
         $rootScope.$broadcast('gsnevent:shoppinglist-toggle-item', item);
       };
 
+      $scope.$on('$routeChangeSuccess', function(evt, next, current) {
+        if (typeof gmodal !== 'undefined') {
+          $timeout(gmodal.hide, 50);
+        }
+      });
       // events handling
 
       $scope.$on('$routeChangeStart', function(evt, next, current) {
@@ -4258,7 +4263,6 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
         $scope.gvm.search = $location.search();
         $scope.gvm.menuInactive = false;
         $scope.gvm.shoppingListActive = false;
-
         if (next.requireLogin && !$scope.isLoggedIn) {
           $scope.goUrl('/signin?fromUrl=' + encodeURIComponent($location.url()));
           return;
