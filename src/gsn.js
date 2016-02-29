@@ -492,11 +492,9 @@
       }
 
       if (root.ga) {
-        if (properties.noninteraction) {
-          ga('send', 'event', properties.category, action, properties.label, properties.value, {
-            nonInteraction: 1
-          });
-        }
+        ga('send', 'event', properties.category, action, properties.label, properties.value, {
+          nonInteraction: 1
+        });
       }
 
       if (root._tk) {
@@ -560,6 +558,10 @@
         'https://*.gsn2.com/**',
         'http://*.gsngrocers.com/**',
         'https://*.gsngrocers.com/**',
+        'http://*.gsnretailer.com/**',
+        'https://*.gsnretailer.com/**',
+        'http://*.brickinc.net/**',
+        'https://*.brickinc.net/**',
         'http://localhost:*/**',
         'file:///**']);
 

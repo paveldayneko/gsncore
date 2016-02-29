@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.3
+ * version 1.7.4
  * gsncore repository
- * Build date: Tue Feb 23 2016 12:19:43 GMT-0600 (CST)
+ * Build date: Mon Feb 29 2016 10:32:58 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
@@ -498,11 +498,9 @@
       }
 
       if (root.ga) {
-        if (properties.noninteraction) {
-          ga('send', 'event', properties.category, action, properties.label, properties.value, {
-            nonInteraction: 1
-          });
-        }
+        ga('send', 'event', properties.category, action, properties.label, properties.value, {
+          nonInteraction: 1
+        });
       }
 
       if (root._tk) {
@@ -566,6 +564,10 @@
         'https://*.gsn2.com/**',
         'http://*.gsngrocers.com/**',
         'https://*.gsngrocers.com/**',
+        'http://*.gsnretailer.com/**',
+        'https://*.gsnretailer.com/**',
+        'http://*.brickinc.net/**',
+        'https://*.brickinc.net/**',
         'http://localhost:*/**',
         'file:///**']);
 
