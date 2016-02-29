@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.5
+ * version 1.7.6
  * gsncore repository
- * Build date: Mon Feb 29 2016 10:51:48 GMT-0600 (CST)
+ * Build date: Mon Feb 29 2016 11:24:09 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
@@ -9424,7 +9424,7 @@ provides: [facebook]
    * var clicky_custom = { pageview_disable : 1, history_disable : 1 };
    * ````
    */
-  angular.module('angulartics.clicky', ['angulartics']).config([
+  angular.module('angulartics').config([
     '$analyticsProvider', '$documentProvider', function($analyticsProvider, $documentProvider) {
 
       var clickyApi;
