@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.6
+ * version 1.7.7
  * gsncore repository
- * Build date: Mon Feb 29 2016 11:24:09 GMT-0600 (CST)
+ * Build date: Mon Feb 29 2016 11:29:05 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
@@ -9489,11 +9489,11 @@ provides: [facebook]
           title = properties.title || properties.value;
           var data = '';
           if (properties.category) {
-            data += "&ec=" + encodeURIComponent(properties.category);
+            data += "&ec=" + properties.category; //encodeURIComponent(properties.category);
           }
 
           if (properties.label) {
-            data += "&el=" + encodeURIComponent(properties.label);
+            data += "&el=" + properties.label; //encodeURIComponent(properties.label);
           }
 
           if (data) {
