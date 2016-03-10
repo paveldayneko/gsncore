@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.7
+ * version 1.7.8
  * gsncore repository
- * Build date: Mon Feb 29 2016 11:29:05 GMT-0600 (CST)
+ * Build date: Thu Mar 10 2016 13:46:57 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
@@ -7861,13 +7861,14 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     $scope.allItems = [];
     $scope.loadMore = loadMore;
     $scope.vm = {
+      currentPage: 1,
       pageCount: 1,
       loadCount: 0,
       cacheItems: [],
       digitalCirc: null,
       filterBy: $location.search().q,
       filter: {},
-      pageIdx: 1,
+      pageIdx: 0,
       circIdx: $location.search().c
     };
 
@@ -7911,13 +7912,11 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 
         $scope.doSearchInternal();
         $scope.vm.digitalCirc = data;
-        setPage();
-        if ($location.search().p) {
-          // allow for setting page index
-          $timeout(function() {
-            $scope.vm.pageIdx = parseInt($location.search().p || 1);
-          }, 1000);
-        }
+
+        // allow for setting page index
+        $timeout(function() {
+          $scope.vm.pageIdx = parseInt($location.search().p || 1);
+        }, 200);
       }
     }
 
@@ -7996,6 +7995,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       }
 
       $scope.vm.cacheItems = result;
+      $scope.vm.pageCount = parseInt(result.length / $scope.itemsPerPage);
       $scope.allItems = [];
       loadMore();
     };

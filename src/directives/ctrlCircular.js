@@ -30,13 +30,14 @@
     $scope.allItems = [];
     $scope.loadMore = loadMore;
     $scope.vm = {
+      currentPage: 1,
       pageCount: 1,
       loadCount: 0,
       cacheItems: [],
       digitalCirc: null,
       filterBy: $location.search().q,
       filter: {},
-      pageIdx: 1,
+      pageIdx: 0,
       circIdx: $location.search().c
     };
 
@@ -80,13 +81,11 @@
 
         $scope.doSearchInternal();
         $scope.vm.digitalCirc = data;
-        setPage();
-        if ($location.search().p) {
-          // allow for setting page index
-          $timeout(function() {
-            $scope.vm.pageIdx = parseInt($location.search().p || 1);
-          }, 1000);
-        }
+
+        // allow for setting page index
+        $timeout(function() {
+          $scope.vm.pageIdx = parseInt($location.search().p || 1);
+        }, 200);
       }
     }
 
@@ -165,6 +164,7 @@
       }
 
       $scope.vm.cacheItems = result;
+      $scope.vm.pageCount = parseInt(result.length / $scope.itemsPerPage);
       $scope.allItems = [];
       loadMore();
     };
