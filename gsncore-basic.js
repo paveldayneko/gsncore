@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.8
+ * version 1.7.9
  * gsncore repository
- * Build date: Thu Mar 10 2016 13:46:57 GMT-0600 (CST)
+ * Build date: Thu Mar 10 2016 13:56:17 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
@@ -4593,7 +4593,7 @@
     ];
   }
 })(angular);
-(function (angular, undefined) {
+(function(angular, undefined) {
   'use strict';
   var serviceId = 'gsnStore';
   angular.module('gsn.core').service(serviceId, ['$rootScope', '$http', 'gsnApi', '$q', '$timeout', '$location', gsnStore]);
@@ -4637,56 +4637,56 @@
       storeCouponById: {},
       manuCouponById: {},
       youtechCouponById: {},
-      processCompleted: 0,  // process completed date
-      lastProcessDate: 0    // number represent a date in month
+      processCompleted: 0, // process completed date
+      lastProcessDate: 0 // number represent a date in month
     };
 
     var processingQueue = [];
 
     // get circular by type id
-    returnObj.getCircular = function (circularTypeId) {
+    returnObj.getCircular = function(circularTypeId) {
       var result = _cp.circularByTypeId[circularTypeId];
       return result;
     };
 
     // get all categories
-    returnObj.getCategories = function () {
+    returnObj.getCategories = function() {
       return _cp.categoryById;
     };
 
     // get inventory categories
-    returnObj.getInventoryCategories = function () {
+    returnObj.getInventoryCategories = function() {
       var url = gsnApi.getStoreUrl() + '/GetInventoryCategories/' + gsnApi.getChainId() + '/' + gsnApi.getSelectedStoreId();
       return gsnApi.http({}, url);
     };
 
     // get sale item categories
-    returnObj.getSaleItemCategories = function () {
+    returnObj.getSaleItemCategories = function() {
       var url = gsnApi.getStoreUrl() + '/GetSaleItemCategories/' + gsnApi.getChainId() + '/' + gsnApi.getSelectedStoreId();
       return gsnApi.http({}, url);
     };
 
     // refresh current store circular
-    returnObj.refreshCircular = function () {
+    returnObj.refreshCircular = function() {
       if (_lc.circularIsLoading) return;
       var config = gsnApi.getConfig();
       if (config.AllContent) {
         _lc.circularIsLoading = true;
-        processCircularData(function(){
+        processCircularData(function() {
           _lc.circularIsLoading = false;
         });
         return;
       }
 
       _lc.storeId = gsnApi.getSelectedStoreId();
-      if (_lc.storeId <= 0 ) return;
+      if (_lc.storeId <= 0) return;
 
       _lc.circular = {};
       _lc.circularIsLoading = true;
       $rootScope.$broadcast("gsnevent:circular-loading");
 
       var url = gsnApi.getStoreUrl() + '/AllContent/' + _lc.storeId;
-      gsnApi.http({}, url).then(function (rst) {
+      gsnApi.http({}, url).then(function(rst) {
         if (rst.success) {
           _lc.circular = rst.response;
           betterStorage.circular = rst.response;
@@ -4702,28 +4702,28 @@
     };
 
 
-    returnObj.searchProducts = function (searchTerm) {
+    returnObj.searchProducts = function(searchTerm) {
       var url = gsnApi.getStoreUrl() + '/SearchProduct/' + gsnApi.getSelectedStoreId() + '?q=' + encodeURIComponent(searchTerm);
       return gsnApi.http({}, url);
     };
 
-    returnObj.searchRecipes = function (searchTerm) {
+    returnObj.searchRecipes = function(searchTerm) {
       var url = gsnApi.getStoreUrl() + '/SearchRecipe/' + gsnApi.getChainId() + '?q=' + encodeURIComponent(searchTerm);
       return gsnApi.http({}, url);
     };
 
-    returnObj.getAvailableVarieties = function (circularItemId) {
+    returnObj.getAvailableVarieties = function(circularItemId) {
       var url = gsnApi.getStoreUrl() + '/GetAvailableVarieties/' + circularItemId;
       return gsnApi.http({}, url);
     };
 
-    returnObj.getQuickSearchItems = function () {
+    returnObj.getQuickSearchItems = function() {
       var url = gsnApi.getStoreUrl() + '/GetQuickSearchItems/' + gsnApi.getChainId();
       return gsnApi.http(_lc.quickSearchItems, url);
     };
 
     // get all stores from cache
-    returnObj.getStores = function () {
+    returnObj.getStores = function() {
       var deferred = $q.defer();
       if (gsnApi.isNull(_lc.previousGetStore, null) !== null) {
         return _lc.previousGetStore.promise;
@@ -4732,20 +4732,28 @@
       _lc.previousGetStore = deferred;
       var storeList = betterStorage.storeList;
       if (gsnApi.isNull(storeList, []).length > 0) {
-        $timeout(function () {
+        $timeout(function() {
           _lc.previousGetStore = null;
           parseStoreList(storeList);
-          deferred.resolve({ success: true, response: storeList });
+          deferred.resolve({
+            success: true,
+            response: storeList
+          });
         }, 10);
       } else {
         $rootScope.$broadcast("gsnevent:storelist-loading");
-        gsnApi.getAccessToken().then(function () {
+        gsnApi.getAccessToken().then(function() {
           var url = gsnApi.getStoreUrl() + '/List/' + gsnApi.getChainId();
-          $http.get(url, { headers: gsnApi.getApiHeaders() }).success(function (response) {
+          $http.get(url, {
+            headers: gsnApi.getApiHeaders()
+          }).success(function(response) {
             _lc.previousGetStore = null;
             var stores = response;
             parseStoreList(stores, true);
-            deferred.resolve({ success: true, response: stores });
+            deferred.resolve({
+              success: true,
+              response: stores
+            });
             $rootScope.$broadcast("gsnevent:storelist-loaded");
           });
         });
@@ -4755,9 +4763,9 @@
     };
 
     // get the current store
-    returnObj.getStore = function () {
+    returnObj.getStore = function() {
       var deferred = $q.defer();
-      returnObj.getStores().then(function (rsp) {
+      returnObj.getStores().then(function(rsp) {
         var data = gsnApi.mapObject(rsp.response, 'StoreId');
         var result = data[gsnApi.getSelectedStoreId()];
         deferred.resolve(result);
@@ -4767,22 +4775,22 @@
     };
 
     // get item by id
-    returnObj.getItem = function (id) {
+    returnObj.getItem = function(id) {
       var result = _cp.itemsById[id];
       return (gsn.isNull(result, null) !== null) ? result : null;
     };
 
-    returnObj.getAskTheChef = function () {
+    returnObj.getAskTheChef = function() {
       var url = gsnApi.getStoreUrl() + '/FeaturedArticle/' + gsnApi.getChainId() + '/1';
       return gsnApi.http(_lc.faAskTheChef, url);
     };
 
-    returnObj.getFeaturedArticle = function () {
+    returnObj.getFeaturedArticle = function() {
       var url = gsnApi.getStoreUrl() + '/FeaturedArticle/' + gsnApi.getChainId() + '/2';
       return gsnApi.http(_lc.faArticle, url);
     };
 
-    returnObj.getFeaturedVideo = function () {
+    returnObj.getFeaturedVideo = function() {
       var url = gsnApi.getStoreUrl() + '/FeaturedVideo/' + gsnApi.getChainId();
       return gsnApi.http(_lc.faVideo, url);
     };
@@ -4792,53 +4800,53 @@
       return gsnApi.http(_lc.allVideos, url);
     };
 
-    returnObj.getCookingTip = function () {
+    returnObj.getCookingTip = function() {
       var url = gsnApi.getStoreUrl() + '/FeaturedArticle/' + gsnApi.getChainId() + '/3';
       return gsnApi.http(_lc.faCookingTip, url);
     };
 
-    returnObj.getTopRecipes = function () {
+    returnObj.getTopRecipes = function() {
       var url = gsnApi.getStoreUrl() + '/TopRecipes/' + gsnApi.getChainId() + '/' + 50;
       return gsnApi.http(_lc.topRecipes, url);
     };
 
-    returnObj.getFeaturedRecipe = function () {
+    returnObj.getFeaturedRecipe = function() {
       var url = gsnApi.getStoreUrl() + '/FeaturedRecipe/' + gsnApi.getChainId();
       return gsnApi.http(_lc.faRecipe, url);
     };
 
-    returnObj.getCoupon = function (couponId, couponType) {
+    returnObj.getCoupon = function(couponId, couponType) {
       return couponType == 2 ? _cp.manuCouponById[couponId] : (couponType == 10 ? _cp.storeCouponById[couponId] : _cp.youtechCouponById[couponId]);
     };
 
-    returnObj.getManufacturerCoupons = function () {
+    returnObj.getManufacturerCoupons = function() {
       return _lc.manufacturerCoupons;
     };
 
-    returnObj.getManufacturerCouponTotalSavings = function () {
+    returnObj.getManufacturerCouponTotalSavings = function() {
       var url = gsnApi.getStoreUrl() + '/GetManufacturerCouponTotalSavings/' + gsnApi.getChainId();
       return gsnApi.http(_lc.manuCouponTotalSavings, url);
     };
 
-    returnObj.getStates = function () {
+    returnObj.getStates = function() {
       var url = gsnApi.getStoreUrl() + '/GetStates';
       return gsnApi.http(_lc.states, url);
     };
 
-    returnObj.getInstoreCoupons = function () {
+    returnObj.getInstoreCoupons = function() {
       return _lc.instoreCoupons;
     };
 
-    returnObj.getYoutechCoupons = function () {
+    returnObj.getYoutechCoupons = function() {
       return _lc.youtechCoupons;
     };
 
-    returnObj.getRecipe = function (recipeId) {
+    returnObj.getRecipe = function(recipeId) {
       var url = gsnApi.getStoreUrl() + '/RecipeBy/' + recipeId;
       return gsnApi.http({}, url);
     };
 
-    returnObj.getStaticContent = function (contentName) {
+    returnObj.getStaticContent = function(contentName) {
       var url = gsnApi.getStoreUrl() + '/GetPartials/' + gsnApi.getChainId() + '/';
       var storeId = gsnApi.isNull(gsnApi.getSelectedStoreId(), 0);
       if (storeId > 0) {
@@ -4849,46 +4857,46 @@
       return gsnApi.http({}, url);
     };
 
-    returnObj.getPartial = function (contentName) {
+    returnObj.getPartial = function(contentName) {
       var url = gsnApi.getContentServiceUrl('GetPartial');
       var today = new Date();
       var nocache = today.getFullYear() + '' + today.getMonth() + '' + today.getDate() + '' + today.getHours();
-      url += '?name=' + encodeURIComponent(contentName) + '&nocache=' +  nocache;
+      url += '?name=' + encodeURIComponent(contentName) + '&nocache=' + nocache;
 
       return gsnApi.http({}, url);
     };
 
-    returnObj.getArticle = function (articleId) {
+    returnObj.getArticle = function(articleId) {
       var url = gsnApi.getStoreUrl() + '/ArticleBy/' + articleId;
       return gsnApi.http({}, url);
     };
 
-    returnObj.getSaleItems = function (departmentId, categoryId) {
+    returnObj.getSaleItems = function(departmentId, categoryId) {
       var url = gsnApi.getStoreUrl() + '/FilterSaleItem/' + gsnApi.getSelectedStoreId() + '?' + 'departmentId=' + gsnApi.isNull(departmentId, '') + '&categoryId=' + gsnApi.isNull(categoryId, '');
       return gsnApi.http({}, url);
     };
 
-    returnObj.getInventory = function (departmentId, categoryId) {
+    returnObj.getInventory = function(departmentId, categoryId) {
       var url = gsnApi.getStoreUrl() + '/FilterInventory/' + gsnApi.getSelectedStoreId() + '?' + 'departmentId=' + gsnApi.isNull(departmentId, '') + '&categoryId=' + gsnApi.isNull(categoryId, '');
       return gsnApi.http({}, url);
     };
 
-    returnObj.getSpecialAttributes = function () {
+    returnObj.getSpecialAttributes = function() {
       var url = gsnApi.getStoreUrl() + '/GetSpecialAttributes/' + gsnApi.getChainId();
       return gsnApi.http(_lc.specialAttributes, url);
     };
 
-    returnObj.getMealPlannerRecipes = function () {
+    returnObj.getMealPlannerRecipes = function() {
       var url = gsnApi.getStoreUrl() + '/GetMealPlannerRecipes/' + gsnApi.getChainId();
       return gsnApi.http(_lc.mealPlanners, url);
     };
 
-    returnObj.getAdPods = function () {
+    returnObj.getAdPods = function() {
       var url = gsnApi.getStoreUrl() + '/ListSlots/' + gsnApi.getChainId();
       return gsnApi.http(_lc.adPods, url);
     };
 
-    returnObj.hasCompleteCircular = function () { 
+    returnObj.hasCompleteCircular = function() {
       var circ = returnObj.getCircularData();
       var result = false;
 
@@ -4908,7 +4916,7 @@
       return _cp.processCompleted;
     };
 
-    returnObj.getCircularData = function (forProcessing) {
+    returnObj.getCircularData = function(forProcessing) {
       if (!_lc.circular) {
         _lc.circular = betterStorage.circular;
         if (!forProcessing) {
@@ -4919,7 +4927,7 @@
       return _lc.circular;
     };
 
-    returnObj.initialize = function (isApi) {
+    returnObj.initialize = function(isApi) {
       /// <summary>Initialze store data. this method should be
       /// written such that, it should do a server retrieval when parameter is null.
       /// </summary>
@@ -4956,7 +4964,7 @@
       }
     };
 
-    $rootScope.$on('gsnevent:store-setid', function (event, values) {
+    $rootScope.$on('gsnevent:store-setid', function(event, values) {
       var storeId = values.newValue;
       var config = gsnApi.getConfig();
       var hasNewStoreId = (gsnApi.isNull(_lc.storeId, 0) != storeId);
@@ -4973,8 +4981,7 @@
       var seconds = (currentTime - gsnApi.isNull(betterStorage.circularLastUpdate, 0)) / 1000;
       if ((requireRefresh && !_lc.circularIsLoading) || (seconds > 1200)) {
         returnObj.refreshCircular();
-      }
-      else if (hasNewStoreId) {
+      } else if (hasNewStoreId) {
         processCircularData();
       }
     });
@@ -4986,7 +4993,7 @@
       if (isRaw) {
         var stores = storeList;
         if (typeof (stores) != "string") {
-          angular.forEach(stores, function (store) {
+          angular.forEach(stores, function(store) {
             store.Settings = gsnApi.mapObject(store.StoreSettings, 'StoreSettingId');
           });
 
@@ -5000,16 +5007,13 @@
         if (storeList[0].StoreId != gsnApi.isNull(gsnApi.getSelectedStoreId(), 0)) {
           gsnApi.setSelectedStoreId(storeList[0].StoreId);
         }
-      }
-      else if (search.storeid) {
+      } else if (search.storeid) {
         var storeById = gsnApi.mapObject(storeList, 'StoreId');
         gsnApi.setSelectedStoreId(storeById[search.storeid].StoreId);
-      }
-      else if (search.storenbr) {
+      } else if (search.storenbr) {
         var storeByNumber = gsnApi.mapObject(storeList, 'StoreNumber');
         gsnApi.setSelectedStoreId(storeByNumber[search.storenbr].StoreId);
-      }
-      else if (search.store) {
+      } else if (search.store) {
         var storeByUrl = gsnApi.mapObject(storeList, 'StoreUrl');
         if (storeByNumber[search.store]) {
           gsnApi.setSelectedStoreId(storeByNumber[search.store].StoreId);
@@ -5023,8 +5027,10 @@
       // process manufacturer coupon
       var circular = returnObj.getCircularData();
       _lc.manufacturerCoupons.items = circular.ManufacturerCoupons;
-      angular.forEach(_lc.manufacturerCoupons.items, function (item) {
-        item.CategoryName = gsnApi.isNull(_cp.categoryById[item.CategoryId], { CategoryName: '' }).CategoryName;
+      angular.forEach(_lc.manufacturerCoupons.items, function(item) {
+        item.CategoryName = gsnApi.isNull(_cp.categoryById[item.CategoryId], {
+          CategoryName: ''
+        }).CategoryName;
         _cp.manuCouponById[item.ItemId] = item;
       });
       gsnApi.getConfig().hasPrintableCoupon = _lc.manufacturerCoupons.items.length > 0;
@@ -5034,9 +5040,11 @@
       var circular = returnObj.getCircularData();
       // process in-store coupon
       var items = [];
-      angular.forEach(circular.InstoreCoupons, function (item) {
+      angular.forEach(circular.InstoreCoupons, function(item) {
         if (item.StoreIds.length <= 0 || item.StoreIds.indexOf(_lc.storeId) >= 0) {
-          item.CategoryName = gsnApi.isNull(_cp.categoryById[item.CategoryId], { CategoryName: '' }).CategoryName;
+          item.CategoryName = gsnApi.isNull(_cp.categoryById[item.CategoryId], {
+            CategoryName: ''
+          }).CategoryName;
           _cp.storeCouponById[item.ItemId] = item;
           items.push(item);
         }
@@ -5054,8 +5062,10 @@
 
       // process youtech coupon
       _lc.youtechCoupons.items = circular.YoutechCoupons;
-      angular.forEach(_lc.youtechCoupons.items, function (item) {
-        item.CategoryName = gsnApi.isNull(_cp.categoryById[item.CategoryId], {CategoryName: ''}).CategoryName;
+      angular.forEach(_lc.youtechCoupons.items, function(item) {
+        item.CategoryName = gsnApi.isNull(_cp.categoryById[item.CategoryId], {
+          CategoryName: ''
+        }).CategoryName;
         _cp.youtechCouponById[item.ItemId] = item;
       });
 
@@ -5080,14 +5090,23 @@
       processingQueue.length = 0;
 
       // process category into key value pair
-      processingQueue.push(function () {
+      processingQueue.push(function() {
         if (_cp.lastProcessDate == (new Date().getDate()) && _cp.categoryById[-1]) return;
 
         var categoryById = gsnApi.mapObject(circularData.Categories, 'CategoryId');
 
-        categoryById[null] = { CategoryId: null, CategoryName: '' };
-        categoryById[-1] = { CategoryId: -1, CategoryName: 'Misc. Items' };
-        categoryById[-2] = { CategoryId: -2, CategoryName: 'Ingredients' };
+        categoryById[null] = {
+          CategoryId: null,
+          CategoryName: ''
+        };
+        categoryById[-1] = {
+          CategoryId: -1,
+          CategoryName: 'Misc. Items'
+        };
+        categoryById[-2] = {
+          CategoryId: -2,
+          CategoryName: 'Ingredients'
+        };
         _cp.categoryById = categoryById;
 
         return;
@@ -5101,7 +5120,7 @@
       circularData.Circulars = [];
 
       // foreach Circular
-      angular.forEach(circulars, function (circ) {
+      angular.forEach(circulars, function(circ) {
         circ.StoreIds = circ.StoreIds || [];
         circ.CircularTypeName = (circularTypes[circ.CircularTypeId] || {}).Name;
         if (circ.StoreIds.length <= 0 || circ.StoreIds.indexOf(_lc.storeId) >= 0) {
@@ -5113,7 +5132,7 @@
           var pages = circ.Pagez;
           circ.Pages = [];
 
-          angular.forEach(pages, function (page) {
+          angular.forEach(pages, function(page) {
             if (page.StoreIds.length <= 0 || page.StoreIds.indexOf(_lc.storeId) >= 0) {
               circ.Pages.push(page);
             }
@@ -5123,37 +5142,44 @@
         }
       });
 
-      processingQueue.push(function () {
+      processingQueue.push(function() {
         // set all items
-        circularByTypes.push({ CircularTypeId: 99, CircularType: 'All Circulars', items: items });
+        circularByTypes.push({
+          CircularTypeId: 99,
+          CircularType: 'All Circulars',
+          items: items
+        });
 
+        // sort by circulartypeid
+        gsnApi.sortOn(circularData.Circulars, 'CircularTypeId');
         return;
       });
 
       // set result
-      processingQueue.push(function () {
+      processingQueue.push(function() {
         _cp.itemsById = gsnApi.mapObject(items, 'ItemId');
         return;
       });
 
-      processingQueue.push(function () {
+      processingQueue.push(function() {
         _cp.circularByTypeId = gsnApi.mapObject(circularByTypes, 'CircularTypeId');
         return;
       });
 
-      processingQueue.push(function () {
+      processingQueue.push(function() {
         _cp.staticCircularById = gsnApi.mapObject(staticCirculars, 'CircularTypeId');
         return;
       });
 
       processingQueue.push(processCoupon);
 
-      processingQueue.push(function () {
+      processingQueue.push(function() {
         if (cb) cb();
         _cp.lastProcessDate = new Date().getDate();
-        // sort by circulartypeid
-        gsnApi.sortOn(circularData.Circulars, 'CircularTypeId');
-        $rootScope.$broadcast('gsnevent:circular-loaded', { success: true, response: circularData });
+        $rootScope.$broadcast('gsnevent:circular-loaded', {
+          success: true,
+          response: circularData
+        });
         return;
       });
 
@@ -5188,19 +5214,19 @@
       };
 
       // foreach Page in Circular
-      angular.forEach(pages, function (page) {
+      angular.forEach(pages, function(page) {
         //var pageCopy = {};
         //angular.extend(pageCopy, page);
         //pageCopy.Items = [];
         itemCount += page.Items.length;
         page.Circular = circ;
 
-        processingQueue.push(function () {
+        processingQueue.push(function() {
           processCircularPage(items, circularMaster, page);
         });
       });
 
-      processingQueue.push(function () {
+      processingQueue.push(function() {
         if (gsnApi.isNull(itemCount, 0) > 0) {
           circularByTypes.push(circularMaster);
         } else {
@@ -5211,22 +5237,25 @@
     }
 
     function processCircularPage(items, circularMaster, page) {
-      angular.forEach(page.Items, function (item) {
+      angular.forEach(page.Items, function(item) {
         item.PageNumber = parseInt(page.PageNumber);
-        item.rect = {x: 0, y: 0};
+        item.rect = {
+          x: 0,
+          y: 0
+        };
         var pos = (item.AreaCoordinates + '').split(',');
         if (pos.length > 2) {
           var temp = 0;
-          for(var i = 0; i < 4; i++){
+          for (var i = 0; i < 4; i++) {
             pos[i] = parseInt(pos[i]) || 0;
           }
           // swap if bad position
-          if (pos[0] > pos[2]){
+          if (pos[0] > pos[2]) {
             temp = pos[0];
             pos[0] = pos[2];
             pos[2] = temp;
           }
-          if (pos[1] > pos[3]){
+          if (pos[1] > pos[3]) {
             temp = pos[1];
             pos[1] = pos[3];
             pos[3] = temp;
@@ -5241,13 +5270,13 @@
           item.rect.cx = item.rect.width / 2; // center
           item.rect.cy = item.rect.height / 2;
         }
-        
+
         circularMaster.items.push(item);
         item.SmallImageUrl = item.ImageUrl.replace('upload.gsngrocers.com/', 'upload.gsngrocers.com/rs/120,fit/');
         items.push(item);
       });
     }
-    //#endregion
+  //#endregion
   }
 })(angular);
 
