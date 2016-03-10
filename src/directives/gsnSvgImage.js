@@ -83,8 +83,8 @@
           }
         });
       }
-
-      scope.$watch(attrs.watch || 'vm.pageIdx', doLoadImage);
+      var myLoadImage = debounce(doLoadImage, 1000);
+      scope.$watch(attrs.watch || 'vm.page', myLoadImage);
     }
   }]);
 })(angular);
