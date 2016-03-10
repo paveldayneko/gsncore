@@ -37,8 +37,8 @@
       digitalCirc: null,
       filterBy: $location.search().q,
       filter: {},
-      pageIdx: parseInt($location.search().p || 1),
-      circIdx: parseInt($location.search().c || 1)
+      pageIdx: 0,
+      circIdx: 0
     };
 
     function activate() {
@@ -81,8 +81,8 @@
 
         $scope.doSearchInternal();
         $scope.vm.digitalCirc = data;
-
-        setPage(0, $scope.vm.pageIdx);
+        $scope.vm.circIdx = parseInt($location.search().p || 0);
+        setPage(0, parseInt($location.search().p || 0));
       }
     }
 
