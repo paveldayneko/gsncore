@@ -38,7 +38,7 @@
       filterBy: $location.search().q,
       filter: {},
       pageIdx: 0,
-      circIdx: $location.search().c
+      circIdx: parseInt($location.search().c || 1)
     };
 
     function activate() {
