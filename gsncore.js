@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.10
+ * version 1.7.11
  * gsncore repository
- * Build date: Thu Mar 10 2016 14:01:14 GMT-0600 (CST)
+ * Build date: Thu Mar 10 2016 14:06:32 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
@@ -7897,7 +7897,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       digitalCirc: null,
       filterBy: $location.search().q,
       filter: {},
-      pageIdx: 0,
+      pageIdx: parseInt($location.search().p || 1),
       circIdx: parseInt($location.search().c || 1)
     };
 
@@ -7942,10 +7942,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
         $scope.doSearchInternal();
         $scope.vm.digitalCirc = data;
 
-        // allow for setting page index
-        $timeout(function() {
-          $scope.vm.pageIdx = parseInt($location.search().p || 1);
-        }, 200);
+        setPage(0, $scope.vm.pageIdx);
       }
     }
 
