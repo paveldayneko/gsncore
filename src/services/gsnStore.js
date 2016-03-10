@@ -314,7 +314,7 @@
         result = false;
       }
 
-      return result;
+      return _cp.getProcessDate() ? result : null;
     };
 
     returnObj.getProcessDate = function() {
