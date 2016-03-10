@@ -42,6 +42,9 @@
     };
 
     function activate() {
+      if ($scope.vm.digitalCirc) {
+        return;
+      }
 
       var config = gsnApi.getConfig();
       if ($scope.currentPath == '/circular' && (gsnApi.isNull(config.defaultMobileListView, null) === null)) {
@@ -64,8 +67,9 @@
           var filteredByStoreCircs = []
           var storeId = gsnApi.isNull(gsnApi.getSelectedStoreId(), 0);
           angular.forEach(data.Circulars, function(circ) {
-            if (gsn.contains(circ.StoreIds, storeId))
+            if (gsn.contains(circ.StoreIds, storeId)) {
               filteredByStoreCircs.push(circ);
+            }
           });
           data.Circulars = filteredByStoreCircs;
         } else {
@@ -124,7 +128,7 @@
       }
 
       return newIndex;
-    }
+    };
 
     $scope.$on('gsnevent:shoppinglist-loaded', activate);
     $scope.$on('gsnevent:digitalcircular-itemselect', $scope.doAddCircularItem);

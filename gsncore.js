@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.14
+ * version 1.7.16
  * gsncore repository
- * Build date: Thu Mar 10 2016 14:54:56 GMT-0600 (CST)
+ * Build date: Thu Mar 10 2016 15:12:08 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
@@ -7902,6 +7902,9 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     };
 
     function activate() {
+      if ($scope.vm.digitalCirc) {
+        return;
+      }
 
       var config = gsnApi.getConfig();
       if ($scope.currentPath == '/circular' && (gsnApi.isNull(config.defaultMobileListView, null) === null)) {
@@ -7924,8 +7927,9 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
           var filteredByStoreCircs = []
           var storeId = gsnApi.isNull(gsnApi.getSelectedStoreId(), 0);
           angular.forEach(data.Circulars, function(circ) {
-            if (gsn.contains(circ.StoreIds, storeId))
+            if (gsn.contains(circ.StoreIds, storeId)) {
               filteredByStoreCircs.push(circ);
+            }
           });
           data.Circulars = filteredByStoreCircs;
         } else {
@@ -7984,7 +7988,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       }
 
       return newIndex;
-    }
+    };
 
     $scope.$on('gsnevent:shoppinglist-loaded', activate);
     $scope.$on('gsnevent:digitalcircular-itemselect', $scope.doAddCircularItem);
