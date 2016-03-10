@@ -82,7 +82,7 @@
         $scope.doSearchInternal();
         $scope.vm.digitalCirc = data;
         $scope.vm.circIdx = parseInt($location.search().c || 0);
-        setPage(0, parseInt($location.search().p || 0));
+        $scope.vm.pageIdx = parseInt($location.search().p || 0);
       }
     }
 
