@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.18
+ * version 1.7.19
  * gsncore repository
- * Build date: Thu Mar 10 2016 15:26:58 GMT-0600 (CST)
+ * Build date: Thu Mar 10 2016 22:12:54 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
