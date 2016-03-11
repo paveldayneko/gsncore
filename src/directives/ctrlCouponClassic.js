@@ -155,6 +155,7 @@
     });
 
     $scope.$on('gsnevent:youtech-cardcoupon-loaded', activate);
+	$scope.$on('gsnevent:youtech-cardcoupon-loadfail', activate);
     $scope.$watch('vm.sortBy', activate);
     $scope.$watch('vm.filterBy', activate);
     $scope.$watch('selectedCoupons.cardCouponOnly', activate);
