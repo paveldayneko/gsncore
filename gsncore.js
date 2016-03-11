@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.21
+ * version 1.7.22
  * gsncore repository
- * Build date: Fri Mar 11 2016 10:37:25 GMT-0600 (CST)
+ * Build date: Fri Mar 11 2016 10:48:40 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
@@ -4486,12 +4486,15 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
           Facebook.logout();
         }
 
-        // reload the page to refresh page status on logout
-        if ($scope.currentPath == '/') {
-          gsnApi.reload();
-        } else {
-          $scope.goUrl('/');
-        }
+        // allow time to logout
+        $timeout(function() {
+          // reload the page to refresh page status on logout
+          if ($scope.currentPath == '/') {
+            gsnApi.reload();
+          } else {
+            $scope.goUrl('/');
+          }
+        }, 500);
       };
 
       $scope.logoutWithPrompt = function() {
