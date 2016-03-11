@@ -81,7 +81,7 @@
 
       $scope.doFacebookLogin = function() {
         Facebook.getLoginStatus(function(response) {
-          if (response.status == 'connected') {
+          if (response.status == 'connected' && response.authResponse.accessToken) {
             $scope.validateRegistration(response);
           } else {
             Facebook.login(function(rsp) {

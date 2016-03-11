@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.20
+ * version 1.7.21
  * gsncore repository
- * Build date: Fri Mar 11 2016 16:54:55 GMT+0300 (Belarus Standard Time)
+ * Build date: Fri Mar 11 2016 10:37:25 GMT-0600 (CST)
  */
 ;(function() {
   'use strict';
@@ -2486,7 +2486,7 @@
 
       $scope.doFacebookLogin = function() {
         Facebook.getLoginStatus(function(response) {
-          if (response.status == 'connected') {
+          if (response.status == 'connected' && response.authResponse.accessToken) {
             $scope.validateRegistration(response);
           } else {
             Facebook.login(function(rsp) {
