@@ -136,12 +136,15 @@
           Facebook.logout();
         }
 
-        // reload the page to refresh page status on logout
-        if ($scope.currentPath == '/') {
-          gsnApi.reload();
-        } else {
-          $scope.goUrl('/');
-        }
+        // allow time to logout
+        $timeout(function() {
+          // reload the page to refresh page status on logout
+          if ($scope.currentPath == '/') {
+            gsnApi.reload();
+          } else {
+            $scope.goUrl('/');
+          }
+        }, 500);
       };
 
       $scope.logoutWithPrompt = function() {
