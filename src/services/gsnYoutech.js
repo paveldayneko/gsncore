@@ -196,7 +196,7 @@
             return;
           }
 
-          $saveData.isValidResponse = false;
+		  $saveData = initData();
           $rootScope.$broadcast('gsnevent:youtech-cardcoupon-loadfail', service);
         }).error(function (response) {
           $saveData.isValidResponse = false;

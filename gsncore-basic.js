@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.19
+ * version 1.7.20
  * gsncore repository
- * Build date: Thu Mar 10 2016 22:12:54 GMT-0600 (CST)
+ * Build date: Fri Mar 11 2016 16:54:55 GMT+0300 (Belarus Standard Time)
  */
 ;(function() {
   'use strict';
@@ -5478,7 +5478,7 @@
             return;
           }
 
-          $saveData.isValidResponse = false;
+		  $saveData = initData();
           $rootScope.$broadcast('gsnevent:youtech-cardcoupon-loadfail', service);
         }).error(function (response) {
           $saveData.isValidResponse = false;
