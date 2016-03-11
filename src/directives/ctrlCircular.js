@@ -165,7 +165,7 @@
       }
 
       $scope.vm.cacheItems = result;
-      $scope.vm.pageCount = parseInt(result.length / $scope.itemsPerPage);
+      $scope.vm.pageCount = Math.ceil(result.length / $scope.itemsPerPage);
       $scope.allItems = [];
       loadMore();
     };
