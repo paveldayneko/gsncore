@@ -92,6 +92,7 @@
     GoogleAnalyticAccountId2: null,
     GoogleSiteVerificationId: null,
     RegistrationFromEmailAddress: 'tech@grocerywebsites.com',
+    FacebookDisable: false,
     FacebookAppId: null,
     FacebookPermission: null,
     GoogleSiteSearchCode: null,
@@ -586,7 +587,9 @@
     }
 
     if (typeof (FacebookProvider) !== "undefined") {
-      if (!gsn.config.FacebookDisable) {
+      if (gsn.config.FacebookDisable) {
+        gsn.config.FacebookAppId = null;
+      } else {
         if (gsn.config.facebookVersion) {
           FacebookProvider.init({
             appId: gsn.config.FacebookAppId,

@@ -2,7 +2,7 @@
  * gsncore
  * version 1.7.24
  * gsncore repository
- * Build date: Mon Mar 14 2016 09:46:59 GMT-0500 (CDT)
+ * Build date: Mon Mar 14 2016 09:48:48 GMT-0500 (CDT)
  */
 ;(function() {
   'use strict';
@@ -98,6 +98,7 @@
     GoogleAnalyticAccountId2: null,
     GoogleSiteVerificationId: null,
     RegistrationFromEmailAddress: 'tech@grocerywebsites.com',
+    FacebookDisable: false,
     FacebookAppId: null,
     FacebookPermission: null,
     GoogleSiteSearchCode: null,
@@ -592,7 +593,9 @@
     }
 
     if (typeof (FacebookProvider) !== "undefined") {
-      if (!gsn.config.FacebookDisable) {
+      if (gsn.config.FacebookDisable) {
+        gsn.config.FacebookAppId = null;
+      } else {
         if (gsn.config.facebookVersion) {
           FacebookProvider.init({
             appId: gsn.config.FacebookAppId,
