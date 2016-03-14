@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.23
+ * version 1.7.24
  * gsncore repository
- * Build date: Mon Mar 14 2016 09:42:02 GMT-0500 (CDT)
+ * Build date: Mon Mar 14 2016 09:46:59 GMT-0500 (CDT)
  */
 ;(function() {
   'use strict';
@@ -592,14 +592,16 @@
     }
 
     if (typeof (FacebookProvider) !== "undefined") {
-      if (gsn.config.facebookVersion) {
-        FacebookProvider.init({
-          appId: gsn.config.FacebookAppId,
-          xfbml: true,
-          version: gsn.config.facebookVersion
-        });
-      } else {
-        FacebookProvider.init(gsn.config.FacebookAppId);
+      if (!gsn.config.FacebookDisable) {
+        if (gsn.config.facebookVersion) {
+          FacebookProvider.init({
+            appId: gsn.config.FacebookAppId,
+            xfbml: true,
+            version: gsn.config.facebookVersion
+          });
+        } else {
+          FacebookProvider.init(gsn.config.FacebookAppId);
+        }
       }
     }
   };

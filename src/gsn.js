@@ -586,14 +586,16 @@
     }
 
     if (typeof (FacebookProvider) !== "undefined") {
-      if (gsn.config.facebookVersion) {
-        FacebookProvider.init({
-          appId: gsn.config.FacebookAppId,
-          xfbml: true,
-          version: gsn.config.facebookVersion
-        });
-      } else {
-        FacebookProvider.init(gsn.config.FacebookAppId);
+      if (!gsn.config.FacebookDisable) {
+        if (gsn.config.facebookVersion) {
+          FacebookProvider.init({
+            appId: gsn.config.FacebookAppId,
+            xfbml: true,
+            version: gsn.config.facebookVersion
+          });
+        } else {
+          FacebookProvider.init(gsn.config.FacebookAppId);
+        }
       }
     }
   };
