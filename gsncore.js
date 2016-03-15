@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.25
+ * version 1.7.26
  * gsncore repository
- * Build date: Tue Mar 15 2016 10:15:41 GMT-0500 (CDT)
+ * Build date: Tue Mar 15 2016 13:40:01 GMT-0500 (CDT)
  */
 ;(function() {
   'use strict';
@@ -7944,17 +7944,17 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
           return;
         }
 
+        var myPageIdx = parseInt($location.search().p || 0);
+        var myCircIdx = parseInt($location.search().p || 0);
         if (data.Circulars.length == 1) {
-          if (gsnApi.isNull($scope.vm.circIdx, null) === null) {
-            $scope.vm.circIdx = 1;
-            $scope.vm.pageIdx = 1;
-          }
+          myCircIdx = myCircIdx || 1;
+          myPageIdx = myPageIdx || 1;
         }
 
         $scope.doSearchInternal();
         $scope.vm.digitalCirc = data;
-        $scope.vm.circIdx = parseInt($location.search().c || 0);
-        $scope.vm.pageIdx = parseInt($location.search().p || 0);
+        $scope.vm.circIdx = myCircIdx;
+        $scope.vm.pageIdx = myPageIdx;
       }
     }
 
@@ -12925,7 +12925,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
                 var circCoupon = gsnStore.getItem(item.ItemId);
                 if (circCoupon && circCoupon.CouponImageUrl) {
                   item.CouponImageUrl = circCoupon.CouponImageUrl;
-                  item.Description2 = circCoupon.Description2;
+                  item.Description2 = circCoupon.ItemDescription;
                   item.EndDate = $scope.circular.Circulars[0].EndDate;
                   $scope.circularCoupons.push(item);
                 }

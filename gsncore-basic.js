@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.25
+ * version 1.7.26
  * gsncore repository
- * Build date: Tue Mar 15 2016 10:15:41 GMT-0500 (CDT)
+ * Build date: Tue Mar 15 2016 13:40:00 GMT-0500 (CDT)
  */
 ;(function() {
   'use strict';
@@ -7578,7 +7578,7 @@
                 var circCoupon = gsnStore.getItem(item.ItemId);
                 if (circCoupon && circCoupon.CouponImageUrl) {
                   item.CouponImageUrl = circCoupon.CouponImageUrl;
-                  item.Description2 = circCoupon.Description2;
+                  item.Description2 = circCoupon.ItemDescription;
                   item.EndDate = $scope.circular.Circulars[0].EndDate;
                   $scope.circularCoupons.push(item);
                 }

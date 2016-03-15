@@ -76,17 +76,17 @@
           return;
         }
 
+        var myPageIdx = parseInt($location.search().p || 0);
+        var myCircIdx = parseInt($location.search().p || 0);
         if (data.Circulars.length == 1) {
-          if (gsnApi.isNull($scope.vm.circIdx, null) === null) {
-            $scope.vm.circIdx = 1;
-            $scope.vm.pageIdx = 1;
-          }
+          myCircIdx = myCircIdx || 1;
+          myPageIdx = myPageIdx || 1;
         }
 
         $scope.doSearchInternal();
         $scope.vm.digitalCirc = data;
-        $scope.vm.circIdx = parseInt($location.search().c || 0);
-        $scope.vm.pageIdx = parseInt($location.search().p || 0);
+        $scope.vm.circIdx = myCircIdx;
+        $scope.vm.pageIdx = myPageIdx;
       }
     }
 
