@@ -149,7 +149,7 @@
 
       $scope.logoutWithPrompt = function() {
         try {
-          $scope.goOutPromt(null, '/', $scope.logout, true);
+          $scope.goOutPrompt(null, '/', $scope.logout, true);
         } catch (e) {
           $scope.logout();
         }
@@ -157,6 +157,7 @@
       };
 
       $scope.logoutWithPromt = $scope.logoutWithPrompt;
+      $scope.goOutPromt = $scope.goOutPrompt;
 
       $scope.doToggleCartItem = function(evt, item, linkedItem) {
         /// <summary>Toggle the shoping list item checked state</summary>
@@ -447,7 +448,6 @@
           }
         }
       }
-      ;
 
       $scope.$on('gsnevent:gsnmodal-hide', gsnModalTracking);
       $scope.$on('gsnevent:gsnmodal-show', gsnModalTracking);
@@ -460,8 +460,9 @@
         for (var k in $window._tk.trackers) {
           $window._tk.trackers[k].on('track', function(item) {
             // populate with page url, storeid, consumerid, is anonymous
-            if (!item.dt)
+            if (!item.dt) {
               item.dt = $scope.currentPath;
+            }
 
             item.stid = gsnApi.getSelectedStoreId();
             item.anon = gsnApi.isLoggedIn();

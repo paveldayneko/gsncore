@@ -1,4 +1,4 @@
-﻿(function (angular, undefined) {
+﻿(function(angular, undefined) {
   'use strict';
 
   var myDirectiveName = 'ctrlRegistration';
@@ -20,11 +20,14 @@
   function myController($scope, gsnProfile, gsnApi, $timeout, gsnStore, $interpolate, $http, $rootScope, $window, $location, $analytics) {
     $scope.activate = activate;
     $scope.totalSavings = '';
-    $scope.profile = { PrimaryStoreId: gsnApi.getSelectedStoreId(), ReceiveEmail: false };
+    $scope.profile = {
+      PrimaryStoreId: gsnApi.getSelectedStoreId(),
+      ReceiveEmail: false
+    };
 
-    $scope.hasSubmitted = false;    // true when user has click the submit button
-    $scope.isValidSubmit = true;    // true when result of submit is valid
-    $scope.isSubmitting = false;    // true if we're waiting for result from server
+    $scope.hasSubmitted = false; // true when user has click the submit button
+    $scope.isValidSubmit = true; // true when result of submit is valid
+    $scope.isSubmitting = false; // true if we're waiting for result from server
     $scope.isFacebook = $scope.currentPath == '/registration/facebook';
     $scope.errorMessage = '';
     var template;
@@ -33,15 +36,15 @@
 
     // try get template from content, if fail, get it from theme
     $http.get(myTemplateUrl)
-      .success(function (response) {
+      .success(function(response) {
         template = response.replace(/data-ctrl-email-preview/gi, '');
       }).error(function(response) {
-        myTemplateUrl = $scope.getThemeUrl(templateUrl);
-        $http.get(myTemplateUrl)
-          .success(function (response) {
-            template = response.replace(/data-ctrl-email-preview/gi, '');
-          });
-      });
+      myTemplateUrl = $scope.getThemeUrl(templateUrl);
+      $http.get(myTemplateUrl)
+        .success(function(response) {
+          template = response.replace(/data-ctrl-email-preview/gi, '');
+        });
+    });
 
     function activate() {
       if ($scope.isFacebook) {
@@ -56,20 +59,20 @@
         $scope.profile.LastName = user.last_name;
       }
 
-      gsnStore.getManufacturerCouponTotalSavings().then(function (rst) {
+      gsnStore.getManufacturerCouponTotalSavings().then(function(rst) {
         if (rst.success) {
           $scope.totalSavings = gsnApi.isNaN(parseFloat(rst.response), 0.00).toFixed(2);
         }
       });
 
-      gsnStore.getStores().then(function (rsp) {
+      gsnStore.getStores().then(function(rsp) {
         $scope.stores = rsp.response;
       });
 
     }
 
-    $scope.registerProfile = function () {
-	  $scope.$broadcast("autofill:update");
+    $scope.registerProfile = function() {
+      $scope.$broadcast("autofill:update");
       var payload = angular.copy($scope.profile);
       if ($scope.myForm.$valid) {
 
@@ -96,34 +99,36 @@
         payload.WelcomeMessage = $interpolate(template.replace(/(data-ng-src)+/gi, 'src').replace(/(data-ng-href)+/gi, 'href'))($scope);
 
         gsnProfile.registerProfile(payload)
-            .then(function (result) {
-              $scope.isSubmitting = false;
-              $scope.isValidSubmit = result.success;
-              if (result.success) {
-                $scope.isSubmitting = true;
+          .then(function(result) {
+            $scope.isSubmitting = false;
+            $scope.isValidSubmit = result.success;
+            if (result.success) {
+              $scope.isSubmitting = true;
 
-                $rootScope.$broadcast('gsnevent:registration-successful', result);
-                $analytics.eventTrack('profile-register', { category: 'registration', label: result.response.ReceiveEmail });
-                $rootScope.$win.gmodal.emit('gsnevent:registration-successful', result);
+              $rootScope.$broadcast('gsnevent:registration-successful', result);
+              $analytics.eventTrack('profile-register', {
+                category: 'registration',
+                label: result.response.ReceiveEmail
+              });
 
-                // since we have the password, automatically login the user
-                if ($scope.isFacebook) {
-                  gsnProfile.loginFacebook(result.response.UserName, payload.FacebookToken);
-                } else {
-                  gsnProfile.login(result.response.UserName, payload.Password);
-                }
+              // since we have the password, automatically login the user
+              if ($scope.isFacebook) {
+                gsnProfile.loginFacebook(result.response.UserName, payload.FacebookToken);
               } else {
-                if (result.response == "Unexpected error occurred.") {
-                  $location.url('/maintenance');
-                } else if (typeof (result.response) === 'string') {
-                  $scope.errorMessage = result.response;
-                }
+                gsnProfile.login(result.response.UserName, payload.Password);
               }
-            });
+            } else {
+              if (result.response == "Unexpected error occurred.") {
+                $location.url('/maintenance');
+              } else if (typeof (result.response) === 'string') {
+                $scope.errorMessage = result.response;
+              }
+            }
+          });
       }
     };
 
-    $scope.$on('gsnevent:login-success', function (evt, result) {
+    $scope.$on('gsnevent:login-success', function(evt, result) {
       $scope.isSubmitting = false;
       if (gsn.config.hasRoundyProfile) {
         //go to the Roundy Profile Page
@@ -131,15 +136,15 @@
       } else if (gsnApi.isNull($scope.profile.ExternalId, '').length > 2) {
         $scope.goUrl('/profile/rewardcardupdate?registration=' + $scope.profile.ExternalId);
       } else {
-        gsnApi.reload();
+        $timeout(gsnApi.reload, 500);
       }
-      // otherwise, do nothing since isLoggedIn will show thank you message
+    // otherwise, do nothing since isLoggedIn will show thank you message
     });
 
     $scope.activate();
     //#region Internal Methods
 
-    //#endregion
+  //#endregion
   }
 
 })(angular);
