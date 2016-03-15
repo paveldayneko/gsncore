@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.28
+ * version 1.7.29
  * gsncore repository
- * Build date: Tue Mar 15 2016 14:54:58 GMT-0500 (CDT)
+ * Build date: Tue Mar 15 2016 15:55:25 GMT-0500 (CDT)
  */
 ;(function() {
   'use strict';
@@ -2097,7 +2097,7 @@
     return returnObj;
   }
 })(angular);
-(function (angular, undefined) {
+(function(angular, undefined) {
   'use strict';
   var serviceId = 'gsnCouponPrinter';
   angular.module('gsn.core').service(serviceId, ['$rootScope', 'gsnApi', '$log', '$timeout', 'gsnStore', 'gsnProfile', '$window', gsnCouponPrinter]);
@@ -2120,7 +2120,7 @@
     return service;
 
     function activate() {
-      if (typeof(gcprinter) == 'undefined') {
+      if (typeof (gcprinter) == 'undefined') {
         $log.log('waiting for gcprinter...');
         $timeout(activate, 500);
 
@@ -2139,11 +2139,11 @@
       service.activated = true
 
       gcprinter.on('printed', function(e, rsp) {
-        $timeout(function () {
+        $timeout(function() {
           // process coupon error message
           var errors = gsnApi.isNull(rsp.ErrorCoupons, []);
           if (errors.length > 0) {
-            angular.forEach(errors, function (item) {
+            angular.forEach(errors, function(item) {
               angular.element('.coupon-message-' + item.CouponId).html(item.ErrorMessage);
             });
           }
@@ -2152,18 +2152,17 @@
       });
 
       gcprinter.on('printing', function(e) {
-        $timeout(function () {
+        $timeout(function() {
           angular.element(couponClasses.join(',')).html('Printing...');
           $rootScope.$broadcast('gsnevent:gcprinter-printing', e);
         }, 5);
       });
 
       gcprinter.on('printfail', function(e, rsp) {
-        $timeout(function () {
+        $timeout(function() {
           if (e == 'gsn-server') {
             angular.element(couponClasses.join(',')).html('Print limit reached...');
-          }
-          else if (e == 'gsn-cancel') {
+          } else if (e == 'gsn-cancel') {
             angular.element(couponClasses.join(',')).html('Print canceled...');
           } else {
             angular.element(couponClasses.join(',')).html('Print failed...');
@@ -2172,7 +2171,7 @@
         }, 5);
       });
 
-     // keep trying to init until ready
+      // keep trying to init until ready
       gcprinter.on('initcomplete', function() {
         service.isScriptReady = true;
         init();
@@ -2182,7 +2181,12 @@
     }
 
     function init() {
-      if (typeof(gcprinter) === 'undefined') {
+      // do not need coupon printer for mobile
+      if (gsnApi.isMobile) {
+        return;
+      }
+
+      if (typeof (gcprinter) === 'undefined') {
         $timeout(init, 500);
         return;
       }
@@ -2196,13 +2200,13 @@
     }
 
     function print(items) {
-      if ((items || []).length <= 0){
+      if ((items || []).length <= 0) {
         return;
       }
 
       if (gsnStore.getProcessDate() == 0) {
         // wait until all coupons has been processed
-        $timeout(function () {
+        $timeout(function() {
           print(items);
           return;
         }, 1000);
@@ -2211,14 +2215,13 @@
 
       coupons.length = 0;
       couponClasses.length = 0;
-      angular.forEach(items, function (v, k) {
+      angular.forEach(items, function(v, k) {
         if (gsnApi.isNull(v, null) === null) {
           return;
         }
 
         var item = v;
-        if (gsnApi.isNull(v.ProductCode, null) === null)
-        {
+        if (gsnApi.isNull(v.ProductCode, null) === null) {
           item = gsnStore.getCoupon(v.ItemId, v.ItemTypeId) || v;
         }
 
@@ -2226,7 +2229,7 @@
         coupons.push(item.ProductCode);
       });
 
-      $timeout(function () {
+      $timeout(function() {
         angular.element(couponClasses.join(',')).html('Checking, please wait...');
       }, 5);
 
@@ -2237,7 +2240,8 @@
       }
 
       $timeout(printInternal, 5);
-    };
+    }
+    ;
 
     function printInternal() {
       if (!isPluginInstalled()) {
@@ -2247,21 +2251,19 @@
           service.isDetecting = true;
           continousDetect();
         }
-      }
-      else if (gcprinter.isPluginBlocked()) {
+      } else if (gcprinter.isPluginBlocked()) {
         $rootScope.$broadcast('gsnevent:gcprinter-blocked');
-      }
-      else if (!isPrinterSupported()) {
+      } else if (!isPrinterSupported()) {
         $rootScope.$broadcast('gsnevent:gcprinter-not-supported');
-      }
-      else if (coupons.length > 0){
+      } else if (coupons.length > 0) {
         var siteId = gsnApi.getChainId();
-        angular.forEach(coupons, function (v) {
+        angular.forEach(coupons, function(v) {
           gsnProfile.addPrinted(v);
         });
         gcprinter.print(siteId, coupons);
       }
-    };
+    }
+    ;
 
     // continously checks plugin to detect when it's installed
     function continousDetect() {
@@ -2272,43 +2274,46 @@
 
       if (gcprinter.isChrome) {
         gcprinter.detectWithSocket(2000, pluginSuccess, continousDetect, 1);
-      }
-      else {
+      } else {
         // use faster checkInstall method for non-chrome
         setTimeout(function() {
           gcprinter.checkInstall(continousDetect, continousDetect);
         }, 2000);
       }
-    };
+    }
+    ;
 
-  	function pluginSuccess() {
-        // force init
-        service.pluginFound = true;
+    function pluginSuccess() {
+      // force init
+      service.pluginFound = true;
 
-        $timeout(function() {
-          $rootScope.$broadcast('gsnevent:gcprinter-ready');
-        }, 5);
+      $timeout(function() {
+        $rootScope.$broadcast('gsnevent:gcprinter-ready');
+      }, 5);
 
-        gcprinter.init(true);
-  	};
+      gcprinter.init(true);
+    }
+    ;
 
-  	function isPluginInstalled() {
-      if (gcprinter.isChrome){
+    function isPluginInstalled() {
+      if (gcprinter.isChrome) {
         return service.pluginFound;
       }
 
       return gcprinter.hasPlugin();
-  	};
+    }
+    ;
 
-  	function isPrinterSupported() {
-        var result = false;
-        try {
-          result = gcprinter.isPrinterSupported();
-        } catch (e) {
-          result = true;
-        }
-        return result;
-  	};
+    function isPrinterSupported() {
+      var result = false;
+      try {
+        result = gcprinter.isPrinterSupported();
+      } catch (e) {
+        result = true;
+      }
+      return result;
+    }
+    ;
   } // end service function
 })(angular);
 (function (angular, Gsn, undefined) {

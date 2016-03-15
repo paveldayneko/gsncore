@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.28
+ * version 1.7.29
  * gsncore repository
- * Build date: Tue Mar 15 2016 14:54:58 GMT-0500 (CDT)
+ * Build date: Tue Mar 15 2016 15:55:25 GMT-0500 (CDT)
  */
 ;(function() {
   'use strict';
@@ -4042,7 +4042,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     return returnObj;
   }
 })(angular);
-(function (angular, undefined) {
+(function(angular, undefined) {
   'use strict';
   var serviceId = 'gsnCouponPrinter';
   angular.module('gsn.core').service(serviceId, ['$rootScope', 'gsnApi', '$log', '$timeout', 'gsnStore', 'gsnProfile', '$window', gsnCouponPrinter]);
@@ -4065,7 +4065,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     return service;
 
     function activate() {
-      if (typeof(gcprinter) == 'undefined') {
+      if (typeof (gcprinter) == 'undefined') {
         $log.log('waiting for gcprinter...');
         $timeout(activate, 500);
 
@@ -4084,11 +4084,11 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       service.activated = true
 
       gcprinter.on('printed', function(e, rsp) {
-        $timeout(function () {
+        $timeout(function() {
           // process coupon error message
           var errors = gsnApi.isNull(rsp.ErrorCoupons, []);
           if (errors.length > 0) {
-            angular.forEach(errors, function (item) {
+            angular.forEach(errors, function(item) {
               angular.element('.coupon-message-' + item.CouponId).html(item.ErrorMessage);
             });
           }
@@ -4097,18 +4097,17 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       });
 
       gcprinter.on('printing', function(e) {
-        $timeout(function () {
+        $timeout(function() {
           angular.element(couponClasses.join(',')).html('Printing...');
           $rootScope.$broadcast('gsnevent:gcprinter-printing', e);
         }, 5);
       });
 
       gcprinter.on('printfail', function(e, rsp) {
-        $timeout(function () {
+        $timeout(function() {
           if (e == 'gsn-server') {
             angular.element(couponClasses.join(',')).html('Print limit reached...');
-          }
-          else if (e == 'gsn-cancel') {
+          } else if (e == 'gsn-cancel') {
             angular.element(couponClasses.join(',')).html('Print canceled...');
           } else {
             angular.element(couponClasses.join(',')).html('Print failed...');
@@ -4117,7 +4116,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
         }, 5);
       });
 
-     // keep trying to init until ready
+      // keep trying to init until ready
       gcprinter.on('initcomplete', function() {
         service.isScriptReady = true;
         init();
@@ -4127,7 +4126,12 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     }
 
     function init() {
-      if (typeof(gcprinter) === 'undefined') {
+      // do not need coupon printer for mobile
+      if (gsnApi.isMobile) {
+        return;
+      }
+
+      if (typeof (gcprinter) === 'undefined') {
         $timeout(init, 500);
         return;
       }
@@ -4141,13 +4145,13 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     }
 
     function print(items) {
-      if ((items || []).length <= 0){
+      if ((items || []).length <= 0) {
         return;
       }
 
       if (gsnStore.getProcessDate() == 0) {
         // wait until all coupons has been processed
-        $timeout(function () {
+        $timeout(function() {
           print(items);
           return;
         }, 1000);
@@ -4156,14 +4160,13 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 
       coupons.length = 0;
       couponClasses.length = 0;
-      angular.forEach(items, function (v, k) {
+      angular.forEach(items, function(v, k) {
         if (gsnApi.isNull(v, null) === null) {
           return;
         }
 
         var item = v;
-        if (gsnApi.isNull(v.ProductCode, null) === null)
-        {
+        if (gsnApi.isNull(v.ProductCode, null) === null) {
           item = gsnStore.getCoupon(v.ItemId, v.ItemTypeId) || v;
         }
 
@@ -4171,7 +4174,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
         coupons.push(item.ProductCode);
       });
 
-      $timeout(function () {
+      $timeout(function() {
         angular.element(couponClasses.join(',')).html('Checking, please wait...');
       }, 5);
 
@@ -4182,7 +4185,8 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       }
 
       $timeout(printInternal, 5);
-    };
+    }
+    ;
 
     function printInternal() {
       if (!isPluginInstalled()) {
@@ -4192,21 +4196,19 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
           service.isDetecting = true;
           continousDetect();
         }
-      }
-      else if (gcprinter.isPluginBlocked()) {
+      } else if (gcprinter.isPluginBlocked()) {
         $rootScope.$broadcast('gsnevent:gcprinter-blocked');
-      }
-      else if (!isPrinterSupported()) {
+      } else if (!isPrinterSupported()) {
         $rootScope.$broadcast('gsnevent:gcprinter-not-supported');
-      }
-      else if (coupons.length > 0){
+      } else if (coupons.length > 0) {
         var siteId = gsnApi.getChainId();
-        angular.forEach(coupons, function (v) {
+        angular.forEach(coupons, function(v) {
           gsnProfile.addPrinted(v);
         });
         gcprinter.print(siteId, coupons);
       }
-    };
+    }
+    ;
 
     // continously checks plugin to detect when it's installed
     function continousDetect() {
@@ -4217,43 +4219,46 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 
       if (gcprinter.isChrome) {
         gcprinter.detectWithSocket(2000, pluginSuccess, continousDetect, 1);
-      }
-      else {
+      } else {
         // use faster checkInstall method for non-chrome
         setTimeout(function() {
           gcprinter.checkInstall(continousDetect, continousDetect);
         }, 2000);
       }
-    };
+    }
+    ;
 
-  	function pluginSuccess() {
-        // force init
-        service.pluginFound = true;
+    function pluginSuccess() {
+      // force init
+      service.pluginFound = true;
 
-        $timeout(function() {
-          $rootScope.$broadcast('gsnevent:gcprinter-ready');
-        }, 5);
+      $timeout(function() {
+        $rootScope.$broadcast('gsnevent:gcprinter-ready');
+      }, 5);
 
-        gcprinter.init(true);
-  	};
+      gcprinter.init(true);
+    }
+    ;
 
-  	function isPluginInstalled() {
-      if (gcprinter.isChrome){
+    function isPluginInstalled() {
+      if (gcprinter.isChrome) {
         return service.pluginFound;
       }
 
       return gcprinter.hasPlugin();
-  	};
+    }
+    ;
 
-  	function isPrinterSupported() {
-        var result = false;
-        try {
-          result = gcprinter.isPrinterSupported();
-        } catch (e) {
-          result = true;
-        }
-        return result;
-  	};
+    function isPrinterSupported() {
+      var result = false;
+      try {
+        result = gcprinter.isPrinterSupported();
+      } catch (e) {
+        result = true;
+      }
+      return result;
+    }
+    ;
   } // end service function
 })(angular);
 (function (angular, Gsn, undefined) {
@@ -8268,7 +8273,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     }
   }
 })(angular);
-(function (angular, undefined) {
+(function(angular, undefined) {
   'use strict';
 
   var myDirectiveName = 'ctrlCouponClassic';
@@ -8285,14 +8290,22 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     };
 
     return directive;
-  }     
+  }
 
   function myController($scope, gsnStore, gsnApi, $timeout, $analytics, $filter, gsnYoutech, gsnCouponPrinter, gsnProfile, gsnProLogicRewardCard, $location) {
     $scope.activate = activate;
     $scope.addCouponToCard = addCouponToCard;
     $scope.printManufacturerCoupon = printManufacturerCoupon;
     $scope.loadMore = loadMore;
-    $scope.printer = { blocked: 0, notsupported: 0, notinstalled: 0, printed: null, count: 0, total: 0, isChrome: /chrome/gi.test(gsnApi.userAgent) };
+    $scope.printer = {
+      blocked: 0,
+      notsupported: 0,
+      notinstalled: 0,
+      printed: null,
+      count: 0,
+      total: 0,
+      isChrome: /chrome/gi.test(gsnApi.userAgent)
+    };
 
     $scope.isValidProLogic = false;
     $scope.selectedCoupons = {
@@ -8309,10 +8322,17 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     };
 
     $scope.coupons = {
-      printable: { items: []},
-      digital: { items: []},
-      store: { items: []}
+      printable: {
+        items: []
+      },
+      digital: {
+        items: []
+      },
+      store: {
+        items: []
+      }
     };
+
     $scope.vm = {
       filterBy: $location.search().q,
       sortBy: 'EndDate',
@@ -8322,7 +8342,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     $scope.couponType = $scope.friendlyPath.replace('coupons-', '');
     $scope.itemsPerPage = $location.search().itemsperpage || $location.search().itemsPerPage || $scope.itemsPerPage || 20;
 
-    if ($scope.couponType.length < 1 || $scope.couponType == $scope.friendlyPath){
+    if ($scope.couponType.length < 1 || $scope.couponType == $scope.friendlyPath) {
       $scope.couponType = 'printable';
     }
 
@@ -8341,9 +8361,9 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 
     function loadCoupons() {
       var manuCoupons = gsnStore.getManufacturerCoupons(),
-          youtechCouponsOriginal = gsnStore.getYoutechCoupons(),
-          instoreCoupons = gsnStore.getInstoreCoupons();
-        
+        youtechCouponsOriginal = gsnStore.getYoutechCoupons(),
+        instoreCoupons = gsnStore.getInstoreCoupons();
+
       if (!$scope.preSelectedCoupons.items) {
         $scope.preSelectedCoupons = {
           items: [],
@@ -8354,14 +8374,14 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       $scope.coupons.printable.items = manuCoupons.items || [];
       $scope.coupons.store.items = instoreCoupons.items || [];
       $scope.coupons.digital.items = youtechCouponsOriginal.items || [];
-      
+
       $scope.preSelectedCoupons.items.length = 0;
       $scope.preSelectedCoupons.targeted.length = 0;
       var list = $scope.preSelectedCoupons;
 
       if ($scope.couponType == 'digital') {
         var totalSavings = 0.0;
-        angular.forEach(youtechCouponsOriginal.items, function (item) {
+        angular.forEach(youtechCouponsOriginal.items, function(item) {
           if (!$scope.selectedCoupons.cardCouponOnly || !gsnYoutech.isAvailable(item.ProductCode)) {
             if (gsnYoutech.isValidCoupon(item.ProductCode)) {
               item.AddCount = 1;
@@ -8369,7 +8389,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
               if (item.IsTargeted) {
                 list.targeted.push(item);
               }
-                
+
               totalSavings += gsnApi.isNaN(parseFloat(item.TopTagLine), 0);
             }
           }
@@ -8378,10 +8398,9 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
         $scope.selectedCoupons.totalSavings = totalSavings.toFixed(2);
       } else if ($scope.couponType == 'store') {
         list.items = instoreCoupons.items;
-      }
-      else {
+      } else {
         gsnCouponPrinter.init();
-        gsnStore.getManufacturerCouponTotalSavings().then(function (rst) {
+        gsnStore.getManufacturerCouponTotalSavings().then(function(rst) {
           $scope.selectedCoupons.totalSavings = parseFloat(rst.response).toFixed(2);
         });
 
@@ -8393,14 +8412,16 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       loadCoupons();
 
       // apply filter
-      $scope.preSelectedCoupons.items = $filter('filter')($filter('filter')($scope.preSelectedCoupons.items, $scope.vm.filterBy), { IsTargeted: false });
+      $scope.preSelectedCoupons.items = $filter('filter')($filter('filter')($scope.preSelectedCoupons.items, $scope.vm.filterBy), {
+        IsTargeted: false
+      });
       $scope.preSelectedCoupons.items = $filter('orderBy')($filter('filter')($scope.preSelectedCoupons.items, $scope.vm.filterBy), $scope.vm.sortBy);
       $scope.preSelectedCoupons.targeted = $filter('orderBy')($filter('filter')($scope.preSelectedCoupons.targeted, $scope.vm.filterBy), $scope.vm.sortBy);
       $scope.selectedCoupons.items.length = 0;
       $scope.selectedCoupons.targeted = $scope.preSelectedCoupons.targeted;
       loadMore();
     }
-    
+
     function init() {
       isValidProLogicInit();
     }
@@ -8414,8 +8435,8 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     }
 
     init();
-    
-    $scope.$on('gsnevent:circular-loaded', function (event, data) {
+
+    $scope.$on('gsnevent:circular-loaded', function(event, data) {
       if (data.success) {
         $timeout(activate, 500);
         $scope.selectedCoupons.noCircular = false;
@@ -8425,11 +8446,11 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     });
 
     $scope.$on('gsnevent:youtech-cardcoupon-loaded', activate);
-	$scope.$on('gsnevent:youtech-cardcoupon-loadfail', activate);
+    $scope.$on('gsnevent:youtech-cardcoupon-loadfail', activate);
     $scope.$watch('vm.sortBy', activate);
     $scope.$watch('vm.filterBy', activate);
     $scope.$watch('selectedCoupons.cardCouponOnly', activate);
-    
+
     // trigger modal
     $scope.$on('gsnevent:gcprinter-not-supported', function() {
       $scope.printer.notsupported++;
@@ -8462,26 +8483,32 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       $scope.printer.total = 1;
       gsnCouponPrinter.print([item]);
 
-      $analytics.eventTrack('CouponPrintNow', 
-        { category: item.ExtCategory, 
-          label: item.Description, 
-          item: item });
+      $analytics.eventTrack('CouponPrintNow',
+        {
+          category: item.ExtCategory,
+          label: item.Description,
+          item: item
+        });
 
       gsn.emit('PrintNow', item);
     }
-      
+
     function addCouponToCard(evt, item) {
       if ($scope.youtech.isAvailable(item.ProductCode)) {
-        $scope.youtech.addCouponTocard(item.ProductCode).then(function (rst) {
+        $scope.youtech.addCouponTocard(item.ProductCode).then(function(rst) {
           if (rst.success) {
             // log coupon add to card
             //var cat = gsnStore.getCategories()[item.CategoryId];
-            $analytics.eventTrack('CouponAddToCard', { category: item.ExtCategory, label: item.Description, item: item });
+            $analytics.eventTrack('CouponAddToCard', {
+              category: item.ExtCategory,
+              label: item.Description,
+              item: item
+            });
 
             $scope.doToggleCartItem(evt, item);
 
             // apply
-            $timeout(function () {
+            $timeout(function() {
               item.AddCount++;
             }, 50);
           }
@@ -8489,17 +8516,21 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       } else {
         // log coupon remove from card
         //var cat = gsnStore.getCategories()[item.CategoryId];
-        $analytics.eventTrack('CouponRemoveFromCard', { category: item.ExtCategory, label: item.Description, item: item });
+        $analytics.eventTrack('CouponRemoveFromCard', {
+          category: item.ExtCategory,
+          label: item.Description,
+          item: item
+        });
 
         $scope.doToggleCartItem(evt, item);
 
         // apply
-        $timeout(function () {
+        $timeout(function() {
           item.AddCount--;
         }, 50);
       }
     }
-    //#endregion
+  //#endregion
   }
 
 })(angular);
