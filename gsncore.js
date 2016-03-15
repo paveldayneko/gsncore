@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.27
+ * version 1.7.28
  * gsncore repository
- * Build date: Tue Mar 15 2016 13:54:33 GMT-0500 (CDT)
+ * Build date: Tue Mar 15 2016 14:54:58 GMT-0500 (CDT)
  */
 ;(function() {
   'use strict';
@@ -7272,6 +7272,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 
         circularMaster.items.push(item);
         item.SmallImageUrl = item.ImageUrl.replace('upload.gsngrocers.com/', 'upload.gsngrocers.com/rs/120,fit/');
+        item.Quantity = item.Quantity || 1;
         items.push(item);
       });
     }
