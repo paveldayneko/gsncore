@@ -124,7 +124,10 @@
       } else if ($scope.couponType == 'store') {
         list.items = instoreCoupons.items;
       } else {
-        gsnCouponPrinter.init();
+        if (!$scope.disableCouponPrinter) {
+          gsnCouponPrinter.init();
+        }
+
         gsnStore.getManufacturerCouponTotalSavings().then(function(rst) {
           $scope.selectedCoupons.totalSavings = parseFloat(rst.response).toFixed(2);
         });
