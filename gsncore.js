@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.26
+ * version 1.7.27
  * gsncore repository
- * Build date: Tue Mar 15 2016 13:40:01 GMT-0500 (CDT)
+ * Build date: Tue Mar 15 2016 13:54:33 GMT-0500 (CDT)
  */
 ;(function() {
   'use strict';
@@ -7945,7 +7945,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
         }
 
         var myPageIdx = parseInt($location.search().p || 0);
-        var myCircIdx = parseInt($location.search().p || 0);
+        var myCircIdx = parseInt($location.search().c || 0);
         if (data.Circulars.length == 1) {
           myCircIdx = myCircIdx || 1;
           myPageIdx = myPageIdx || 1;

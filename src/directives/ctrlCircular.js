@@ -77,7 +77,7 @@
         }
 
         var myPageIdx = parseInt($location.search().p || 0);
-        var myCircIdx = parseInt($location.search().p || 0);
+        var myCircIdx = parseInt($location.search().c || 0);
         if (data.Circulars.length == 1) {
           myCircIdx = myCircIdx || 1;
           myPageIdx = myPageIdx || 1;
