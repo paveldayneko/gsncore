@@ -152,6 +152,7 @@
                 var circCoupon = gsnStore.getItem(item.ItemId);
                 if (circCoupon && circCoupon.CouponImageUrl) {
                   item.CouponImageUrl = circCoupon.CouponImageUrl;
+                  item.Description2 = circCoupon.Description2;
                   item.EndDate = $scope.circular.Circulars[0].EndDate;
                   $scope.circularCoupons.push(item);
                 }

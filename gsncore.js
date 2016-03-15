@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.24
+ * version 1.7.25
  * gsncore repository
- * Build date: Mon Mar 14 2016 09:48:48 GMT-0500 (CDT)
+ * Build date: Tue Mar 15 2016 10:15:41 GMT-0500 (CDT)
  */
 ;(function() {
   'use strict';
@@ -12925,6 +12925,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
                 var circCoupon = gsnStore.getItem(item.ItemId);
                 if (circCoupon && circCoupon.CouponImageUrl) {
                   item.CouponImageUrl = circCoupon.CouponImageUrl;
+                  item.Description2 = circCoupon.Description2;
                   item.EndDate = $scope.circular.Circulars[0].EndDate;
                   $scope.circularCoupons.push(item);
                 }
