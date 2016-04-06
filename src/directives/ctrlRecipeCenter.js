@@ -4,7 +4,7 @@
   var myDirectiveName = 'ctrlRecipeCenter';
 
   angular.module('gsn.core')
-    .controller(myDirectiveName, ['$scope', 'gsnStore', 'gsnApi', myController])
+    .controller(myDirectiveName, ['$scope', 'gsnStore', 'gsnApi', '$controller', myController])
     .directive(myDirectiveName, myDirective);
 
   function myDirective() {
@@ -17,7 +17,11 @@
     return directive;
   }
 
-  function myController($scope, gsnStore, gsnApi) {
+  function myController($scope, gsnStore, gsnApi, $controller) {
+    $controller('ctrlBaseRecipeSearch', {
+		$scope: $scope
+	});
+	
     $scope.activate = activate;
     $scope.vm = {
       mealPlanners: [],
@@ -25,7 +29,6 @@
       quickSearchItems: [],
       videos: []
     };
-    $scope.recipeSearch = { attrib: {} };
 
     function activate() {
 
@@ -99,34 +102,6 @@
         }
       });
     }
-
-
-
-    $scope.doRecipeSearch = function () {
-      var search = $scope.recipeSearch, attributes = '', resultString = '';
-	  
-      if (gsnApi.isNull(search.term, '').length > 0) {
-        resultString += 'SearchTerm:' + gsnApi.isNull(search.term, '') + ';';
-      }
-      if (gsnApi.isNull(search.preptime, '').length > 0) {
-        resultString += 'Time:' + gsnApi.isNull(search.preptime, '') + ';';
-      }
-      if (gsnApi.isNull(search.skilllevel, '').length > 0) {
-        resultString += 'SkillLevelList:|' + gsnApi.isNull(search.skilllevel, '') + '|;';
-      }
-
-      angular.forEach(search.attrib, function (value, key) {
-        if (gsnApi.isNull(value, '').length > 0) {
-          attributes += value + '|';
-        }
-      });
-      if (gsnApi.isNull(attributes, '').length > 0) {
-        resultString += 'AttributeList:|' + gsnApi.isNull(attributes, '') + ';';
-      }
-
-      $scope.$emit('gsnevent:closemodal');
-      $scope.goUrl('/recipe/search?q=' + encodeURIComponent(resultString));
-    };
 
     $scope.activate();
     //#region Internal Methods        
