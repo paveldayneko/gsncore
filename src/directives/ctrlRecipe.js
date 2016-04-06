@@ -4,7 +4,7 @@
   var myDirectiveName = 'ctrlRecipe';
 
   angular.module('gsn.core')
-    .controller(myDirectiveName, ['$scope', 'gsnStore', 'gsnApi', '$location', '$window', '$timeout', 'gsnProfile', myController])
+    .controller(myDirectiveName, ['$scope', 'gsnStore', 'gsnApi', '$location', '$window', '$timeout', 'gsnProfile', '$controller', myController])
     .directive(myDirectiveName, myDirective);
 
   function myDirective() {
@@ -17,7 +17,11 @@
     return directive;
   }
 
-  function myController($scope, gsnStore, gsnApi, $location, $window, $timeout, gsnProfile) {
+  function myController($scope, gsnStore, gsnApi, $location, $window, $timeout, gsnProfile, $controller) {
+    $controller('ctrlBaseRecipeSearch', {
+		$scope: $scope
+	});
+	
     $scope.activate = activate;
     $scope.addSelectedIngredients = addSelectedIngredients;
     $scope.selectAllIngredients = selectAllIngredients;
