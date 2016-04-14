@@ -199,12 +199,13 @@
       });
       // events handling
 
-      $scope.$on('$routeChangeStart', function(evt, next, current) {
-        /// <summary>Listen to route change</summary>
+      $scope.$on('$locationChangeStart', function(evt, nxt, current) {
+        /// <summary>Listen to location change</summary>
         /// <param name="evt" type="Object">Event object</param>
-        /// <param name="next" type="Object">next route</param>
-        /// <param name="current" type="Object">current route</param>
-
+        /// <param name="nxt" type="String">next location</param>
+        /// <param name="current" type="String">current location</param>
+		
+        var next = $route.routes[$location.path()];
         // store the new route location
         $scope.currentPath = angular.lowercase(gsnApi.isNull($location.path(), ''));
         $scope.friendlyPath = $scope.currentPath.replace('/', '').replace(/\/+/gi, '-');
@@ -212,6 +213,7 @@
         $scope.gvm.menuInactive = false;
         $scope.gvm.shoppingListActive = false;
         if (next.requireLogin && !$scope.isLoggedIn) {
+          evt.preventDefault();
           $scope.goUrl('/signin?fromUrl=' + encodeURIComponent($location.url()));
           return;
         }

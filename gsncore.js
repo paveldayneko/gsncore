@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.33
+ * version 1.7.34
  * gsncore repository
- * Build date: Wed Apr 06 2016 15:15:17 GMT+0300 (Belarus Standard Time)
+ * Build date: Thu Apr 14 2016 17:57:05 GMT+0300 (Belarus Standard Time)
  */
 ;(function() {
   'use strict';
@@ -4559,12 +4559,13 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       });
       // events handling
 
-      $scope.$on('$routeChangeStart', function(evt, next, current) {
-        /// <summary>Listen to route change</summary>
+      $scope.$on('$locationChangeStart', function(evt, nxt, current) {
+        /// <summary>Listen to location change</summary>
         /// <param name="evt" type="Object">Event object</param>
-        /// <param name="next" type="Object">next route</param>
-        /// <param name="current" type="Object">current route</param>
-
+        /// <param name="nxt" type="String">next location</param>
+        /// <param name="current" type="String">current location</param>
+		
+        var next = $route.routes[$location.path()];
         // store the new route location
         $scope.currentPath = angular.lowercase(gsnApi.isNull($location.path(), ''));
         $scope.friendlyPath = $scope.currentPath.replace('/', '').replace(/\/+/gi, '-');
@@ -4572,6 +4573,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
         $scope.gvm.menuInactive = false;
         $scope.gvm.shoppingListActive = false;
         if (next.requireLogin && !$scope.isLoggedIn) {
+          evt.preventDefault();
           $scope.goUrl('/signin?fromUrl=' + encodeURIComponent($location.url()));
           return;
         }
