@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.34
+ * version 1.7.35
  * gsncore repository
- * Build date: Thu Apr 14 2016 17:57:05 GMT+0300 (Belarus Standard Time)
+ * Build date: Fri Apr 15 2016 14:39:10 GMT+0300 (Belarus Standard Time)
  */
 ;(function() {
   'use strict';
@@ -2609,7 +2609,9 @@
 
       $scope.$on('$routeChangeSuccess', function(evt, next, current) {
         if (typeof gmodal !== 'undefined') {
-          $timeout(gmodal.hide, 50);
+          $timeout(function() { 
+            gmodal.hide();
+          }, 50);
         }
       });
       // events handling
@@ -2621,6 +2623,7 @@
         /// <param name="current" type="String">current location</param>
 		
         var next = $route.routes[$location.path()];
+        if(!next) next = {};
         // store the new route location
         $scope.currentPath = angular.lowercase(gsnApi.isNull($location.path(), ''));
         $scope.friendlyPath = $scope.currentPath.replace('/', '').replace(/\/+/gi, '-');
