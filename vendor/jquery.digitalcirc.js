@@ -156,9 +156,9 @@
         q[qv[0]] = qv[1];
       }
       if (myData.Circulars.length <= 1) {
-        $this.displayCircular(0, (parseInt(q['p']) || 1) - 1);
+        $this.displayCircular(0, (parseInt(q['p'] || q['pg']) || 1) - 1);
       } else if (q['c']) {
-        $this.displayCircular((parseInt(q['c']) || 1) - 1, (parseInt(q['p']) || 1) - 1)
+        $this.displayCircular((parseInt(q['c']) || 1) - 1, (parseInt(q['p'] || q['pg']) || 1) - 1)
       }
     },
     displayCircular: function(circularIdx, pageIdx) {
