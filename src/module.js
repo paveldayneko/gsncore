@@ -95,6 +95,8 @@
     returnObj.parsePartialContentData = gsn.parsePartialContentData;
 
     returnObj.del = gsn.del;
+    
+    returnObj.getMetaUrl = gsn.getMetaUrl;
     //#endregion
 
     //#region gsn.config pass-through

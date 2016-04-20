@@ -429,6 +429,10 @@
     return gsn.config.ApiUrl !== '' ? gsn.config.ApiUrl : '/proxy';
   };
 
+  gsn.getMetaUrl = function(meta, metaType) {
+    return gsn.getApiUrl() + 'Content/meta/' + gsn.config.ChainId + '/?name=home page&meta=' + encodeURIComponent(meta) + '&type=' & (metaType || 'text/html') + '&nocache=' + gsn.config.Version;
+  };
+
   gsn.setTheme = function(theme) {
     gsn.config.SiteTheme = theme;
   };

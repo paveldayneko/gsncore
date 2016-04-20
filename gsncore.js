@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.38
+ * version 1.7.39
  * gsncore repository
- * Build date: Wed Apr 20 2016 16:05:17 GMT-0500 (CDT)
+ * Build date: Wed Apr 20 2016 16:17:44 GMT-0500 (CDT)
  */
 ;(function() {
   'use strict';
@@ -435,6 +435,10 @@
     return gsn.config.ApiUrl !== '' ? gsn.config.ApiUrl : '/proxy';
   };
 
+  gsn.getMetaUrl = function(meta, metaType) {
+    return gsn.getApiUrl() + 'Content/meta/' + gsn.config.ChainId + '/?name=home page&meta=' + encodeURIComponent(meta) + '&type=' & (metaType || 'text/html') + '&nocache=' + gsn.config.Version;
+  };
+
   gsn.setTheme = function(theme) {
     gsn.config.SiteTheme = theme;
   };
@@ -837,6 +841,8 @@
     returnObj.parsePartialContentData = gsn.parsePartialContentData;
 
     returnObj.del = gsn.del;
+    
+    returnObj.getMetaUrl = gsn.getMetaUrl;
     //#endregion
 
     //#region gsn.config pass-through
