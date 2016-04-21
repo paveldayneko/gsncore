@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.41
+ * version 1.7.42
  * gsncore repository
- * Build date: Wed Apr 20 2016 16:26:00 GMT-0500 (CDT)
+ * Build date: Thu Apr 21 2016 13:50:10 GMT+0300 (Belarus Standard Time)
  */
 ;(function() {
   'use strict';

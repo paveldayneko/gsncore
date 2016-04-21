@@ -4,7 +4,7 @@
   var myDirectiveName = 'ctrlRecipeSearch';
 
   angular.module('gsn.core')
-    .controller(myDirectiveName, ['$scope', 'gsnApi', 'gsnStore', '$routeParams', myController])
+    .controller(myDirectiveName, ['$scope', 'gsnApi', 'gsnStore', '$routeParams', '$controller', myController])
     .directive(myDirectiveName, myDirective);
 
   function myDirective() {
@@ -17,7 +17,11 @@
     return directive;
   }
 
-  function myController($scope, gsnApi, gsnStore, $routeParams) {
+  function myController($scope, gsnApi, gsnStore, $routeParams, $controller) {
+    $controller('ctrlBaseRecipeSearch', {
+		$scope: $scope
+	});
+  
     $scope.activate = activate;
     $scope.categories = [];
     $scope.vm = {
