@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.42
+ * version 1.7.43
  * gsncore repository
- * Build date: Thu Apr 21 2016 13:50:10 GMT+0300 (Belarus Standard Time)
+ * Build date: Tue Apr 26 2016 17:05:42 GMT-0500 (CDT)
  */
 ;(function() {
   'use strict';
@@ -841,7 +841,7 @@
     returnObj.parsePartialContentData = gsn.parsePartialContentData;
 
     returnObj.del = gsn.del;
-    
+
     returnObj.getMetaUrl = gsn.getMetaUrl;
     //#endregion
 
@@ -1083,7 +1083,7 @@
         var storeIds = returnObj.isNull(v.StoreIds, []);
 
         // get first content as default or value content without storeids
-        if (i <= 0 && storeIds.length <= 0) {
+        if ((i <= 0 || !contentDataResult) && storeIds.length <= 0) {
           contentDataResult = v;
         }
         i++;
