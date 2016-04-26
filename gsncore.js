@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.43
+ * version 1.7.44
  * gsncore repository
- * Build date: Tue Apr 26 2016 17:05:42 GMT-0500 (CDT)
+ * Build date: Tue Apr 26 2016 17:14:09 GMT-0500 (CDT)
  */
 ;(function() {
   'use strict';
@@ -1083,7 +1083,7 @@
         var storeIds = returnObj.isNull(v.StoreIds, []);
 
         // get first content as default or value content without storeids
-        if ((i <= 0 || !contentDataResult) && storeIds.length <= 0) {
+        if ((i <= 0 || !contentDataResult.Description) && storeIds.length <= 0) {
           contentDataResult = v;
         }
         i++;
