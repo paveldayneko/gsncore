@@ -337,7 +337,7 @@
         var storeIds = returnObj.isNull(v.StoreIds, []);
 
         // get first content as default or value content without storeids
-        if ((i <= 0 || !contentDataResult) && storeIds.length <= 0) {
+        if ((i <= 0 || !contentDataResult.Description) && storeIds.length <= 0) {
           contentDataResult = v;
         }
         i++;
