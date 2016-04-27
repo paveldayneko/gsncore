@@ -677,6 +677,7 @@
         }
 
         circularMaster.items.push(item);
+        item.ImageUrl = item.ImageUrl.replace('http://', '//');
         item.SmallImageUrl = item.ImageUrl.replace('upload.gsngrocers.com/', 'upload.gsngrocers.com/rs/120,fit/');
         item.Quantity = item.Quantity || 1;
         items.push(item);
