@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.45
+ * version 1.7.46
  * gsncore repository
- * Build date: Wed Apr 27 2016 13:40:34 GMT-0500 (CDT)
+ * Build date: Thu Apr 28 2016 09:55:08 GMT-0500 (CDT)
  */
 ;(function() {
   'use strict';
@@ -76,7 +76,6 @@
     LoggingServiceUrl: '/proxy/logging',
     YoutechCouponUrl: '/proxy/couponut',
     RoundyProfileUrl: '/proxy/roundy',
-    MidaxServiceUrl: '/proxy/midax',
     ApiUrl: '',
 
     // global config
@@ -91,11 +90,10 @@
     ContentBaseUrl: '/asset',
 
     ChainId: 0,
-    ChainName: 'Grocery Shopping Network',
+    ChainName: 'Brick, Inc.',
     DfpNetworkId: '/6394/digitalstore.test',
     GoogleTagId: null,
     GoogleAnalyticAccountId1: null,
-    GoogleAnalyticAccountId2: null,
     GoogleSiteVerificationId: null,
     RegistrationFromEmailAddress: 'tech@grocerywebsites.com',
     FacebookDisable: false,
@@ -898,10 +896,6 @@
       return gsn.config.LoggingServiceUrl;
     };
 
-    returnObj.getMidaxServiceUrl = function() {
-      return gsn.config.MidaxServiceUrl;
-    };
-
     returnObj.getUseLocalStorage = function() {
       return returnObj.isNull(gsn.config.UseLocalStorage, false);
     };
@@ -931,10 +925,6 @@
 
     returnObj.getGoogleAnalyticAccountId1 = function() {
       return returnObj.isNull(gsn.config.GoogleAnalyticAccountId1, '');
-    };
-
-    returnObj.getGoogleAnalyticAccountId2 = function() {
-      return returnObj.isNull(gsn.config.GoogleAnalyticAccountId2, '');
     };
 
     returnObj.getEmailRegEx = function() {
@@ -7376,7 +7366,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
   }
 })(angular);
 
-(function (angular, undefined) {
+(function(angular, undefined) {
   'use strict';
   var serviceId = 'gsnYoutech';
   angular.module('gsn.core').service(serviceId, ['$rootScope', 'gsnApi', 'gsnProfile', 'gsnStore', '$q', '$http', gsnYoutech]);
@@ -7394,7 +7384,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     var service = {
       isValidCoupon: isValidCoupon,
       hasValidCard: hasValidCard,
-      addCouponTocard: addCouponToCard,     
+      addCouponTocard: addCouponToCard,
       removeCouponFromCard: removeCouponFromCard,
       isOldRoundyCard: isOldRoundyCard,
       isAvailable: isAvailable,
@@ -7406,7 +7396,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     var $saveData = initData();
 
     $rootScope[serviceId] = service;
-    $rootScope.$on('gsnevent:logout', function (event, result) {
+    $rootScope.$on('gsnevent:logout', function(event, result) {
       if (!service.enable) {
         return;
       }
@@ -7414,22 +7404,22 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
       $saveData = initData();
     });
 
-    $rootScope.$on('gsnevent:profile-load-success', function (event, result) {
+    $rootScope.$on('gsnevent:profile-load-success', function(event, result) {
       if (!service.enable) {
         return;
       }
-      
+
       initData();
 
       if ($saveData.youtechCouponUrl.length > 2) {
-        
+
         //    - When profile change occurred, make call to get any available coupon for card
         $saveData.currentProfile = result.response;
         loadCardCoupon();
       }
     });
-    
-    $rootScope.$on('gsnevent:store-persisted', function (event, result) {
+
+    $rootScope.$on('gsnevent:store-persisted', function(event, result) {
       if (!service.enable) {
         return;
       }
@@ -7479,26 +7469,34 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     function isOnCard(couponId) {
       return (gsnApi.isNull($saveData.takenCouponById[couponId], null) !== null);
     }
-    
+
     function hasRedeemed(couponId) {
       return (gsnApi.isNull($saveData.redeemedCouponById[couponId], null) !== null);
     }
 
     function handleFailureEvent(eventName, deferred, couponId, response) {
-      deferred.resolve({ success: false, response: response });
+      deferred.resolve({
+        success: false,
+        response: response
+      });
       $rootScope.$broadcast(eventName, couponId);
     }
 
     function addCouponToCard(couponId) {
       var deferred = $q.defer();
-      gsnApi.getAccessToken().then(function () {
+      gsnApi.getAccessToken().then(function() {
         var url = $saveData.youtechCouponUrl + '/AddToCard/' + gsnApi.getProfileId() + '/' + couponId;
-        $http.post(url, {}, { headers: gsnApi.getApiHeaders() }).success(function (response) {
+        $http.post(url, {}, {
+          headers: gsnApi.getApiHeaders()
+        }).success(function(response) {
           $saveData.takenCouponById[couponId] = true;
           $saveData.availableCouponById[couponId] = null;
-          deferred.resolve({ success: true, response: response });
+          deferred.resolve({
+            success: true,
+            response: response
+          });
           $rootScope.$broadcast('gsnevent:youtech-cardcoupon-added', couponId);
-        }).error(function (response) {
+        }).error(function(response) {
           handleFailureEvent('gsnevent:youtech-cardcoupon-addfail', deferred, couponId, response);
         });
       });
@@ -7507,18 +7505,23 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 
     function removeCouponFromCard(couponId) {
       var deferred = $q.defer();
-      gsnApi.getAccessToken().then(function () {
+      gsnApi.getAccessToken().then(function() {
         var url = $saveData.youtechCouponUrl + '/RemoveFromCard/' + gsnApi.getProfileId() + '/' + couponId;
-        $http.post(url, {}, { headers: gsnApi.getApiHeaders() }).success(function (response) {
+        $http.post(url, {}, {
+          headers: gsnApi.getApiHeaders()
+        }).success(function(response) {
           if (response.Success) {
             $saveData.availableCouponById[couponId] = true;
             $saveData.takenCouponById[couponId] = null;
-            deferred.resolve({ success: true, response: response });
+            deferred.resolve({
+              success: true,
+              response: response
+            });
             $rootScope.$broadcast('gsnevent:youtech-cardcoupon-removed', couponId);
           } else {
             handleFailureEvent('gsnevent:youtech-cardcoupon-removefail', deferred, couponId, response.Message);
           }
-        }).error(function (response) {
+        }).error(function(response) {
           handleFailureEvent('gsnevent:youtech-cardcoupon-removefail', deferred, couponId, response);
         });
       });
@@ -7526,9 +7529,15 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     }
 
     function loadCardCoupon() {
-      gsnApi.getAccessToken().then(function () {
+      if (!gsnApi.getConfig().hasDigitalCoupon) {
+        return;
+      }
+
+      gsnApi.getAccessToken().then(function() {
         var url = $saveData.youtechCouponUrl + '/GetProfileCoupons/' + gsnApi.getProfileId();
-        $http.get(url, { headers: gsnApi.getApiHeaders() }).success(function (response) {
+        $http.get(url, {
+          headers: gsnApi.getApiHeaders()
+        }).success(function(response) {
           // process card coupon response
           if (response.Success) {
             var i = 0;
@@ -7544,20 +7553,20 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
                   $saveData.availableCouponById[$saveData.cardCouponResponse.available_ids[i]] = true;
                 }
               }
-              
+
               if ($saveData.cardCouponResponse.takenCoupons) {
                 $saveData.takenCouponById = gsnApi.mapObject($saveData.cardCouponResponse.takenCoupons.coupon, 'couponId');
               }
 
               var toParse = gsnApi.isNull($saveData.cardCouponResponse.taken_ids, $saveData.cardCouponResponse.clipped_active_ids);
-              
+
               if (toParse) {
                 $saveData.takenCouponById = {};
                 for (i = 0; i < toParse.length; i++) {
                   $saveData.takenCouponById[toParse[i]] = true;
                 }
               }
-              
+
               // add clipped_redeemed_ids
               toParse = $saveData.cardCouponResponse.clipped_redeemed_ids;
               if (toParse) {
@@ -7568,21 +7577,21 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
                 }
               }
 
-            } catch (e) { }
+            } catch (e) {}
 
             $rootScope.$broadcast('gsnevent:youtech-cardcoupon-loaded', service);
             return;
           }
 
-		  $saveData = initData();
+          $saveData = initData();
           $rootScope.$broadcast('gsnevent:youtech-cardcoupon-loadfail', service);
-        }).error(function (response) {
+        }).error(function(response) {
           $saveData.isValidResponse = false;
           $rootScope.$broadcast('gsnevent:youtech-cardcoupon-loadfail', service);
         });
       });
     }
-    //#endregion
+  //#endregion
   }
 })(angular);
 

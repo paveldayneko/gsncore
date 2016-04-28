@@ -70,7 +70,6 @@
     LoggingServiceUrl: '/proxy/logging',
     YoutechCouponUrl: '/proxy/couponut',
     RoundyProfileUrl: '/proxy/roundy',
-    MidaxServiceUrl: '/proxy/midax',
     ApiUrl: '',
 
     // global config
@@ -85,11 +84,10 @@
     ContentBaseUrl: '/asset',
 
     ChainId: 0,
-    ChainName: 'Grocery Shopping Network',
+    ChainName: 'Brick, Inc.',
     DfpNetworkId: '/6394/digitalstore.test',
     GoogleTagId: null,
     GoogleAnalyticAccountId1: null,
-    GoogleAnalyticAccountId2: null,
     GoogleSiteVerificationId: null,
     RegistrationFromEmailAddress: 'tech@grocerywebsites.com',
     FacebookDisable: false,

@@ -152,10 +152,6 @@
       return gsn.config.LoggingServiceUrl;
     };
 
-    returnObj.getMidaxServiceUrl = function() {
-      return gsn.config.MidaxServiceUrl;
-    };
-
     returnObj.getUseLocalStorage = function() {
       return returnObj.isNull(gsn.config.UseLocalStorage, false);
     };
@@ -185,10 +181,6 @@
 
     returnObj.getGoogleAnalyticAccountId1 = function() {
       return returnObj.isNull(gsn.config.GoogleAnalyticAccountId1, '');
-    };
-
-    returnObj.getGoogleAnalyticAccountId2 = function() {
-      return returnObj.isNull(gsn.config.GoogleAnalyticAccountId2, '');
     };
 
     returnObj.getEmailRegEx = function() {
