@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.46
+ * version 1.7.47
  * gsncore repository
- * Build date: Thu Apr 28 2016 09:55:08 GMT-0500 (CDT)
+ * Build date: Thu Apr 28 2016 15:23:53 GMT-0500 (CDT)
  */
 ;(function() {
   'use strict';
@@ -4061,6 +4061,10 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     return service;
 
     function activate() {
+      if (!gsnApi.getConfig().hasPrintableCoupon) {
+        return;
+      }
+
       if (typeof (gcprinter) == 'undefined') {
         $log.log('waiting for gcprinter...');
         $timeout(activate, 500);
@@ -4122,6 +4126,10 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     }
 
     function init() {
+      if (!gsnApi.getConfig().hasPrintableCoupon) {
+        return;
+      }
+
       // do not need coupon printer for mobile
       if (gsnApi.isMobile) {
         return;
@@ -4182,7 +4190,6 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 
       $timeout(printInternal, 5);
     }
-    ;
 
     function printInternal() {
       if (!isPluginInstalled()) {

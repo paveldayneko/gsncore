@@ -21,6 +21,10 @@
     return service;
 
     function activate() {
+      if (!gsnApi.getConfig().hasPrintableCoupon) {
+        return;
+      }
+
       if (typeof (gcprinter) == 'undefined') {
         $log.log('waiting for gcprinter...');
         $timeout(activate, 500);
@@ -82,6 +86,10 @@
     }
 
     function init() {
+      if (!gsnApi.getConfig().hasPrintableCoupon) {
+        return;
+      }
+
       // do not need coupon printer for mobile
       if (gsnApi.isMobile) {
         return;
@@ -142,7 +150,6 @@
 
       $timeout(printInternal, 5);
     }
-    ;
 
     function printInternal() {
       if (!isPluginInstalled()) {
