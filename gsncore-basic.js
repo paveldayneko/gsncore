@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.47
+ * version 1.7.48
  * gsncore repository
- * Build date: Thu Apr 28 2016 15:23:53 GMT-0500 (CDT)
+ * Build date: Fri Apr 29 2016 10:26:27 GMT-0500 (CDT)
  */
 ;(function() {
   'use strict';
@@ -5545,10 +5545,6 @@
     }
 
     function loadCardCoupon() {
-      if (!gsnApi.getConfig().hasDigitalCoupon) {
-        return;
-      }
-
       gsnApi.getAccessToken().then(function() {
         var url = $saveData.youtechCouponUrl + '/GetProfileCoupons/' + gsnApi.getProfileId();
         $http.get(url, {

@@ -161,10 +161,6 @@
     }
 
     function loadCardCoupon() {
-      if (!gsnApi.getConfig().hasDigitalCoupon) {
-        return;
-      }
-
       gsnApi.getAccessToken().then(function() {
         var url = $saveData.youtechCouponUrl + '/GetProfileCoupons/' + gsnApi.getProfileId();
         $http.get(url, {
