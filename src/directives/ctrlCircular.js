@@ -185,7 +185,7 @@
       }
     });
 
-    $timeout(activate, 50);
+    $timeout(activate, 500);
     //#region Internal Methods   
     function sortMe(a, b) {
       if (a.rect.x <= b.rect.x) return a.rect.y - b.rect.y;
@@ -242,6 +242,8 @@
             $scope.allItems.push(item);
           }
         }
+      } else {
+        $timeout(activate, 500);
       }
     }
 
