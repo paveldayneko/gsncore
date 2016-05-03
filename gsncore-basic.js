@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.49
+ * version 1.7.50
  * gsncore repository
- * Build date: Mon May 02 2016 10:42:09 GMT-0500 (CDT)
+ * Build date: Tue May 03 2016 08:24:54 GMT-0500 (CDT)
  */
 ;(function() {
   'use strict';
@@ -596,7 +596,7 @@
 
     if (typeof (FacebookProvider) !== "undefined") {
       if (gsn.config.FacebookDisable) {
-        gsn.config.FacebookAppId = null;
+        FacebookProvider.init(gsn.config.FacebookAppId, false);
       } else {
         if (gsn.config.facebookVersion) {
           FacebookProvider.init({
@@ -2576,6 +2576,9 @@
 
       $scope.logoutWithPromt = $scope.logoutWithPrompt;
       $scope.goOutPromt = $scope.goOutPrompt;
+      $scope.print = function() {
+        $timeout($window.print, 50);
+      }
 
       $scope.doToggleCartItem = function(evt, item, linkedItem) {
         /// <summary>Toggle the shoping list item checked state</summary>
@@ -2612,7 +2615,7 @@
 
       $scope.$on('$routeChangeSuccess', function(evt, next, current) {
         if (typeof gmodal !== 'undefined') {
-          $timeout(function() { 
+          $timeout(function() {
             gmodal.hide();
           }, 50);
         }
@@ -2624,9 +2627,10 @@
         /// <param name="evt" type="Object">Event object</param>
         /// <param name="nxt" type="String">next location</param>
         /// <param name="current" type="String">current location</param>
-		
+
         var next = $route.routes[$location.path()];
-        if(!next) next = {};
+        if (!next)
+          next = {};
         // store the new route location
         $scope.currentPath = angular.lowercase(gsnApi.isNull($location.path(), ''));
         $scope.friendlyPath = $scope.currentPath.replace('/', '').replace(/\/+/gi, '-');
@@ -5764,6 +5768,259 @@
     //#endregion
   }
 })(angular);
+(function(angular, undefined) {
+  'use strict';
+
+  var myDirectiveName = 'ctrlCircular';
+
+  angular.module('gsn.core')
+    .controller(myDirectiveName, ['$scope', '$timeout', 'gsnStore', '$rootScope', '$location', 'gsnProfile', 'gsnApi', '$analytics', '$filter', myController])
+    .directive(myDirectiveName, myDirective);
+
+  function myDirective() {
+    var directive = {
+      restrict: 'EA',
+      scope: true,
+      controller: myDirectiveName
+    };
+
+    return directive;
+  }
+
+  function myController($scope, $timeout, gsnStore, $rootScope, $location, gsnProfile, gsnApi, $analytics, $filter) {
+    $scope.activate = activate;
+
+    $scope.pageId = 99; // it's always all items for desktop     
+    $scope.loadAll = $scope.loadAll || false;
+    $scope.itemsPerPage = $scope.itemsPerPage || 10;
+    $scope.sortBy = $scope.sortBy || 'CategoryName';
+    $scope.sortByName = $scope.sortByName || 'Department';
+    $scope.actualSortBy = $scope.sortBy;
+
+    $scope.allItems = [];
+    $scope.loadMore = loadMore;
+    $scope.vm = {
+      currentPage: 1,
+      pageCount: 1,
+      loadCount: 0,
+      cacheItems: [],
+      digitalCirc: null,
+      filterBy: $location.search().q,
+      filter: {},
+      pageIdx: 0,
+      circIdx: 0
+    };
+
+    function activate() {
+      if ($scope.vm.digitalCirc) {
+        return;
+      }
+
+      var config = gsnApi.getConfig();
+      if ($scope.currentPath == '/circular' && (gsnApi.isNull(config.defaultMobileListView, null) === null)) {
+        config.defaultMobileListView = true;
+        var mobileListViewUrl = gsnApi.getThemeConfigDescription('default-mobile-listview');
+        if (gsnApi.browser.isMobile && mobileListViewUrl) {
+          gsnApi.goUrl(mobileListViewUrl);
+          return;
+        }
+      }
+
+      // broadcast message
+      $rootScope.$broadcast('gsnevent:loadads');
+
+      if (gsnStore.hasCompleteCircular()) {
+        var data = gsnStore.getCircularData();
+
+        //Filter circulars
+        if (data.Circulars.length > 0) {
+          var filteredByStoreCircs = []
+          var storeId = gsnApi.isNull(gsnApi.getSelectedStoreId(), 0);
+          angular.forEach(data.Circulars, function(circ) {
+            if (gsn.contains(circ.StoreIds, storeId)) {
+              filteredByStoreCircs.push(circ);
+            }
+          });
+          data.Circulars = filteredByStoreCircs;
+        } else {
+          return;
+        }
+
+        var myPageIdx = parseInt($location.search().p || $location.search().pg || 0);
+        var myCircIdx = parseInt($location.search().c || 0);
+        if (data.Circulars.length == 1) {
+          myCircIdx = myCircIdx || 1;
+          myPageIdx = myPageIdx || 1;
+        }
+
+        $scope.doSearchInternal();
+        $scope.vm.digitalCirc = data;
+        $scope.vm.circIdx = myCircIdx;
+        $scope.vm.pageIdx = myPageIdx;
+      }
+    }
+
+    $scope.doAddCircularItem = function(evt, tempItem) {
+      var item = gsnStore.getItem(tempItem.ItemId);
+      if (item) {
+        gsnProfile.addItem(item);
+
+        if (gsnApi.isNull(item.Varieties, null) === null) {
+          item.Varieties = [];
+        }
+
+        $scope.vm.selectedItem = item;
+        $scope.gvm.selectedItem = item;
+      }
+    };
+
+    $scope.doToggleCircularItem = function(evt, tempItem) {
+      if ($scope.isOnList(tempItem)) {
+        gsnProfile.removeItem(tempItem);
+      } else {
+        $scope.doAddCircularItem(evt, tempItem);
+      }
+    };
+
+    $scope.toggleSort = function(sortBy) {
+      $scope.sortBy = sortBy;
+      var reverse = (sortBy == $scope.actualSortBy);
+      $scope.actualSortBy = ((reverse) ? '-' : '') + sortBy;
+      $scope.doSearchInternal();
+    };
+
+    $scope.getIndex = function(step) {
+      var newIndex = parseInt($scope.vm.pageIdx || 1) + step;
+      if (newIndex > $scope.vm.pageCount) {
+        newIndex = 1;
+      } else if (newIndex < 1) {
+        newIndex = $scope.vm.pageCount;
+      }
+
+      return newIndex;
+    };
+
+    $scope.$on('gsnevent:shoppinglist-loaded', activate);
+    $scope.$on('gsnevent:digitalcircular-itemselect', $scope.doAddCircularItem);
+
+    $scope.$watch('vm.selectedItem', function(newValue, oldValue) {
+      if (newValue) {
+        if (gsnApi.isNull(newValue.Varieties, []).length > 0) return;
+        if (newValue.LinkedItemCount <= 0) return;
+
+        gsnStore.getAvailableVarieties(newValue.ItemId).then(function(result) {
+          if (result.success) {
+            // this is affecting the UI so render it on the UI thread
+            $timeout(function() {
+              newValue.Varieties = result.response;
+            }, 0);
+          }
+        });
+      }
+    });
+
+    $scope.doSearchInternal = function() {
+      var circularType = gsnStore.getCircular($scope.pageId);
+      var list = gsnProfile.getShoppingList();
+
+      // don't show circular until data and list are both loaded
+      if (gsnApi.isNull(circularType, null) === null || gsnApi.isNull(list, null) === null) return;
+
+      var result1 = $filter('filter')(circularType.items, $scope.vm.filter);
+      var result = $filter('orderBy')($filter('filter')(result1, $scope.vm.filterBy || ''), $scope.actualSortBy);
+      if (!$scope.vm.circularType) {
+        $scope.vm.circularType = circularType;
+        $scope.vm.categories = gsnApi.groupBy(circularType.items, 'CategoryName');
+        $scope.vm.brands = gsnApi.groupBy(circularType.items, 'BrandName');
+      }
+
+      $scope.vm.cacheItems = result;
+      $scope.vm.pageCount = Math.ceil(result.length / $scope.itemsPerPage);
+      $scope.allItems = [];
+      loadMore();
+    };
+
+    $scope.$watch('vm.filterBy', $scope.doSearchInternal);
+    $scope.$watch('vm.filter.BrandName', $scope.doSearchInternal);
+    $scope.$watch('vm.filter.CategoryName', $scope.doSearchInternal);
+    $scope.$watch('vm.pageIdx', setPage);
+    $scope.$watch('vm.circIdx', setPage);
+
+    $scope.$on('gsnevent:circular-loaded', function(event, data) {
+      if (data.success) {
+        $scope.vm.noCircular = false;
+        $timeout(activate, 500);
+      } else {
+        $scope.vm.noCircular = true;
+      }
+    });
+
+    $timeout(activate, 500);
+    //#region Internal Methods   
+    function sortMe(a, b) {
+      if (a.rect.x <= b.rect.x) return a.rect.y - b.rect.y;
+      return a.rect.x - b.rect.x;
+    }
+
+    function setPage(oldValue, newValue) {
+      if (!$scope.vm.digitalCirc) return;
+      if (!$scope.vm.digitalCirc.Circulars) return;
+      if ($scope.vm.digitalCirc.Circulars.length <= 0) return;
+
+      $scope.vm.circular = $scope.vm.digitalCirc.Circulars[$scope.vm.circIdx - 1];
+      if ($scope.vm.circular) {
+        $scope.vm.pageCount = $scope.vm.circular.Pages.length;
+        $scope.vm.page = $scope.vm.circular.Pages[$scope.vm.pageIdx - 1];
+        if (!$scope.vm.page.sorted) {
+          $scope.vm.page.Items.sort(sortMe);
+          $scope.vm.page.sorted = true;
+        }
+      }
+      if (oldValue != newValue) {
+        var pageIdx = gsnApi.isNull($scope.vm.pageIdx, 1);
+        // must use timeout to sync with UI thread
+        $timeout(function() {
+          // trigger ad refresh for circular page changed
+          $rootScope.$broadcast('gsnevent:digitalcircular-pagechanging', {
+            circularIndex: $scope.vm.circIdx,
+            pageIndex: pageIdx
+          });
+        }, 50);
+
+        var circ = $scope.vm.circular;
+        if (circ) {
+          $analytics.eventTrack('PageChange', {
+            category: 'Circular_Type' + circ.CircularTypeId + '_P' + pageIdx,
+            label: circ.CircularDescription
+          });
+        }
+      }
+    }
+
+    function loadMore() {
+      var items = $scope.vm.cacheItems || [];
+      if (items.length > 0) {
+        var itemsToLoad = $scope.itemsPerPage;
+        if ($scope.loadAll) {
+          itemsToLoad = items.length;
+        }
+
+        var last = $scope.allItems.length - 1;
+        for (var i = 1; i <= itemsToLoad; i++) {
+          var item = items[last + i];
+          if (item) {
+            $scope.allItems.push(item);
+          }
+        }
+      } else {
+        $timeout(activate, 500);
+      }
+    }
+
+  //#endregion
+  }
+})(angular);
+
 (function (angular, undefined) {
   'use strict';
 
@@ -5914,6 +6171,133 @@
     }
   }
 })(angular);
+(function (angular, undefined) {
+  'use strict';
+
+  var myDirectiveName = 'ctrlEmail';
+
+  angular.module('gsn.core')
+    .controller(myDirectiveName, ['$scope', 'gsnStore', 'gsnApi', 'gsnProfile', myController])
+    .directive(myDirectiveName, myDirective);
+
+  function myDirective() {
+    var directive = {
+      restrict: 'EA',
+      scope: true,
+      controller: myDirectiveName
+    };
+
+    return directive;
+  }
+
+  function myController($scope, gsnStore, gsnApi, gsnProfile) {
+    $scope.activate = activate;
+    $scope.emailShoppingList = doEmailShoppingList;
+    $scope.email = {};
+    $scope.vm = { Message: '' };
+    $scope.totalSavings = '';
+
+    $scope.hasSubmitted = false;    // true when user has click the submit button
+    $scope.isValidSubmit = true;    // true when result of submit is valid
+    $scope.isSubmitting = false;    // true if we're waiting for result from server
+
+    function activate() {
+      gsnStore.getManufacturerCouponTotalSavings().then(function (rst) {
+        if (rst.success) {
+          $scope.totalSavings = gsnApi.isNaN(parseFloat(rst.response), 0.00).toFixed(2);
+        }
+      });
+
+      gsnProfile.getProfile().then(function (p) {
+        if (p.success) {
+          var profile = gsnApi.isNull(angular.copy(p.response), {});
+
+          var email = $scope.email;
+          email.FirstName = profile.FirstName;
+          email.ChainName = gsnApi.getChainName();
+          email.CopyrightYear = (new Date()).getFullYear();
+          email.ManufacturerCouponTotalSavings = '$' + $scope.totalSavings;
+          email.FromEmail = gsnApi.getRegistrationFromEmailAddress();
+
+          $scope.vm = angular.copy(email, $scope.vm);
+          $scope.vm.Message = '';
+          $scope.vm.Name = (gsnApi.isNull(profile.FirstName, '') + ' ' + gsnApi.isNull(profile.LastName, '')).replace(/^\s+/gi, '');
+          $scope.vm.EmailFrom = gsnApi.isNull(profile.Email, '');
+        }
+      });
+    }
+
+    $scope.activate();
+
+    //#region Internal Methods        
+    function doEmailShoppingList() {
+      /// <summary>submit handler for sending shopping list email</summary> 
+
+      var payload = angular.copy($scope.vm);
+      if ($scope.myForm.$valid) {
+        $scope.hasSubmitted = true;
+        payload.Message = 'You are receiving this message because ' + payload.EmailFrom + ' created a shopping list for you to see.<br/>' + payload.Message.replace(/\n+/gi, '<br/>');
+        gsnProfile.sendEmail(payload).then(function (rsp) {
+          $scope.isValidSubmit = rsp.success;
+        });
+      }
+    }
+    //#endregion
+  }
+
+})(angular);
+(function (angular, undefined) {
+  'use strict';
+
+  var myDirectiveName = 'ctrlEmailPreview';
+
+  angular.module('gsn.core')
+    .controller(myDirectiveName, ['$scope', 'gsnStore', 'gsnApi', 'gsnProfile', '$location', myController])
+    .directive(myDirectiveName, myDirective);
+
+  // directive for previewing email
+  function myDirective() {
+    var directive = {
+      restrict: 'EA',
+      scope: true,
+      controller: myDirectiveName
+    };
+
+    return directive;
+  }
+
+  function myController($scope, gsnStore, gsnApi, gsnProfile, $location) {
+    $scope.activate = activate;
+    $scope.email = {};
+    $scope.totalSavings = '';
+
+    function activate() {
+      gsnStore.getManufacturerCouponTotalSavings().then(function (rst) {
+        if (rst.success) {
+          $scope.totalSavings = gsnApi.isNaN(parseFloat(rst.response), 0.00).toFixed(2);
+          $scope.email.ManufacturerCouponTotalSavings = '$' + $scope.totalSavings;
+        }
+      });
+
+      gsnProfile.getProfile().then(function (p) {
+        if (p.success) {
+          var profile = gsnApi.isNull(angular.copy(p.response), {});
+
+          var email = $scope.email;
+          email.FirstName = profile.FirstName;
+          email.ChainName = gsnApi.getChainName();
+          email.CopyrightYear = (new Date()).getFullYear();
+          email.ManufacturerCouponTotalSavings = '$' + $scope.totalSavings;
+          email.FromEmail = gsnApi.getRegistrationFromEmailAddress();
+          angular.copy($location.search(), email);
+        }
+      });
+    }
+
+    $scope.activate();
+  }
+})(angular);
+
 (function (angular, undefined) {
   'use strict';
 

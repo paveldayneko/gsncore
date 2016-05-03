@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.49
+ * version 1.7.50
  * gsncore repository
- * Build date: Mon May 02 2016 10:42:09 GMT-0500 (CDT)
+ * Build date: Tue May 03 2016 08:24:54 GMT-0500 (CDT)
  */
 ;(function() {
   'use strict';
@@ -596,7 +596,7 @@
 
     if (typeof (FacebookProvider) !== "undefined") {
       if (gsn.config.FacebookDisable) {
-        gsn.config.FacebookAppId = null;
+        FacebookProvider.init(gsn.config.FacebookAppId, false);
       } else {
         if (gsn.config.facebookVersion) {
           FacebookProvider.init({
@@ -4521,6 +4521,9 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 
       $scope.logoutWithPromt = $scope.logoutWithPrompt;
       $scope.goOutPromt = $scope.goOutPrompt;
+      $scope.print = function() {
+        $timeout($window.print, 50);
+      }
 
       $scope.doToggleCartItem = function(evt, item, linkedItem) {
         /// <summary>Toggle the shoping list item checked state</summary>
@@ -4557,7 +4560,7 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 
       $scope.$on('$routeChangeSuccess', function(evt, next, current) {
         if (typeof gmodal !== 'undefined') {
-          $timeout(function() { 
+          $timeout(function() {
             gmodal.hide();
           }, 50);
         }
@@ -4569,9 +4572,10 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
         /// <param name="evt" type="Object">Event object</param>
         /// <param name="nxt" type="String">next location</param>
         /// <param name="current" type="String">current location</param>
-		
+
         var next = $route.routes[$location.path()];
-        if(!next) next = {};
+        if (!next)
+          next = {};
         // store the new route location
         $scope.currentPath = angular.lowercase(gsnApi.isNull($location.path(), ''));
         $scope.friendlyPath = $scope.currentPath.replace('/', '').replace(/\/+/gi, '-');

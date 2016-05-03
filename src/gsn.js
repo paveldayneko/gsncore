@@ -590,7 +590,7 @@
 
     if (typeof (FacebookProvider) !== "undefined") {
       if (gsn.config.FacebookDisable) {
-        gsn.config.FacebookAppId = null;
+        FacebookProvider.init(gsn.config.FacebookAppId, false);
       } else {
         if (gsn.config.facebookVersion) {
           FacebookProvider.init({
