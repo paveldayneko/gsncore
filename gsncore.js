@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.50
+ * version 1.7.51
  * gsncore repository
- * Build date: Tue May 03 2016 08:24:54 GMT-0500 (CDT)
+ * Build date: Wed May 04 2016 06:59:35 GMT-0500 (CDT)
  */
 ;(function() {
   'use strict';
@@ -8224,6 +8224,15 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
     });
 
     $timeout(activate, 500);
+
+    // activate again in 5 seconds if not responsive
+    $timeout(function() {
+      var items = $scope.vm.cacheItems || [];
+      if (items.length <= 0) {
+        activate();
+      }
+    }, 5000);
+
     //#region Internal Methods   
     function sortMe(a, b) {
       if (a.rect.x <= b.rect.x) return a.rect.y - b.rect.y;
@@ -8280,8 +8289,6 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
             $scope.allItems.push(item);
           }
         }
-      } else {
-        $timeout(activate, 500);
       }
     }
 
