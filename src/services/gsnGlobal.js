@@ -158,8 +158,8 @@
 
       $scope.logoutWithPromt = $scope.logoutWithPrompt;
       $scope.goOutPromt = $scope.goOutPrompt;
-      $scope.print = function() {
-        $timeout($window.print, 50);
+      $scope.print = function(timeout) {
+        setTimeout($window.print, timeout || 5000);
       }
 
       $scope.doToggleCartItem = function(evt, item, linkedItem) {

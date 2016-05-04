@@ -1,8 +1,8 @@
 /*!
  * gsncore
- * version 1.7.51
+ * version 1.8.0
  * gsncore repository
- * Build date: Wed May 04 2016 06:59:35 GMT-0500 (CDT)
+ * Build date: Wed May 04 2016 12:36:44 GMT-0500 (CDT)
  */
 ;(function() {
   'use strict';
@@ -4521,8 +4521,8 @@ var mod;mod=angular.module("infinite-scroll",[]),mod.directive("infiniteScroll",
 
       $scope.logoutWithPromt = $scope.logoutWithPrompt;
       $scope.goOutPromt = $scope.goOutPrompt;
-      $scope.print = function() {
-        $timeout($window.print, 50);
+      $scope.print = function(timeout) {
+        setTimeout($window.print, timeout || 5000);
       }
 
       $scope.doToggleCartItem = function(evt, item, linkedItem) {
