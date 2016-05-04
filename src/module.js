@@ -118,7 +118,7 @@
         return url;
       }
 
-      return url.replace('clientapi.gsn2.com/', 'clientapi.gsngrocers.com/').replace('https://', $location.protocol() + '://');
+      return url.replace('https://', $location.protocol() + '://');
     };
 
     returnObj.getDefaultLayout = function(defaultUrl) {

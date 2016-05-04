@@ -26,7 +26,7 @@
       if ($localStorage.hasMobileApp)
         return;
 
-      var url = '//clientapi.gsngrocers.com/api/v1/content/meta/' + gsnApi.getChainId() + '/?name=home%20page&meta=mobileAppPage&type=text/html&nocache=';
+      var url = '//clientapi.gsn2.com/api/v1/content/meta/' + gsnApi.getChainId() + '/?name=home%20page&meta=mobileAppPage&type=text/html&nocache=';
       var today = new Date();
       var nocache = today.getFullYear() + '' + today.getMonth() + '' + today.getDate() + '' + today.getHours();
 
