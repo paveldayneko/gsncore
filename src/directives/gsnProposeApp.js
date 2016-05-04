@@ -20,13 +20,13 @@
       scope.isAndroid = gsnApi.browser.isAndroid;
 
       // going to show this popUp only for iOs and Android users
-       if (!gsnApi.browser.isMobile && !(scope.isIOS||scope.isAndroid))
-         return;
+      if (!gsnApi.browser.isMobile && !(scope.isIOS || scope.isAndroid))
+        return;
 
-       if ($localStorage.hasMobileApp)
-         return;
+      if ($localStorage.hasMobileApp)
+        return;
 
-      var url = 'http://clientapi.gsngrocers.com/api/v1/content/meta/' + gsnApi.getChainId() + '/?name=home%20page&meta=mobileAppPage&type=text/html&nocache=';
+      var url = '//clientapi.gsngrocers.com/api/v1/content/meta/' + gsnApi.getChainId() + '/?name=home%20page&meta=mobileAppPage&type=text/html&nocache=';
       var today = new Date();
       var nocache = today.getFullYear() + '' + today.getMonth() + '' + today.getDate() + '' + today.getHours();
 
